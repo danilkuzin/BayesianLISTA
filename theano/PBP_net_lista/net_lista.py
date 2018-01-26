@@ -7,9 +7,9 @@ import gzip
 
 import pbp
 
-class PBP_net_lista:
+class net_lista:
 
-    def __init__(self, X_train, y_train, n_hidden, n_epochs = 40,
+    def __init__(self, Beta_train, Y_train, L, n_epochs = 40,
         normalize = False):
 
         """
@@ -35,31 +35,34 @@ class PBP_net_lista:
         # deviation in the training set if necessary
 
         if normalize:
-            self.std_X_train = np.std(X_train, 0)
-            self.std_X_train[ self.std_X_train == 0 ] = 1
-            self.mean_X_train = np.mean(X_train, 0)
+            self.std_Beta_train = np.std(Beta_train, 0)
+            self.std_Beta_train[ self.std_Beta_train == 0 ] = 1
+            self.mean_Beta_train = np.mean(Beta_train, 0)
         else:
-            self.std_X_train = np.ones(X_train.shape[ 1 ])
-            self.mean_X_train = np.zeros(X_train.shape[ 1 ])
+            self.std_Beta_train = np.ones(Beta_train.shape[ 1 ])
+            self.mean_Beta_train = np.zeros(Beta_train.shape[ 1 ])
 
-        X_train = (X_train - np.full(X_train.shape, self.mean_X_train)) / \
-            np.full(X_train.shape, self.std_X_train)
+        Beta_train = (Beta_train - np.full(Beta_train.shape, self.mean_Beta_train)) / \
+            np.full(Beta_train.shape, self.std_Beta_train)
 
-        self.mean_y_train = np.mean(y_train)
-        self.std_y_train = np.std(y_train)
+        self.mean_Y_train = np.mean(Y_train)
+        self.std_Y_train = np.std(Y_train)
 
-        y_train_normalized = (y_train - self.mean_y_train) / self.std_y_train
+        Y_train_normalized = (Y_train - self.mean_Y_train) / self.std_Y_train
 
         # We construct the network
 
-        n_units_per_layer = \
-            np.concatenate(([ X_train.shape[ 1 ] ], n_hidden, [ 1 ]))
+        # n_units_per_layer = \
+        #     np.concatenate(([ X_train.shape[ 1 ] ], n_hidden, [ 1 ]))
+
+        N, D = Beta_train.shape
+        N, K = Y_train.shape
         self.pbp_instance = \
-            pbp.PBP_lista(n_units_per_layer, self.mean_y_train, self.std_y_train)
+            pbp.PBP_lista(L, D, K, self.mean_Y_train, self.std_Y_train)
 
         # We iterate the learning process
 
-        self.pbp_instance.do_pbp(X_train, y_train_normalized, n_epochs)
+        self.pbp_instance.do_pbp(Beta_train, Y_train_normalized, n_epochs)
 
         # We are done!
 
