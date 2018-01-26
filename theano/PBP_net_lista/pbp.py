@@ -1,4 +1,3 @@
-
 import sys
 
 import math
@@ -13,9 +12,13 @@ import network
 
 import prior
 
+
 class PBP_lista:
 
     def __init__(self, L, D, K, mean_y_train, std_y_train):
+
+        self.D = D
+        self.K = K
 
         var_targets = 1
         self.std_y_train = std_y_train
@@ -31,14 +34,14 @@ class PBP_lista:
 
         thr_lambda = 0.1
 
-        self.network = network.Network(params[ 'W_M' ], params[ 'W_V' ], params[ 'S_M' ], params[ 'S_V' ], thr_lambda,
-                                       params[ 'a' ], params[ 'b' ], D, K)
+        self.network = network.Network(params['W_M'], params['W_V'], params['S_M'], params['S_V'], thr_lambda,
+                                       params['a'], params['b'], D, K)
 
         # We create the input and output variables in theano
 
         self.y = T.vector('y')
         self.beta = T.vector('beta')
-        
+
         # A function for computing the value of logZ, logZ1 and logZ2
 
         self.Z, self.Z1, self.Z2 = \
@@ -46,14 +49,14 @@ class PBP_lista:
 
         # We create a theano function for updating the posterior
 
-        self.adf_update = theano.function([ self.beta, self.y ], self.Z,
-            updates = self.network.generate_updates(self.Z, self.Z1,
-            self.Z2))
+        self.adf_update = theano.function([self.beta, self.y], self.Z,
+                                          updates=self.network.generate_updates(self.Z, self.Z1,
+                                                                                self.Z2))
 
         # We greate a theano function for the network predictive distribution
 
-        self.predict_probabilistic = theano.function([ self.y ],
-            self.network.output_probabilistic(self.y))
+        self.predict_probabilistic = theano.function([self.y],
+                                                     self.network.output_probabilistic(self.y))
 
         # self.predict_deterministic = theano.function([ self.x ],
         #     self.network.output_deterministic(self.x))
@@ -76,7 +79,6 @@ class PBP_lista:
             sys.stdout.flush()
 
             for i in range(int(n_iterations) - 1):
-
                 # We do one more pass
 
                 params = self.prior.get_params()
@@ -93,39 +95,43 @@ class PBP_lista:
 
     def get_deterministic_output(self, X_test):
 
-        output = np.zeros(X_test.shape[ 0 ])
-        for i in range(X_test.shape[ 0 ]):
-            output[ i ] = self.predict_deterministic(X_test[ i, : ])
-            output[ i ] = output[ i ] * self.std_y_train + self.mean_y_train
+        output = np.zeros(X_test.shape[0])
+        for i in range(X_test.shape[0]):
+            output[i] = self.predict_deterministic(X_test[i, :])
+            output[i] = output[i] * self.std_y_train + self.mean_y_train
 
         return output
 
-    def get_predictive_mean_and_variance(self, X_test):
+    def get_predictive_omega_mean_and_variance(self, Y_test):
 
-        mean = np.zeros(X_test.shape[ 0 ])
-        variance = np.zeros(X_test.shape[ 0 ])
-        for i in range(X_test.shape[ 0 ]):
-            m, v = self.predict_probabilistic(X_test[ i, : ])
-            m = m * self.std_y_train + self.mean_y_train
-            v = v * self.std_y_train**2
-            mean[ i ] = m
-            variance[ i ] = v
+        mean = np.zeros((Y_test.shape[0], self.D))
+        variance = np.zeros((Y_test.shape[0], self.D))
+        omega = np.zeros((Y_test.shape[0], self.D))
+
+        for i in range(Y_test.shape[0]):
+            w, m, v = self.predict_probabilistic(Y_test[i, :])
+            # m = m * self.std_y_train + self.mean_y_train
+            # v = v * self.std_y_train ** 2
+            print('prediction {0}\n. w:{1}\n, m:{2}\n, v:{3}\n. Input was:{4}\n'.format(i, w, m, v, Y_test[i, :]))
+            mean[i] = m
+            variance[i] = v
+            omega[i] = w
 
         v_noise = self.network.b.get_value() / \
-            (self.network.a.get_value() - 1) * self.std_y_train**2
+                  (self.network.a.get_value() - 1) * self.std_y_train ** 2
 
-        return mean, variance, v_noise
+        return omega, mean, variance, v_noise
 
     def do_first_pass(self, Beta, Y):
 
-        permutation = np.random.choice(range(Beta.shape[ 0 ]), Beta.shape[ 0 ],
-            replace = False)
+        permutation = np.random.choice(range(Beta.shape[0]), Beta.shape[0],
+                                       replace=False)
 
         counter = 0
         for i in permutation:
 
             old_params = self.network.get_params()
-            Z = self.adf_update(Beta[ i, : ], Y[ i, : ])
+            Z = self.adf_update(Beta[i, :], Y[i, :])
             new_params = self.network.get_params()
             self.network.remove_invalid_updates(new_params, old_params)
             self.network.set_params(new_params)

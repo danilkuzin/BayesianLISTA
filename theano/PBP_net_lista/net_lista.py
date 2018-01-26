@@ -45,8 +45,8 @@ class net_lista:
         Beta_train = (Beta_train - np.full(Beta_train.shape, self.mean_Beta_train)) / \
             np.full(Beta_train.shape, self.std_Beta_train)
 
-        self.mean_Y_train = np.mean(Y_train)
-        self.std_Y_train = np.std(Y_train)
+        self.mean_Y_train = np.mean(Y_train, axis=0)
+        self.std_Y_train = np.std(Y_train, axis=0)
 
         Y_train_normalized = (Y_train - self.mean_Y_train) / self.std_Y_train
 
@@ -87,7 +87,7 @@ class net_lista:
 
         self.pbp_instance.do_pbp(X_train, y_train_normalized, n_epochs)
 
-    def predict(self, X_test):
+    def predict(self, Y_test):
 
         """
             Function for making predictions with the Bayesian neural network.
@@ -102,21 +102,21 @@ class net_lista:
 
         """
 
-        X_test = np.array(X_test, ndmin = 2)
+        Y_test = np.array(Y_test, ndmin = 2)
 
         # We normalize the test set
 
-        X_test = (X_test - np.full(X_test.shape, self.mean_X_train)) / \
-            np.full(X_test.shape, self.std_X_train)
+        Y_test = (Y_test - np.full(Y_test.shape, self.mean_Y_train)) / \
+            np.full(Y_test.shape, self.std_Y_train)
 
         # We compute the predictive mean and variance for the target variables
         # of the test data
 
-        m, v, v_noise = self.pbp_instance.get_predictive_mean_and_variance(X_test)
+        w, m, v, v_noise = self.pbp_instance.get_predictive_omega_mean_and_variance(Y_test)
 
         # We are done!
 
-        return m, v, v_noise
+        return w, m, v, v_noise
 
     def predict_deterministic(self, X_test):
 

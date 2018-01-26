@@ -32,6 +32,7 @@ class Network:
             self.params_thr_lambda.append(layer.thr_lambda)
 
         # TODO must be vector of dim(beta)
+        # TODO 2 but we update it as scalar in generate updates, as Z are scalar
         self.a = theano.shared(value=a_init)
         self.b = theano.shared(value=b_init)
 
@@ -44,7 +45,7 @@ class Network:
         for layer in self.layers:
             w, m, v = layer.output_probabilistic(w, m, v, y)
 
-        return w[0], m[0], v[0]
+        return w, m, v
 
     def Z_Z1_Z2(self, beta, y):
 
@@ -63,12 +64,12 @@ class Network:
         nu_student1 = 2 * (self.a + 1)
         nu_student2 = 2 * (self.a + 2)
 
-        Z = (w * T.prod(network_layer.student_pdf(beta, mu_student, v_student, nu_student))
-             + (1 - w) * T.prod(network_layer.n_pdf(beta, m, v_final)))
-        Z1 = (w * T.prod(network_layer.student_pdf(beta, mu_student, v_student1, nu_student1))
-              + (1 - w) * T.prod(network_layer.n_pdf(beta, m, v_final1)))
-        Z2 = (w * T.prod(network_layer.student_pdf(beta, mu_student, v_student2, nu_student2))
-              + (1 - w) * T.prod(network_layer.n_pdf(beta, m, v_final2)))
+        Z = T.prod(w * network_layer.student_pdf(beta, mu_student, v_student, nu_student)
+            + (1 - w) * network_layer.n_pdf(beta, m, v_final))
+        Z1 = T.prod(w * network_layer.student_pdf(beta, mu_student, v_student1, nu_student1)
+             + (1 - w) * network_layer.n_pdf(beta, m, v_final1))
+        Z2 = T.prod(w * network_layer.student_pdf(beta, mu_student, v_student2, nu_student2)
+             + (1 - w) * network_layer.n_pdf(beta, m, v_final2))
 
         return Z, Z1, Z2
 

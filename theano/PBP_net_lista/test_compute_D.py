@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def random_spike_and_slab(mean, std, omega_prob):
-    omega = np.random.binomial(np.ones_like(omega_prob).astype(np.int), omega_prob)
-
-    beta = np.random.normal(mean, std) * (np.ones_like(omega) - omega)
-
-    return beta
+# def random_spike_and_slab(mean, std, omega_prob):
+#     omega = np.random.binomial(np.ones_like(omega_prob).astype(np.int), omega_prob)
+#
+#     beta = np.random.normal(mean, std) * (np.ones_like(omega) - omega)
+#
+#     return beta
 
 
 def compute_D_normal(S_M, S_V, z_m_prev, z_v_prev):
