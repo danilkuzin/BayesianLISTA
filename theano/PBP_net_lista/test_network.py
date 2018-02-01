@@ -32,18 +32,18 @@ network = network.Network(W_M, W_V, S_M, S_V, thr_lambda, a_w, b_w, D, K)
 
 y = np.random.randn(K)
 print('t')
-for t in network.output_probabilistic(y):
-    print(t.eval())
+# for t in network.output_probabilistic(y):
+    # print(t.eval())
 
 beta = np.random.randn(D)
 print('z')
-res_z = network.Z_Z1_Z2(beta, y)
-for z in res_z:
-    print(z.eval())
+res_z = network.logZ_Z1_Z2(beta, y)
+# for z in res_z:
+#     print(theano.printing.pp(z))
 
-Z = res_z[0]
-Z1 = res_z[1]
-Z2 = res_z[2]
-updates = network.generate_updates(Z, Z1, Z2)
+logZ = res_z[0]
+logZ1 = res_z[1]
+logZ2 = res_z[2]
+updates = network.generate_updates(logZ, logZ1, logZ2)
 print('u')
-print(updates)
+print((updates[0])[1])

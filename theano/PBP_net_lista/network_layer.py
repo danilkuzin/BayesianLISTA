@@ -66,3 +66,23 @@ class Network_layer:
         C_m, C_v = self.compute_C(B_m, B_v, D_m, D_v)
         z_new_w, z_new_m, z_new_v = self.compute_new_z(C_m, C_v)
         return z_new_w, z_new_m, z_new_v
+
+    def output_deterministic(self, output_previous):
+
+        # We add an additional input with value 1
+
+        output_previous_with_bias = \
+            T.concatenate([ output_previous, T.alloc(1, 1) ], 0) / \
+            T.sqrt(self.n_inputs)
+
+        # We compute the mean and variance after the linear operation
+
+        a = T.dot(self.w, output_previous_with_bias)
+
+        if (self.non_linear):
+
+            # We compute the ReLU activation
+
+            a = T.switch(T.lt(a, T.fill(a, 0)), T.fill(a, 0), a)
+
+        return a

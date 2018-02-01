@@ -112,7 +112,7 @@ class PBP_lista:
             w, m, v = self.predict_probabilistic(Y_test[i, :])
             # m = m * self.std_y_train + self.mean_y_train
             # v = v * self.std_y_train ** 2
-            print('prediction {0}\n. w:{1}\n, m:{2}\n, v:{3}\n. Input was:{4}\n'.format(i, w, m, v, Y_test[i, :]))
+            # print('prediction {0}\n. w:{1}\n, m:{2}\n, v:{3}\n. Input was:{4}\n'.format(i, w, m, v, Y_test[i, :]))
             mean[i] = m
             variance[i] = v
             omega[i] = w
