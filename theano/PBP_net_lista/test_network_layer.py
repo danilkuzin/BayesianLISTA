@@ -216,3 +216,12 @@ class TestNetwork_layer(TestCase):
         z_omega_new, z_m_new, z_v_new = fprop_func(self.z_omega, self.z_m, self.z_v, self.np_y)
         print('z_omega_new:{0}\n, z_m_new:{1}\n, z_v_new:{2}'.format(z_omega_new, z_m_new, z_v_new))
 
+    def test_output_deterministic(self):
+        y = T.vector()
+        out_prev = T.vector()
+
+        out_prev_np = 2 * np.ones((self.D))
+
+        fprop_func = theano.function([out_prev, y], self.layer.output_deterministic(out_prev, y))
+        out_cur = fprop_func(out_prev_np, self.np_y)
+        print('out_cur:{}'.format(out_cur))

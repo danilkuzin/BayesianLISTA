@@ -37,12 +37,12 @@ class Network:
         self.a = theano.shared(float(a_init))
         self.b = theano.shared(float(b_init))
 
-    def output_deterministic(self, x):
+    def output_deterministic(self, x, y):
 
         # Recursively compute output
 
         for layer in self.layers:
-            x = layer.output_deterministic(x)
+            x = layer.output_deterministic(x, y)
 
         return x
 

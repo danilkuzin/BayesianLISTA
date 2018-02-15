@@ -53,7 +53,7 @@ class PBP:
             self.network.output_probabilistic(self.x))
 
         self.predict_deterministic = theano.function([ self.x ],
-            self.network.output_deterministic(self.x))
+            self.network.output_deterministic(self.x, self.y))
 
     def do_pbp(self, X_train, y_train, n_iterations):
 
@@ -88,11 +88,11 @@ class PBP:
                 sys.stdout.write('{}\n'.format(i + 1))
                 sys.stdout.flush()
 
-    def get_deterministic_output(self, X_test):
+    def get_deterministic_output(self, X_test, Y_test):
 
         output = np.zeros(X_test.shape[ 0 ])
         for i in range(X_test.shape[ 0 ]):
-            output[ i ] = self.predict_deterministic(X_test[ i, : ])
+            output[ i ] = self.predict_deterministic(X_test[ i, : ], Y_test[i, :])
             output[ i ] = output[ i ] * self.std_y_train + self.mean_y_train
 
         return output

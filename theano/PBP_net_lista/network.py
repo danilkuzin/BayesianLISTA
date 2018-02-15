@@ -6,6 +6,8 @@ import theano.tensor as T
 
 import network_layer
 
+from PBP_net_lista.network_layer import theano_soft_threshold
+
 
 class Network:
 
@@ -22,6 +24,10 @@ class Network:
         self.params_W_V = []
         self.params_S_M = []
         self.params_S_V = []
+
+        self.params_W = []
+        self.params_S = []
+
         self.params_thr_lambda = []
 
         for layer in self.layers:
@@ -29,17 +35,21 @@ class Network:
             self.params_W_V.append(layer.W_V)
             self.params_S_M.append(layer.S_M)
             self.params_S_V.append(layer.S_V)
+            self.params_W.append(layer.W)
+            self.params_S.append(layer.S)
+
             self.params_thr_lambda.append(layer.thr_lambda)
 
         self.a = theano.shared(value=a_init)
         self.b = theano.shared(value=b_init)
 
-    def output_deterministic(self, x):
+    def output_deterministic(self, y):
 
         # Recursively compute output
+        x = T.zeros((self.D,), dtype=np.float)
 
         for layer in self.layers:
-            x = layer.output_deterministic(x)
+            x = layer.output_deterministic(x, y)
 
         return x
 
@@ -159,3 +169,22 @@ class Network:
             if len(index[0]) > 0:
                 S_M_new[i][index] = S_M_old[i][index]
                 S_V_new[i][index] = S_V_old[i][index]
+
+    def sample_ws(self):
+
+        W = []
+        S = []
+        for i in range(len(self.layers)):
+            W.append(self.params_W_M[i].get_value()
+                     + np.random.randn(self.params_W_M[i].get_value().shape[0],
+                                       self.params_W_M[i].get_value().shape[1])
+                     * np.sqrt(self.params_W_V[i].get_value()))
+
+            S.append(self.params_S_M[i].get_value()
+                     + np.random.randn(self.params_S_M[i].get_value().shape[0],
+                                       self.params_S_M[i].get_value().shape[1])
+                     * np.sqrt(self.params_S_V[i].get_value()))
+
+        for i in range(len(self.layers)):
+            self.params_W[i].set_value(W[i])
+            self.params_S[i].set_value(S[i])

@@ -14,13 +14,19 @@ def student_pdf(x, mu, beta, nu):
     return T.gamma(0.5 * (nu + 1)) / (T.gamma(0.5 * nu) * T.sqrt(np.pi * nu * beta)) * T.power(
         (1 + 1 / nu * (x - mu) ** 2 / beta), -0.5 * (nu + 1))
 
+def theano_soft_threshold(v, thr_lambda):
+    return T.sgn(v) * T.maximum(abs(v) - thr_lambda, T.zeros_like(v))
+
 class Network_layer:
 
     def __init__(self, W_M_init, W_V_init, S_M_init, S_V_init, thr_lambda):
         self.W_M = theano.shared(value=W_M_init.astype(theano.config.floatX), name='W_M', borrow=True)
         self.W_V = theano.shared(value=W_V_init.astype(theano.config.floatX), name='W_V', borrow=True)
+        self.W = theano.shared(value=W_V_init.astype(theano.config.floatX), name='W', borrow=True)
         self.S_M = theano.shared(value=S_M_init.astype(theano.config.floatX), name='S_M', borrow=True)
         self.S_V = theano.shared(value=S_V_init.astype(theano.config.floatX), name='S_V', borrow=True)
+        self.S = theano.shared(value=S_V_init.astype(theano.config.floatX), name='S', borrow=True)
+
         self.thr_lambda = thr_lambda
 
     def compute_B(self, y):
@@ -67,22 +73,10 @@ class Network_layer:
         z_new_w, z_new_m, z_new_v = self.compute_new_z(C_m, C_v)
         return z_new_w, z_new_m, z_new_v
 
-    def output_deterministic(self, output_previous):
+    def output_deterministic(self, output_previous, y):
+        B = T.dot(self.W, y)
+        D = T.dot(self.S, output_previous)
+        C = B + D
+        out = theano_soft_threshold(C, self.thr_lambda)
 
-        # We add an additional input with value 1
-
-        output_previous_with_bias = \
-            T.concatenate([ output_previous, T.alloc(1, 1) ], 0) / \
-            T.sqrt(self.n_inputs)
-
-        # We compute the mean and variance after the linear operation
-
-        a = T.dot(self.w, output_previous_with_bias)
-
-        if (self.non_linear):
-
-            # We compute the ReLU activation
-
-            a = T.switch(T.lt(a, T.fill(a, 0)), T.fill(a, 0), a)
-
-        return a
+        return out

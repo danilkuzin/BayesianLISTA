@@ -118,29 +118,29 @@ class net_lista:
 
         return w, m, v, v_noise
 
-    def predict_deterministic(self, X_test):
+    def predict_deterministic(self, Y_test):
 
         """
             Function for making predictions with the Bayesian neural network.
 
-            @param X_test   The matrix of features for the test data
+            @param Y_test   The matrix of features for the test data
             
     
             @return o       The predictive value for the test target variables.
 
         """
 
-        X_test = np.array(X_test, ndmin = 2)
+        Y_test = np.array(Y_test, ndmin=2)
 
         # We normalize the test set
 
-        X_test = (X_test - np.full(X_test.shape, self.mean_X_train)) / \
-            np.full(X_test.shape, self.std_X_train)
+        Y_test = (Y_test - np.full(Y_test.shape, self.mean_Y_train)) / \
+            np.full(Y_test.shape, self.std_Y_train)
 
         # We compute the predictive mean and variance for the target variables
         # of the test data
 
-        o = self.pbp_instance.get_deterministic_output(X_test)
+        o = self.pbp_instance.get_deterministic_output(Y_test)
 
         # We are done!
 
@@ -154,7 +154,7 @@ class net_lista:
 
         """
  
-        self.pbp_instance.sample_w()
+        self.pbp_instance.sample_ws()
 
     def save_to_file(self, filename):
 

@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 from PBP_net_lista.DataGenerator import DataGenerator
 from PBP_net_lista.test_network_layer import random_spike_and_slab
 
+np.random.seed(1)
 
 D = 10
 K = 5
-N_train = 1000
-N_test = 10
+N_train = 10000
+N_test = 1
 
 # theano.config.exception_verbosity='high'
 # theano.config.optimizer='None'
@@ -20,13 +21,15 @@ dataGenerator = DataGenerator(D, K)
 Beta_train, Y_train, _ = dataGenerator.new_sample(N_train)
 Beta_test, Y_test, _ = dataGenerator.new_sample(N_test)
 
-L = 1
+L = 5
 
 net = net_lista(Beta_train, Y_train, L)
 w, m, v, v_noise = net.predict(Y_test)
-# print(w, m, v, v_noise)
+net.sample_weights()
+beta = net.predict_deterministic(Y_test)
+print("w:{}\n, m:{}\n, v:{}\n, v_noise:{}\n, beta: {}\n".format(w, m, v, v_noise, beta))
 
-n = 6
+n = 0
 
 sample_size = 100000
 
