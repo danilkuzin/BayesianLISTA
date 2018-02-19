@@ -10,15 +10,16 @@ import six.moves.cPickle as pickle
 import os
 import sys
 
+import matplotlib.pyplot as plt
 
-def load_data(n_train_batches, n_valid_batches, n_test_batches, D, K):
+
+def load_data(n_train_batches, n_valid_batches, n_test_batches, D, K, data_generator):
     def create_data(dataGenerator, n, borrow=True):
         beta, y, _ = dataGenerator.new_sample(n)
         shared_y = theano.shared(np.asarray(y, dtype=theano.config.floatX), borrow=borrow)
         shared_beta = theano.shared(np.asarray(beta, dtype=theano.config.floatX), borrow=borrow)
         return shared_beta, shared_y
 
-    dataGenerator = DataGenerator(D, K)
     beta_train, y_train = create_data(dataGenerator, n_train_batches)
     beta_test, y_test = create_data(dataGenerator, n_valid_batches)
     beta_valid, y_valid = create_data(dataGenerator, n_test_batches)
@@ -26,8 +27,9 @@ def load_data(n_train_batches, n_valid_batches, n_test_batches, D, K):
     return [(beta_train, y_train), (beta_valid, y_valid), (beta_test, y_test)]
 
 def sgd_optimization_lista(n_train_batches=10, n_valid_batches=10, n_test_batches=10, learning_rate=0.13, n_epochs=1000,
-                           dataset='mnist.pkl.gz', batch_size=600, D=10, K=5, L=6):
-    datasets = load_data(n_train_batches, n_valid_batches, n_test_batches, D=D, K=K)
+                        batch_size=600, D=10, K=5, L=6, data_generator=None):
+
+    datasets = load_data(n_train_batches*batch_size, n_valid_batches, n_test_batches, D=D, K=K, data_generator=data_generator)
     beta_train, y_train = datasets[0]
     beta_valid, y_valid = datasets[1]
     beta_test, y_test = datasets[2]
@@ -38,16 +40,7 @@ def sgd_optimization_lista(n_train_batches=10, n_valid_batches=10, n_test_batche
     y = T.matrix('y')
     beta = T.matrix('beta')
 
-    # D = 10
-    # K = 5
-    # L = 6
-
-    # batch_size = 50
-    #
-    # N_train = 10000
-    # N_test = 1
-
-    lista = Lista(L, D, K, y)
+    lista = Lista(L, D, K, y, data_generator.X)
 
     cost = lista.mean_squared_error(beta)
 
@@ -68,8 +61,6 @@ def sgd_optimization_lista(n_train_batches=10, n_valid_batches=10, n_test_batche
             beta: beta_valid[index * batch_size: (index + 1) * batch_size]
         }
     )
-
-    learning_rate = 0.1
 
     g_S = T.grad(cost=cost, wrt=lista.S)
     g_W = T.grad(cost=cost, wrt=lista.W)
@@ -168,24 +159,43 @@ def sgd_optimization_lista(n_train_batches=10, n_valid_batches=10, n_test_batche
            os.path.split(__file__)[1] +
            ' ran for %.1fs' % ((end_time - start_time))), file=sys.stderr)
 
-def predict():
+def predict(D, K, data_generator):
 
-    lista = pickle.load(open('best_model.pkl'))
+    lista = pickle.load(open('best_model.pkl', 'rb'))
 
-    predict_model = theano.function(
-        inputs=[lista.input],
-        outputs=lista.beta_estimator)
-
-    datasets = load_data(n_train_batches=10, n_valid_batches=10, n_test_batches=10, D=10, K=5)
-    beta_train, y_train = datasets[0]
-    beta_valid, y_valid = datasets[1]
+    datasets = load_data(n_train_batches=10, n_valid_batches=10, n_test_batches=10, D=D, K=K, data_generator=data_generator)
     beta_test, y_test = datasets[2]
 
-    predicted_values = predict_model(y_test[:10])
-    print("Predicted values for the first 10 examples in test set:")
+    predict_model = theano.function(
+        inputs=[lista.y],
+        outputs=lista.beta_estimator
+    )
+    y_test = y_test.get_value()
+    beta_test = beta_test.get_value()
+
+    test_number = 3
+
+    predicted_values = predict_model(y_test[:test_number])
+    print("Predicted values for the first 1 examples in test set:")
     print(predicted_values)
+    print("True values:")
+    print(beta_test[:test_number])
+
+    for t in range(test_number):
+        plt.plot(predicted_values[t], label='predicted')
+        plt.plot(beta_test[t], label='true')
+        plt.legend()
+        plt.show()
 
 
 if __name__ == '__main__':
+    theano.config.exception_verbosity = 'high'
+    theano.config.optimizer = 'None'
+
     np.random.seed(1)
-    sgd_optimization_lista()
+    D = 10
+    K = 5
+    dataGenerator = DataGenerator(D, K)
+    sgd_optimization_lista(n_train_batches=100, n_valid_batches=20, n_test_batches=20, learning_rate=0.0001, n_epochs=10000,
+                            batch_size=100, D=D, K=K, L=2, data_generator=dataGenerator)
+    predict(D=D, K=K, data_generator=dataGenerator)

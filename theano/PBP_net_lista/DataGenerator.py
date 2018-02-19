@@ -24,9 +24,21 @@ class DataGenerator:
                         sampled = True
         return slab
 
+    def sample_omega(self, N):
+        omega = np.zeros((N, self.D))
+        eps = 1e-3
+        for n in range(N):
+            sampled = False
+            while not sampled:
+                omega[n] = np.random.binomial(1, self.sparsity, size=(1, self.D))
+                if np.sum(1-omega[n]) > eps and np.sum(omega[n]) > eps:
+                    sampled = True
+        return omega
+
+
     def new_sample(self, N):
         Y = np.zeros((N, self.K))
-        omega = np.random.binomial(1, self.sparsity, size=(N, self.D))
+        omega = self.sample_omega(N)
         Beta = (1-omega) * self.sample_slab(N)
         Noise = np.random.normal(loc=0, scale=self.noise_scale, size=(N, self.K))
         for n in np.arange(N):
