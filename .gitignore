@@ -4,3 +4,7 @@
 theano/.idea/
 .ipynb_checkpoints/
 *.pkl
+*.gz
+*.aux
+*.log
+paper/sample2e.pdf

@@ -1,6 +1,7 @@
 import numpy as np
 import theano
 import six.moves.cPickle as pickle
+from tqdm import tqdm
 
 from PBP_net_lista.BayesianListaHandler import BayesianListaHandler
 from PBP_net_lista.DataGenerator import DataGenerator
@@ -37,19 +38,33 @@ class MnistSequentialComparator(object):
 
     def train_iteration(self):
 
+        # self.freq_train_loss.append(
+        #     self.freq_lista.train_iteration(beta_train=self.data.train_data, y_train=self.data.y_train))
+        # self.bayesian_train_loss.append(
+        #     self.bayesian_lista.train_iteration(beta_train=self.data.train_data, y_train=self.data.y_train))
+        # self.shared_bayesian_train_loss.append(
+        #     self.shared_bayesian_lista.train_iteration(beta_train=self.data.train_data, y_train=self.data.y_train))
+
         self.freq_train_loss.append(
-            self.freq_lista.train_iteration(beta_train=self.data.train_data, y_train=self.data.y_train))
+            self.freq_lista.train_iteration_nmse(beta_train=self.data.train_data, y_train=self.data.y_train))
         self.bayesian_train_loss.append(
-            self.bayesian_lista.train_iteration(beta_train=self.data.train_data, y_train=self.data.y_train))
+            self.bayesian_lista.train_iteration_nmse(beta_train=self.data.train_data, y_train=self.data.y_train))
         self.shared_bayesian_train_loss.append(
-            self.shared_bayesian_lista.train_iteration(beta_train=self.data.train_data, y_train=self.data.y_train))
+            self.shared_bayesian_lista.train_iteration_nmse(beta_train=self.data.train_data, y_train=self.data.y_train))
+
+        # self.freq_validation_loss.append(
+        #     self.freq_lista.test(beta_test=self.data.validation_data, y_test=self.data.y_validation))
+        # self.bayesian_validation_loss.append(
+        #     self.bayesian_lista.test(beta_test=self.data.validation_data, y_test=self.data.y_validation))
+        # self.shared_bayesian_validation_loss.append(
+        #     self.shared_bayesian_lista.test(beta_test=self.data.validation_data, y_test=self.data.y_validation))
 
         self.freq_validation_loss.append(
-            self.freq_lista.test(beta_test=self.data.validation_data, y_test=self.data.y_validation))
+            self.freq_lista.test_nmse(beta_test=self.data.validation_data, y_test=self.data.y_validation))
         self.bayesian_validation_loss.append(
-            self.bayesian_lista.test(beta_test=self.data.validation_data, y_test=self.data.y_validation))
+            self.bayesian_lista.test_nmse(beta_test=self.data.validation_data, y_test=self.data.y_validation))
         self.shared_bayesian_validation_loss.append(
-            self.shared_bayesian_lista.test(beta_test=self.data.validation_data, y_test=self.data.y_validation))
+            self.shared_bayesian_lista.test_nmse(beta_test=self.data.validation_data, y_test=self.data.y_validation))
 
 
 if __name__ == '__main__':
@@ -59,14 +74,14 @@ if __name__ == '__main__':
     K = 100
     L = 4
 
-    batch_size = 5000
-    validation_size = 100
+    # batch_size = 5000
+    # validation_size = 100
 
     comparator = MnistSequentialComparator(K, L, learning_rate=0.0001)
 
-    n_iter = 500
+    n_iter = 5
 
-    for _ in range(n_iter):
+    for _ in tqdm(range(n_iter)):
         comparator.train_iteration()
 
     plt.semilogy(comparator.freq_train_loss, label="freq train loss")

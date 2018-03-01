@@ -21,9 +21,12 @@ class MnistData(object):
         self.y_train = None
         self.y_validation = None
 
+        self.training_size = 5000
+
     def check_download(self):
         mnist = tf.contrib.learn.datasets.load_dataset("mnist")
-        self.train_data = mnist.train.images
+        random_train_ind = np.random.choice(mnist.train.images.shape[0], self.training_size, replace=False)
+        self.train_data = mnist.train.images[random_train_ind]
         self.train_labels = np.asarray(mnist.train.labels, dtype=np.int32)
         self.dictionary_learn_data = mnist.test.images
         self.dictionary_learn_labels = np.asarray(mnist.test.labels, dtype=np.int32)

@@ -13,7 +13,7 @@ from PBP_net_lista_single_matrices import prior, network
 
 class PBP_lista:
 
-    def __init__(self, L, D, K, mean_y_train, std_y_train):
+    def __init__(self, L, D, K, X_design_matrix, mean_y_train, std_y_train):
 
         self.D = D
         self.K = K
@@ -31,6 +31,9 @@ class PBP_lista:
         params = self.prior.get_initial_params()
 
         thr_lambda = 0.1
+
+        params['W_M'] = X_design_matrix.T / (1.01 * np.linalg.norm(X_design_matrix, 2) ** 2)
+        params['S_M'] = np.identity(D) - np.matmul(params['W_M'], X_design_matrix)
 
         self.network = network.Network(params['W_M'], params['W_V'], params['S_M'], params['S_V'], thr_lambda,
                                        params['a'], params['b'], D, K, L)

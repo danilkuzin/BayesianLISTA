@@ -7,13 +7,14 @@ import numpy as np
 import theano
 
 import theano.tensor as T
+from tqdm import tqdm
 
 from PBP_net_lista import prior, network
 
 
 class PBP_lista:
 
-    def __init__(self, L, D, K, mean_y_train, std_y_train):
+    def __init__(self, L, D, K, X_design_matrix, mean_y_train, std_y_train):
 
         self.D = D
         self.K = K
@@ -31,6 +32,16 @@ class PBP_lista:
         params = self.prior.get_initial_params()
 
         thr_lambda = 0.1
+
+        params['W_M'] = []
+        params['S_M'] = []
+
+        W_init = X_design_matrix.T / (1.01 * np.linalg.norm(X_design_matrix, 2) ** 2)
+        S_init = np.identity(D) - np.matmul(W_init, X_design_matrix)
+
+        for i in range(L):
+            params['W_M'].append(W_init)
+            params['S_M'].append(S_init)
 
         self.network = network.Network(params['W_M'], params['W_V'], params['S_M'], params['S_V'], thr_lambda,
                                        params['a'], params['b'], D, K)

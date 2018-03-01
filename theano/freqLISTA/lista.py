@@ -26,6 +26,9 @@ class Lista(object):
     def mean_squared_error(self, beta):
         return T.mean(T.sqrt(T.sum(T.sqr(self.beta_estimator - beta), axis=1)))
 
+    def normalised_mean_squared_error(self, beta):
+        return T.mean(T.sqrt(T.sum(T.sqr(self.beta_estimator - beta), axis=1)) / T.sqrt(T.sum(T.sqr(beta), axis=1)))
+
     def net(self, y):
         b = T.dot(y, self.W.T)
         beta_estimator_history = [theano_soft_threshold(b, self.thr_lambda)]
