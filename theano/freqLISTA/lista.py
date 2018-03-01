@@ -24,7 +24,7 @@ class Lista(object):
         self.y = y
 
     def mean_squared_error(self, beta):
-        return T.mean(0.5 * T.sqrt(T.sum(T.sqr(self.beta_estimator - beta))))
+        return T.mean(T.sqrt(T.sum(T.sqr(self.beta_estimator - beta), axis=1)))
 
     def net(self, y):
         b = T.dot(y, self.W.T)

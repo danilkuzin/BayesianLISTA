@@ -26,10 +26,56 @@ def load_data(n_train_batches, n_valid_batches, n_test_batches, D, K, data_gener
 
     return [(beta_train, y_train), (beta_valid, y_valid), (beta_test, y_test)]
 
-def sgd_optimization_lista(n_train_batches=10, n_valid_batches=10, n_test_batches=10, learning_rate=0.13, n_epochs=1000,
-                        batch_size=600, D=10, K=5, L=6, data_generator=None):
 
-    datasets = load_data(n_train_batches*batch_size, n_valid_batches, n_test_batches, D=D, K=K, data_generator=data_generator)
+def sgd_optimization_lista(beta_train, y_train, X, n_train_batches=10, learning_rate=0.13, n_epochs=1000,
+                           batch_size=600, D=10, K=5, L=6):
+    print('... building the model')
+    index = T.lscalar()
+
+    y = T.matrix('y')
+    beta = T.matrix('beta')
+
+    lista = Lista(L, D, K, y, X)
+
+    cost = lista.mean_squared_error(beta)
+
+    g_S = T.grad(cost=cost, wrt=lista.S)
+    g_W = T.grad(cost=cost, wrt=lista.W)
+
+    updates = [(lista.S, lista.S - learning_rate * g_S),
+               (lista.W, lista.W - learning_rate * g_W)]
+
+    train_model = theano.function(
+        inputs=[index],
+        outputs=cost,
+        updates=updates,
+        givens={
+            y: y_train[index * batch_size: (index + 1) * batch_size],
+            beta: beta_train[index * batch_size: (index + 1) * batch_size]
+        }
+    )
+
+    print('... training the model')
+
+    start_time = timeit.default_timer()
+
+    done_looping = False
+    epoch = 0
+    while (epoch < n_epochs) and (not done_looping):
+        epoch = epoch + 1
+        for minibatch_index in range(n_train_batches):
+            train_model(minibatch_index)
+
+    end_time = timeit.default_timer()
+    print('Optimization complete, {} sec'.format(end_time - start_time))
+    return lista
+
+
+def sgd_optimization_lista_old(n_train_batches=10, n_valid_batches=10, n_test_batches=10, learning_rate=0.13,
+                                        n_epochs=1000,
+                                        batch_size=600, D=10, K=5, L=6, data_generator=None):
+    datasets = load_data(n_train_batches * batch_size, n_valid_batches, n_test_batches, D=D, K=K,
+                         data_generator=data_generator)
     beta_train, y_train = datasets[0]
     beta_valid, y_valid = datasets[1]
     beta_test, y_test = datasets[2]
@@ -159,11 +205,24 @@ def sgd_optimization_lista(n_train_batches=10, n_valid_batches=10, n_test_batche
            os.path.split(__file__)[1] +
            ' ran for %.1fs' % ((end_time - start_time))), file=sys.stderr)
 
-def predict(D, K, data_generator):
 
+def predict(lista, y_test):
+    predict_model = theano.function(
+        inputs=[lista.y],
+        outputs=lista.beta_estimator
+    )
+    y_test = y_test.get_value()
+
+    predicted_values = predict_model(y_test)
+
+    return predicted_values
+
+
+def predict_old(D, K, data_generator):
     lista = pickle.load(open('best_model.pkl', 'rb'))
 
-    datasets = load_data(n_train_batches=10, n_valid_batches=10, n_test_batches=10, D=D, K=K, data_generator=data_generator)
+    datasets = load_data(n_train_batches=10, n_valid_batches=10, n_test_batches=10, D=D, K=K,
+                         data_generator=data_generator)
     beta_test, y_test = datasets[2]
 
     predict_model = theano.function(
@@ -196,6 +255,7 @@ if __name__ == '__main__':
     D = 10
     K = 5
     dataGenerator = DataGenerator(D, K)
-    sgd_optimization_lista(n_train_batches=100, n_valid_batches=20, n_test_batches=20, learning_rate=0.0001, n_epochs=10000,
-                            batch_size=100, D=D, K=K, L=2, data_generator=dataGenerator)
+    sgd_optimization_lista(n_train_batches=100, n_valid_batches=20, n_test_batches=20, learning_rate=0.0001,
+                           n_epochs=10000,
+                           batch_size=100, D=D, K=K, L=2, data_generator=dataGenerator)
     predict(D=D, K=K, data_generator=dataGenerator)

@@ -4,8 +4,7 @@ import theano
 
 import theano.tensor as T
 
-import network_layer
-
+from PBP_net_lista import network_layer
 from PBP_net_lista.network_layer import theano_soft_threshold
 
 
@@ -81,6 +80,14 @@ class Network:
         nu_student1 = 2 * (self.a + 1) * T.ones(self.D)
         nu_student2 = 2 * (self.a + 2) * T.ones(self.D)
 
+        test_student = network_layer.student_pdf(beta, mu_student, v_student, nu_student)
+        test_student1 = network_layer.student_pdf(beta, mu_student, v_student1, nu_student1)
+        test_student2 = network_layer.student_pdf(beta, mu_student, v_student2, nu_student2)
+
+        test_norm = network_layer.n_pdf(beta, m, v_final)
+        test_norm1 = network_layer.n_pdf(beta, m, v_final1)
+        test_norm2 = network_layer.n_pdf(beta, m, v_final2)
+
         logZ = T.sum(T.log(w * network_layer.student_pdf(beta, mu_student, v_student, nu_student)
             + (1 - w) * network_layer.n_pdf(beta, m, v_final)))
         logZ1 = T.sum(T.log(w * network_layer.student_pdf(beta, mu_student, v_student1, nu_student1)
@@ -88,7 +95,9 @@ class Network:
         logZ2 = T.sum(T.log(w * network_layer.student_pdf(beta, mu_student, v_student2, nu_student2)
              + (1 - w) * network_layer.n_pdf(beta, m, v_final2)))
 
-        return logZ, logZ1, logZ2
+        return logZ, logZ1, logZ2, test_student, test_student1, test_student2, test_norm, test_norm1, test_norm2, \
+               self.a, self.b, beta, mu_student, v_student, v_student1, v_student2, nu_student, nu_student1, nu_student2, \
+               v_final, v_final1, v_final2
 
     def generate_updates(self, logZ, logZ1, logZ2):
 
@@ -102,8 +111,28 @@ class Network:
                             self.params_S_M[i] + self.params_S_V[i] * T.grad(logZ, self.params_S_M[i])))
             updates.append((self.params_S_V[i],
                             self.params_S_V[i] - self.params_S_V[i] ** 2 * (T.grad(logZ, self.params_S_M[i]) ** 2 - 2 * T.grad(logZ, self.params_S_V[i]))))
+        #
+        # updates.append((self.a, 1.0 / (T.exp(logZ2 - 2 * logZ1 + logZ) * (self.a + 1) / self.a - 1.0)))
+        #
+        # updates.append((self.b, 1.0 / (T.exp(logZ2 - logZ1) * (self.a + 1) / self.b - T.exp(logZ1 - logZ) * self.a / self.b)))
+
+        return updates
+
+    def generate_updates_full_learning(self, logZ, logZ1, logZ2):
+
+        updates = []
+        for i in range(len(self.params_W_M)):
+            updates.append((self.params_W_M[i],
+                            self.params_W_M[i] + self.params_W_V[i] * T.grad(logZ, self.params_W_M[i])))
+            updates.append((self.params_W_V[i],
+                            self.params_W_V[i] - self.params_W_V[i] ** 2 * (T.grad(logZ, self.params_W_M[i]) ** 2 - 2 * T.grad(logZ, self.params_W_V[i]))))
+            updates.append((self.params_S_M[i],
+                            self.params_S_M[i] + self.params_S_V[i] * T.grad(logZ, self.params_S_M[i])))
+            updates.append((self.params_S_V[i],
+                            self.params_S_V[i] - self.params_S_V[i] ** 2 * (T.grad(logZ, self.params_S_M[i]) ** 2 - 2 * T.grad(logZ, self.params_S_V[i]))))
 
         updates.append((self.a, 1.0 / (T.exp(logZ2 - 2 * logZ1 + logZ) * (self.a + 1) / self.a - 1.0)))
+
         updates.append((self.b, 1.0 / (T.exp(logZ2 - logZ1) * (self.a + 1) / self.b - T.exp(logZ1 - logZ) * self.a / self.b)))
 
         return updates

@@ -9,9 +9,8 @@ import theano
 
 import theano.tensor as T
 
-import network
+from PBP_net import network, prior
 
-import prior
 
 class PBP:
 
@@ -53,7 +52,7 @@ class PBP:
             self.network.output_probabilistic(self.x))
 
         self.predict_deterministic = theano.function([ self.x ],
-            self.network.output_deterministic(self.x, self.y))
+            self.network.output_deterministic(self.x))
 
     def do_pbp(self, X_train, y_train, n_iterations):
 

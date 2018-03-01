@@ -3,9 +3,8 @@ import math
 
 import numpy as np
 
-import sys
-sys.path.append('PBP_net/')
-import PBP_net
+
+from PBP_net.net_pbp import net_pbp
 
 np.random.seed(1)
 
@@ -36,7 +35,7 @@ y_test = y[ index_test ]
 # zero mean and unit standard deviation in the trainig set.
 
 n_hidden_units = 50
-net = PBP_net.PBP_net(X_train, y_train,
+net = net_pbp(X_train, y_train,
     [ n_hidden_units, n_hidden_units ], normalize = True, n_epochs = 40)
 
 # We make predictions for the test set

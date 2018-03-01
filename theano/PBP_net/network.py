@@ -5,7 +5,8 @@ import theano
 
 import theano.tensor as T
 
-import network_layer
+from PBP_net import network_layer
+
 
 class Network:
 
@@ -37,12 +38,12 @@ class Network:
         self.a = theano.shared(float(a_init))
         self.b = theano.shared(float(b_init))
 
-    def output_deterministic(self, x, y):
+    def output_deterministic(self, x):
 
         # Recursively compute output
 
         for layer in self.layers:
-            x = layer.output_deterministic(x, y)
+            x = layer.output_deterministic(x)
 
         return x
 

@@ -5,9 +5,10 @@ import pickle
 
 import gzip
 
-import pbp
+from PBP_net import pbp
 
-class PBP_net:
+
+class net_pbp:
 
     def __init__(self, X_train, y_train, n_hidden, n_epochs = 40,
         normalize = False):

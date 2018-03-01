@@ -5,7 +5,7 @@ import pickle
 
 import gzip
 
-from PBP_net_lista import pbp
+from PBP_net_lista_single_matrices import pbp
 
 
 class net_lista:

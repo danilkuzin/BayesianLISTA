@@ -8,7 +8,7 @@ import theano
 
 import theano.tensor as T
 
-from PBP_net_lista import prior, network
+from PBP_net_lista_single_matrices import prior, network
 
 
 class PBP_lista:
@@ -33,7 +33,7 @@ class PBP_lista:
         thr_lambda = 0.1
 
         self.network = network.Network(params['W_M'], params['W_V'], params['S_M'], params['S_V'], thr_lambda,
-                                       params['a'], params['b'], D, K)
+                                       params['a'], params['b'], D, K, L)
 
         # We create the input and output variables in theano
 
@@ -42,10 +42,7 @@ class PBP_lista:
 
         # A function for computing the value of logZ, logZ1 and logZ2
 
-        self.logZ, self.logZ1, self.logZ2, self.test_student, self.test_student1, self.test_student2, self.test_norm, \
-            self.test_norm1, self.test_norm2, self.a_j, self.b_j, self.beta_temp, self.mu_student, \
-            self.v_student, self.v_studen1, self.v_student2, self.nu_student, self.nu_student1, self.nu_student2, \
-            self.v_final, self.v_final1, self.v_final2 = \
+        self.logZ, self.logZ1, self.logZ2 = \
             self.network.logZ_Z1_Z2(self.beta, self.y)
 
         # We create a theano function for updating the posterior
@@ -62,13 +59,8 @@ class PBP_lista:
         self.predict_deterministic = theano.function([self.y],
              self.network.output_deterministic(self.y))
 
-        self.logs_output = theano.function([self.beta, self.y], [self.logZ, self.logZ1, self.logZ2, self.test_student,
-                                                                 self.test_student1, self.test_student2, self.test_norm,
-                                                                 self.test_norm1, self.test_norm2, self.a_j, self.b_j,
-                                                                 self.beta_temp, self.mu_student,
-                                                                 self.v_student, self.v_studen1, self.v_student2,
-                                                                 self.nu_student, self.nu_student1, self.nu_student2,
-                                                                 self.v_final, self.v_final1, self.v_final2])
+
+        self.logs_output = theano.function([self.beta, self.y], [self.logZ, self.logZ1, self.logZ2])
 
     def do_pbp(self, Beta_train, y_train, n_iterations):
 
@@ -139,61 +131,7 @@ class PBP_lista:
         counter = 0
         for i in permutation:
             w, m, v = self.predict_probabilistic(Y[i, :])
-            logZ, logZ1, logZ2, test_student, test_student1, test_student2, test_norm, test_norm1, test_norm2, \
-                a_j, b_j, beta_tmp, mu_student, v_student, v_student1, v_student2, \
-                nu_student, nu_student1, nu_student2, v_final, v_final1, v_final2 = self.logs_output(Beta[i, :], Y[i, :])
-
-            if not np.all(a_j > 0):
-                print("permutation {}. a_j is not positive".format(i))
-
-            if not np.all(np.isfinite(v_final)):
-                print("permutation {}. v_final is not finite".format(i))
-
-            if not np.all(np.isfinite(beta_tmp)):
-                print("permutation {}. beta_tmp is not finite".format(i))
-
-            if not np.all(np.isfinite(mu_student)):
-                print("permutation {}. mu_student is not finite".format(i))
-
-            if not np.all(np.isfinite(v_student2)):
-                print("permutation {}. v_student2 is not finite".format(i))
-
-            if not np.all(np.isfinite(nu_student2)):
-                print("permutation {}. nu_student2 is not finite".format(i))
-
-            if not np.all(np.isfinite(test_student)):
-                print("permutation {}. test_student is not finite".format(i))
-
-            if not np.all(np.isfinite(test_student1)):
-                print("permutation {}. test_student1 is not finite".format(i))
-
-            if not np.all(np.isfinite(test_student2)):
-                print("permutation {}. test_student2 is not finite".format(i))
-
-            if not np.all(np.isfinite(test_norm)):
-                print("permutation {}. test_norm is not finite".format(i))
-
-            if not np.all(np.isfinite(test_norm1)):
-                print("permutation {}. test_norm1 is not finite".format(i))
-
-            if not np.all(np.isfinite(test_norm2)):
-                print("permutation {}. test_norm2 is not finite".format(i))
-
-            if not np.all(np.isfinite(logZ)):
-                print("permutation {}. logZ is not finite".format(i))
-
-            if not np.all(np.isfinite(logZ1)):
-                print("permutation {}. logZ1 is not finite".format(i))
-
-            if not np.all(np.isfinite(logZ2)):
-                print("permutation {}. logZ2 is not finite".format(i))
-
-            if not np.all(np.isfinite(a_j)):
-                print("permutation {}. a_j is not finite".format(i))
-
-            if not np.all(np.isfinite(b_j)):
-                print("permutation {}. b_j is not finite".format(i))
-
+            logs = self.logs_output(Beta[i, :], Y[i, :])
             old_params = self.network.get_params()
             Z = self.adf_update(Beta[i, :], Y[i, :])
             new_params = self.network.get_params()
