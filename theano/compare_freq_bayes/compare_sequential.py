@@ -35,35 +35,55 @@ class SequentialComparator(object):
 
     def train_iteration(self):
 
+        # self.freq_train_loss.append(
+        #     self.freq_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
+        # self.bayesian_train_loss.append(
+        #     self.bayesian_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
+        # self.shared_bayesian_train_loss.append(
+        #     self.shared_bayesian_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
+        #
+        # self.freq_validation_loss.append(
+        #     self.freq_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
+        # self.bayesian_validation_loss.append(
+        #     self.bayesian_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
+        # self.shared_bayesian_validation_loss.append(
+        #     self.shared_bayesian_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
+
         self.freq_train_loss.append(
-            self.freq_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
+            self.freq_lista.train_iteration_nmse(beta_train=self.beta_train, y_train=self.y_train))
         self.bayesian_train_loss.append(
-            self.bayesian_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
+            self.bayesian_lista.train_iteration_nmse(beta_train=self.beta_train, y_train=self.y_train))
         self.shared_bayesian_train_loss.append(
-            self.shared_bayesian_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
+            self.shared_bayesian_lista.train_iteration_nmse(beta_train=self.beta_train, y_train=self.y_train))
 
         self.freq_validation_loss.append(
-            self.freq_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
+            self.freq_lista.test_nmse(beta_test=self.beta_validation, y_test=self.y_validation))
         self.bayesian_validation_loss.append(
-            self.bayesian_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
+            self.bayesian_lista.test_nmse(beta_test=self.beta_validation, y_test=self.y_validation))
         self.shared_bayesian_validation_loss.append(
-            self.shared_bayesian_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
+            self.shared_bayesian_lista.test_nmse(beta_test=self.beta_validation, y_test=self.y_validation))
 
 
 if __name__ == '__main__':
 
     np.random.seed(1)
 
-    D = 100
-    K = 50
+    D = 784#100
+    K = 100#50
     L = 4
 
-    batch_size = 5000
+    batch_size = 1000
     validation_size = 100
 
-    comparator = SequentialComparator(D, K, L, learning_rate=0.0001, n_train_sample=batch_size, n_validation_sample=validation_size)
+    saved_comparator_file_name = []#'synthetic_data_comparator_good_results.pkl'
 
-    n_iter = 500
+    if not saved_comparator_file_name:
+        comparator = SequentialComparator(D, K, L, learning_rate=0.0001, n_train_sample=batch_size, n_validation_sample=validation_size)
+    else:
+        comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
+
+
+    n_iter = 5
 
     for _ in range(n_iter):
         comparator.train_iteration()
@@ -79,4 +99,4 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-# D = 100, K = 50, L = 4, batch_size = 1000 - at iterations 0-200 bayesian loss is smaller than freq
+# D = 784, K = 100, L = 4, batch_size = 1000, validation_size = 100 - at the beginning bayes loss less than freg
