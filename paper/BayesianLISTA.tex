@@ -1,0 +1,346 @@
+\documentclass[letterpaper]{article}
+\usepackage{proceed2e}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{subfig}
+\usepackage{hyperref}
+
+\usepackage{times}
+\usepackage{float}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\title{Bayesian LISTA / Uncertainty propagation in deep neural networks for sparse coding}
+
+\author{} % LEAVE BLANK FOR ORIGINAL SUBMISSION.
+          % UAI  reviewing is double-blind.
+
+% The author names and affiliations should appear only in the accepted paper.
+%
+%\author{ {\bf Harry Q.~Bovik\thanks{Footnote for author to give an
+%alternate address.}} \\
+%Computer Science Dept. \\
+%Cranberry University\\
+%Pittsburgh, PA 15213 \\
+%\And
+%{\bf Coauthor}  \\
+%Affiliation          \\
+%Address \\
+%\And
+%{\bf Coauthor}   \\
+%Affiliation \\
+%Address    \\
+%(if needed)\\
+%}
+
+\author{ {\bf Danil Kuzin} \\
+\And
+{\bf Olga Isupova}  \\
+\And
+{\bf Lyudmila Mihaylova}   \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We propose the method of propagating the uncertainty through the multilevel soft-thresholding nonlinearity. This allows to use it as a building block for sparse coding deep neural networks. As an example we develop the Bayesian LISTA algorithm with probabilistic backpropagation. It allows to obtain the variance estimates for parameters and posterior distributions.
+\end{abstract}
+
+\section{Introduction}
+Though the idea of Bayesian learning in neural networks is not new \cite{neal2012bayesian}, it has gained its attention only recently, with the development of distributed approximate inference techniques \cite{li2015stochastic, hoffman2013stochastic}  and general boost in popularity of deep learning. In some spheres, such as self-driving cars or healthcare, posterior estimates are very important and Bayesian learning allows to obtain them. 
+
+In general, when distributions are included in the network, Bayesian inference complexity scales exponentially with the number of layers, thus making it impossible to be implemented for deep neural networks in general. Nevertheless, recently several techniques were proposed to handle specific types of neural networks. For example, dense layers \cite{hernandez2015probabilistic}, networks with discrete distributions \cite{soudry2014expectation}, recurrent networks \cite{mcdermott2017bayesian}. 
+
+There are currently two approaches for Bayesian neural networks: including distributions of weights in the network \cite{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing the uncertainty \cite{gal2016dropout}. We are using the first way.
+
+In this paper we propose the approach to propagate uncertainty through the soft-thresholding nonlinearity. At every layer the current distribution of the target vector is represented as spike-and-slab distribution, this can be effectively combined with Gaussian weights for dense layers and after soft-thresholding it can be closely approximated with distribution from the same family.
+
+The paper is organised as following: first, we describe the uncertainty propagation to obtain the spike-and-slab distribution - output from the network, then we describe how the backpropagation is organised to update distributions of weights and their priors. After that we show how the algorithm is performed on MNIST data and demonstrate the obtained posterior estimates.
+
+Soft thresholding usually appears in LISTA network \cite{gregor2010learning}, so we present our algorithm for it.
+
+The main contributions are: 
+\begin{itemize}
+\item for the first time we propose uncertainty propagation through the soft-thresholding nonlinearity for Bayesian neural network
+\item efficient posterior inference for weights and outputs of neural networks with the soft-thresholding nonlinearity
+\item novel Bayesian LISTA network for sparse coding
+\end{itemize}
+
+\section{LISTA}
+
+LISTA neural network was proposed for sparse coding to mimic the iterative thresholding algorithms. The current estimate is iteratively combined with the design matrix and then thresholded. Soft thresholding operator for input $v$ with parameter $\lambda$ is defined as
+\begin{equation}
+h_\lambda(v) = \text{sgn}(v) * \max(|v| - \lambda, 0)
+\end{equation} 
+When this process is limited to the predefined set of iterations and weights of design matrix combinations are learnt, this can be interpreted as a neural network.
+
+The problem is an underdefined linear regression with assumption of sparse weights:
+\begin{equation}
+\mathbf{y} = \mathbf{X}\boldsymbol\beta + \varepsilon
+\end{equation}
+where $\mathbf{y}$ are observations, $\mathbf{X}$ is design matrix, $\boldsymbol\beta$ is unknown vector of weights larger than $\mathbf{y}$ with some of the elements equal to zero to achieve regularisation. $\varepsilon$ is Gaussian noise.
+
+LISTA network has the following scheme
+\begin{align}
+&\mathbf{b}_0 = \mathbf{W}_0\mathbf{y}\\
+&\widehat{\boldsymbol\beta}_0 = h_\lambda(\mathbf{b}_0) \\
+&\text{for } l=1:L\\
+	&\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y} \\
+	&\quad \mathbf{c}_l = \mathbf{b}_l + \mathbf{S}_l\widehat{\boldsymbol\beta}_{l-1} \\
+	&\quad \widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l) \\
+& \widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_{L}
+\end{align}
+
+Matrices $\mathbf{W}_l \in \mathbb{R}^{D \times K}$, $\mathbf{S}_l\in\mathbb{R}^{D \times D}$ are the parameters that are learnt in LISTA. Vectors $\mathbf{c}_l$, $\mathbf{b}_l$ are intermediate vectors that describe propagation within the layer. $\boldsymbol\beta_l$ is the current approximation of the target coefficients vector.
+
+\section{Bayesian LISTA}
+To formulate the Bayesian LISTA we start with putting the prior distributions on the unknown weights
+\begin{align}
+&p(\mathbf{W}) = \prod_{l=1}^L\prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{ij, l} | 0, \eta^{-1}), \\
+&p(\mathbf{S}) = \prod_{l=1}^L\prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd'', l} | 0, \eta^{-1}),
+\end{align}
+where $w_{ij, l}$ is the component of the matrix $\mathbf{W}_l$, $s_{d'd'', l}$ is the component of the matrix $\mathbf{S}_l$ from the layer $l$.
+Likelihood of the output $\mathbf{y}$ is defined as 
+\begin{equation}
+\label{eq:likelihood}
+p(\mathbf{y}; \mathbf{W}, \mathbf{S}, \gamma) = \prod_{d=1}^D\mathcal{N}([\mathbf{y}]_d; [f(\mathbf{y}; \mathbf{W}, \mathbf{S})]_d, \gamma^{-1}),
+\end{equation}
+where $f(\mathbf{y}; \mathbf{W}, \mathbf{S})$ is the output of the LISTA neural network.
+The posterior distribution is 
+\begin{equation}
+\label{eq:posterior}
+p(\mathbf{W}, \mathbf{S}, \gamma, \eta | D) = \frac{p(\mathbf{y} | \mathbf{W},  \mathbf{S}, \gamma) p(\mathbf{W} | \eta )p(\mathbf{S} | \eta) p(\eta) p(\gamma)}{p(\mathbf{y})}
+\end{equation}
+
+\section{Uncertainty propagation through soft thresholding}
+We initialise the $\widehat{\boldsymbol\beta}_{0}$ with the spike and slab distribution with parameters $\boldsymbol\omega = \mathbf{0}$, $\mathbf{m} = \mathbf{0}$, $\mathbf{v} = \mathbf{1}$. For every layer we assume that $\widehat{\boldsymbol\beta}_{l-1}$ has the spike and slab distribution with parameters $\boldsymbol\omega$, $\mathbf{m}$, $\mathbf{v}$
+\begin{equation}
+[\boldsymbol\beta_{l-1}]_d \sim [\boldsymbol\omega]_d \delta_0 + (1 - [\boldsymbol\omega]_d)\mathcal{N}([\mathbf{m}]_d, [\mathbf{v}]_d)
+\end{equation}
+
+Further in this section we show that the value of the next layer $\widehat{\boldsymbol\beta}_l$ can be approximated with spike and slab distribution and therefore it maintains the same family of distributions and allows to apply the extended probabilistic backpropagation algorithm that is proposed in Section~\ref{sec:backpropagation}: lemma \ref{thm:matrix_const} describes the probabilistic variant of LISTA step $\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y}$, lemma \ref{thm:matrix_vector} and \ref{thm:sum_vectors} describe the probabilistic variant of LISTA step $ \mathbf{c}_l = \mathbf{b}_l +\mathbf{S}$ and lemma \ref{thm:soft_thresholding} describes the soft thresholding step $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$. Overall the probabilistic layer is described by theorem \ref{thm:prob_layer}.
+
+\begin{lemma}[Moments of spike and slab]
+\label{thm:moments_spsl}
+Let the random variable $\xi$ have a spike and slab distribution with probability of spike $\omega$, slab mean $m$ and slab variance $v$. Then its moments are
+\begin{align}
+\mathbb{E}\xi &= (1-\omega)m \\
+%\mathbb{E}\xi^2 &= (1-\omega)(v + m^2) \\
+\text{Var }\xi & = (1-\omega)(v + \omega m^2)
+\end{align}
+
+\end{lemma}
+\begin{proof}
+\begin{align}
+\mathbb{E}\xi &= \int x (\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v))dx \\
+& = \omega \int x \delta_0(x)dx + (1 - \omega)\int x \mathcal{N}(x; m, v)dx \\
+& = (1-\omega)m
+\end{align}
+\begin{align}
+\mathbb{E}\xi^2 &= \int x^2 (\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v))dx \\
+& = \omega \int x^2 \delta_0(x)dx + (1 - \omega)\int x^2 \mathcal{N}(x; m, v)dx \\
+& = (1-\omega)(v + m^2)
+\end{align}
+\begin{align}
+\text{Var }\xi &= \mathbb{E}\xi^2 - \left(\mathbb{E}\xi\right)^2\\
+& = (1-\omega)(v + \omega m^2)
+\end{align}
+\end{proof}
+
+ \begin{lemma}
+ \label{thm:matrix_const}
+ Let $\mathbf{W} \in \mathbb{R}^{D \times K}$ be a matrix of independent Gaussian-distributed random variables: $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $\mathbf{y} \in \mathbb{R}^K$ be a constant vector. Then their product $\mathbf{W} \mathbf{y}$ is a vector $\mathbf{b} \in \mathbb{R}^{D}$ of random variables $b_d \sim \mathcal{N}(m^b_d, w^b_d)$, where $m^b_d = \sum_{k=1}^Ky_k m^w_{dk}$, $w^b_d = \sum_{k=1}^Ky_k^2v^w_{dk}$. 
+ %If we denote $M^W = [m^w_{dk}]_{d=1:D, k=1:K}$, $V^W = [v^w_{dk}]_{d=1:D, k=1:K}$, then $\mathbf{b}^m = W^My$, $\mathbf{b}^w = W^Vy^2$.
+ \end{lemma}
+ \begin{proof}
+ 	The statement follows from the property that the family of normal distributions is closed under linear transformations.
+ \end{proof}
+ 
+  \begin{lemma}
+  \label{thm:matrix_vector}
+ Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\boldsymbol\beta \in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\beta_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. Then their product can be approximated as a vector $\mathbf{d} \in \mathbb{R}^{D}$ of random variables $d_d \sim \mathcal{N}(d^d_m, d^d_w)$, where $m^d_d = \sum_{d'=1}^D m^s_{dd'}(1-\omega_{d'})m_{d'}$, $v^d_d = \sum_{d'=1}^D [(m^s_{dd'})^2(1-\omega_{d'})^2v_{d'} + (1-\omega_{d'})^2(m_{d'})^2v^s_{dd'} + v^s_{dd'}(1-\omega_{d'})^2v_{d'}]$.
+ \end{lemma}
+ \begin{proof}
+ 	We compute the mean and variance of the product $\mathbf{S}\boldsymbol\beta$ and approximate resulting distribution as Gaussian.
+\begin{align}
+	&\mathbb{E}d_d = \mathbb{E} \left[\sum_{d'=1}^D s_{dd'}\beta_{d'}\right] =  \sum_{d'=1}^D \mathbb{E}[s_{dd'}\beta_{d'}] \\
+	&= \sum_{d'=1}^D \mathbb{E}s_{dd'}\mathbb{E}\beta_{d'} = \sum_{d'=1}^D m^s_{dd'}\mathbb{E}\beta_{d'}
+\end{align}
+\begin{align}
+	&\text{Var}d_d = \text{Var} \left[\sum_{d'=1}^D s_{dd'}\beta_{d'}\right] =  \sum_{d'=1}^D \text{Var}[s_{dd'}\beta_{d'}] = \\
+	&\sum_{d'=1}^D [(\mathbb{E}s_{dd'})^2 \text{Var}\beta_{d'} + (\mathbb{E}\beta_{d'})^2 \text{Var}s_{dd'} + \text{Var}\beta_{d'} \text{Var}s_{dd'}]
+\end{align}
+where $\mathbb{E}\beta_{d'}$, $\text{Var}\beta_{d'}$ are computed according to lemma~\ref{thm:moments_spsl}.
+ \end{proof}
+
+\begin{lemma}
+\label{thm:sum_vectors}
+If $\mathbf{b} \in \mathbb{R}^{D}$ and $\mathbf{d} \in \mathbb{R}^{D}$ are both vectors of independent Gaussian-distributed random variables: $b_{d} \sim \mathcal{N}(m^b_{d}, v^b_{d})$, $d_{d} \sim \mathcal{N}(m^d_{d}, v^d_{d})$ then their sum $\mathbf{c} = \mathbf{b} + \mathbf{d}$ is a vector of independent Gaussian-distributed random variables $c_{d} \sim \mathcal{N}(m^c_{d}, v^c_{d})$ with $m^c_{d} = m^b_{d} + m^d_{d}$, $v^c_{d} = v^b_{d} + v^d_{d}$
+\end{lemma}
+\begin{proof}
+Based on properties of Gaussian distributions.
+\end{proof}
+
+\begin{lemma}
+\label{thm:soft_thresholding}
+When a Gaussian-distributed random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft-thresholding function it can be approximated with the spike and slab distribution on $x^*$ with the probability of spike $\omega^*$, slab mean $m^*$ and slab variance $v^*$ (Formulae are given in the proof).
+\end{lemma}
+\begin{proof}
+Soft-thresholding operator is defined as $h_\lambda(v) = \text{sign}(v) * \max(|v| - \lambda, 0)$. We need to compute the parameters of approximating distribution.
+\begin{enumerate}
+\item The probability of spike $\omega^*$ equals to the probability mass that lies in $(-\lambda, \lambda)$ of the original distribution and is flattened into zero by soft-thresholding operator. As the original distribution is Gaussian, this can be computed as $\omega^* = p(x^*=0) = p(x \in (-\lambda, \lambda)) = \Phi(\frac{\lambda-m}{\sqrt{v}}) - \Phi(\frac{-\lambda-m}{\sqrt{v}})$. 
+\item Soft-thresholding shifts elements that are greater than $\lambda$  or less than $-\lambda$ elements towards 0. Let $\psi(\cdot)$ denote the density of the soft-threshold distribution, $\phi(\cdot)$ denote the density of the original Gaussian distribution. Then the first moment of the resulting distribution is $m^* = \int_{-\infty}^{+\infty}x\psi(x)dx = \int_{-\infty}^{0}x\phi(x-\lambda)dx + \int_{0}^{+\infty}x\phi(x+\lambda)dx$. Integrals are computed below.
+\begin{align}
+&\int_{-\infty}^{0}x\phi(x-\lambda)dx = \\
+&-\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} \\
+& + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
+\end{align}
+\begin{align}
+&\int_{0}^{+\infty}x\phi(x+\lambda)dx = \\
+& = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\\
+& + (m - \lambda)\left(1 - \Phi\left(-\frac{\lambda-m}{\sqrt{v}}\right)\right)
+\end{align}
+\item The second moment of the approximating distribution is computed as $s = \int_{-\infty}^{+\infty}x^2\psi(x)dx = \int_{-\infty}^{0}x^2\phi(x-\lambda)dx + \int_{0}^{+\infty}x^2\phi(x+\lambda)dx$.
+\begin{align}
+&\int_{-\infty}^{0}x^2\phi(x-\lambda)dx = \\
+&-\frac{\sqrt{v}}{\sqrt{2\pi}} (\lambda+m)\exp\left\{\frac{-(\lambda+m)^2}{2v}\right\}\\
+& + (\sigma^2 + (\lambda+m)^2)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
+\end{align}
+\begin{align}
+&\int_{0}^{+\infty}x^2\phi(x+\lambda)dx = \\
+&\frac{\sqrt{v}}{\sqrt{2\pi}} (m - \lambda)\exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\\
+& + (\sigma^2 + (m - \lambda)^2)\left(1 - \Phi\left(\frac{\lambda -m}{\sqrt{v}}\right)\right)
+\end{align}
+Resulting variance is
+\begin{equation}
+v^* = s- (m^*)^2
+\end{equation}
+\end{enumerate}
+\end{proof}
+
+The proposed operations on Gaussian and spike-and-slab distributions allow to formulate the main result in this section that describes how the uncertainty propagation works.
+\begin{theorem}[Bayesian LISTA forward propagation]
+\label{thm:prob_layer}
+The spike and slab distribution for $\boldsymbol\beta_{l-1}$ with parameters ($\boldsymbol\omega$, $\mathbf{m}$, $\mathbf{w}$) can be propagated through the LISTA layer and the parameters after propagation can be computed as following:
+\begin{enumerate}
+	\item $\mathbf{b} = Wy$ is computed according to lemma \ref{thm:matrix_const}
+	\item $\mathbf{d} = S\boldsymbol\beta_{l-1}$ is computed according to lemma \ref{thm:matrix_vector}
+	\item $\mathbf{c} = \mathbf{b} + \mathbf{d}$ is computed according to lemma \ref{thm:sum_vectors}
+	\item $\boldsymbol\beta_{l} = h_\lambda(\mathbf{c})$ is computed according to lemma \ref{thm:soft_thresholding}
+\end{enumerate}
+\end{theorem}
+
+\subsection{Approximation quality}
+We have used two approximations in forward propagation of the uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike-and-slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft-thresholding of a Gaussian vector is approximated with the spike-and-slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
+
+Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:matrix_vector}. For sampled distribution, 10000 values were sampled from the Gaussian matrix and the Gaussian vector and their product was computed, then one of the dimensionalities was plotted. The approximated distribution was computed according to lemma \ref{thm:matrix_vector}.
+
+Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:soft_thresholding}. For sampled distribution, 10000 values were sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities was plotted. The approximated distribution was computed according to lemma \ref{thm:soft_thresholding}.
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{d_testing}
+\caption{Approximation of product of Gaussians.}
+\label{fig:d_testing}
+\end{figure}
+
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{z_new_testing}
+\caption{Approximation of propagation through soft thresholding}
+\label{fig:z_new_testing}
+\end{figure}
+
+
+\section{Backpropagation}
+\label{sec:backpropagation}
+\subsection{Likelihood}
+The Student-t density, that is required for further derivation, can be parametrised in different ways. In this paper the following parametrisation is used 
+\begin{equation}
+\mathcal{T}(x; \mu, \beta, \nu) = \frac{\Gamma\left(\frac{\nu + 1}{2}\right)}{\Gamma\left(\frac{\nu}{2}\right)\sqrt{\pi \nu \beta}} \left(1 + \frac{(x - \mu)^2}{\nu\beta}\right)^{-\frac{\nu + 1}{2}}
+\end{equation}
+where $\Gamma(\cdot)$ denotes the Gamma function.
+
+We use the probabilistic backpropagation algorithm \cite{hernandez2015probabilistic} for computing parameters updates. It is based on assumed density filtering and expectation propagation and allows to update parameters of the distributions based on the derivative of the logarithm of the normalisation constant. 
+The exact posterior \ref{eq:posterior} is approximated with a factorised distribution
+\begin{align}
+\begin{split}
+q(\mathbf{W}, \mathbf{S}, \gamma, \eta) &= \prod_{l=1}^L\prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{dk, l} | m^w_{dk, l}, v^w_{dk, l}) \\
+&\times \prod_{l=1}^L\prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd'', l} | m^s_{d'd'', l}, v^s_{d'd'', l}) \\
+&\times \text{Gam}(\gamma; \alpha^\gamma, \beta^\gamma) \text{Gam}(\eta; \alpha^\eta, \beta^\eta) 
+\end{split}
+\end{align}
+The normalisation constant of the approximating distribution $q$ with the likelihood~\ref{eq:likelihood} term incorporated can be computed as follows
+\begin{align}
+Z = \int \prod_{d=1}^{D} \big[&\mathcal{N}(\beta_d | f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda), \gamma^{-1}) \\
+ &q(\mathbf{S}, \mathbf{W}, \eta, \gamma)\big] \mathrm{d}\mathbf{S} \mathrm{d}\mathbf{W} \mathrm{d}\eta \mathrm{d}\gamma
+\end{align}
+We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\mathbf{z}_L$ - output from the network
+\begin{align}
+\begin{split}
+&Z \approx \int \prod_{d=1}^{D} \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma_d^{-1}) \\
+&\times (\omega^{z_L}_d \delta_0([\mathbf{z}_L]_d) + (1 - \omega^{z_L}_d)\mathcal{N}(m^{z_L}_d, v^{z_L}_d))\\
+&\times \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}\mathbf{z}_L \mathrm{d}\boldsymbol\gamma \\
+&= \prod_{d=1}^{D} \Big[\omega^{z_L}_d \int \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma_d^{-1})  \delta_0([z_L]_d) \\
+&\times \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}[{z}_L]_d \mathrm{d}\gamma_d \\
+& + (1 - \omega^{z_L}_d)\int \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma_d^{-1})\mathcal{N}(m^{z_L}_d, v^{z_L}_d)) \\
+&\times \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}[{z}_L]_d \mathrm{d}\gamma_d\Big] \\
+& = \prod_{d=1}^{D} \Big[\omega^{z_L}_d \int \mathcal{N}(\beta_d | 0, \gamma_d^{-1})  \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma) d\gamma_d \\
+& + (1 - \omega^{z_L}_d)\int \big[\mathcal{T}(\beta_d | [\mathbf{z}_L]_d, \frac{\beta^\gamma}{\alpha^\gamma}, 2\alpha^\gamma) \\
+&\times \mathcal{N}(m^{z_L}_d, v^{z_L}_d))\big] \mathrm{d}[{z}_L]_d\Big] \\
+& \approx \prod_{d=1}^D \Big[\omega^{z_L}_d  \mathcal{T}(\beta_d | 0, \frac{\beta^\gamma}{\alpha^\gamma}, 2\alpha^\gamma) \\
+&+ (1 - \omega^{z_L}_d)\mathcal{N}(m^{z_L}_d, \frac{\beta^\gamma}{\alpha^\gamma - 1} + v^{z_L})\Big]
+\end{split}
+\end{align}
+
+Then derivatives of $Z$ are computed w.r.t the weights and hyperparameters of the factorised distribution and then they are used for updates.
+
+\section{Experiments}
+\subsection{Synthetic data}
+We have generated the random Gaussian design matrix $\mathbf{X}$. Coefficients $\boldsymbol\beta$ are generated from the spike-and-slab distribution with truncated slab: each component of $\boldsymbol\beta$ is zero with probability 0.8 or is from standard Gaussian distribution without interval (-0.1, 0.1) with probability 0.2. The observations are generated accordingly. Size of observations is $K=100$, size of coefficients is $D=784$, number of layers is $L=4$. Size of the training set is $1000$, validation set is $100$. 
+
+We compare two versions of the proposed Bayesian LISTA: with shared weight matrices and with individual matrices at each layer --- and LISTA.
+
+The NMSE is presented in figure \ref{fig:validation_synthetic}.
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{loss_synthetic}
+\caption{Validation NMSE on synthetic data}
+\label{fig:validation_synthetic}
+\end{figure}
+
+\subsection{MNIST}
+Here we evaluate the proposed Bayesian LISTA in terms of predictive performance on the MNIST dataset \cite{lecun2010mnist}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is learned on 5000 images with the minibatch online algorithm (J. Mairal, et al 2009). The resulting size of $\mathbf{X}$ is $100 \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta$ are images converted to vectors. We use randomly selected 1000 images for training and 100 for validation. 
+
+Figure \ref{fig:validation} presents NMSE loss on the validation set. 
+
+Proposed Bayesian LISTA networks estimate posterior distribution for $\boldsymbol\beta$. Figure \ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{loss}
+\caption{Validation NMSE}
+\label{fig:validation}
+\end{figure}
+\begin{figure*}[t]
+\subfloat[$\beta$ posterior mean]{\includegraphics[width=0.66\columnwidth]{posterior_mean}}
+\subfloat[$\beta$ posterior std]{\includegraphics[width=0.66\columnwidth]{posterior_std}}
+\subfloat[$\beta$ posterior spike indicator]{\includegraphics[width=0.66\columnwidth]{posterior_spike_indicator}}
+\caption{Posterior for the digit 7.}
+\label{fig:posterior_distribution}
+\end{figure*}
+\begin{figure*}[t]
+\subfloat[]{\includegraphics[width=0.66\columnwidth]{posterior_sample_0}}
+\subfloat[]{\includegraphics[width=0.66\columnwidth]{posterior_sample_1}}
+\subfloat[]{\includegraphics[width=0.66\columnwidth]{posterior_sample_2}}
+\caption{Samples from the posterior for the digit 7.}
+\label{fig:posterior_samples}
+\end{figure*}
+
+\section{Discussion}
+As far as we are aware, this is the first implementation of Bayesian deep sparse coding algorithm, there are works on Bayesian sparsity in context of neural networks \cite{he2017bayesian}, but it is not the Bayesian Neural Network. We find not only correct predictions but also useful posterior estimates for the predictions that show how the model is confident in its decision. 
+Though EP is not suited for distributed inference, some variations of ADF can be used \cite{li2015stochastic}. This allows the proposed approach to scale.
+
+\bibliographystyle{unsrt}
+\bibliography{bibliography}
+
+\end{document}
