@@ -144,6 +144,16 @@ def sgd_optimization_lista_old(n_train_batches=10, n_valid_batches=10, n_test_ba
             minibatch_avg_cost = train_model(minibatch_index)
             iter = (epoch - 1) * n_train_batches + minibatch_index
 
+            print(
+                'epoch %i, minibatch %i/%i, train error %f %%' %
+                (
+                    epoch,
+                    minibatch_index + 1,
+                    n_train_batches,
+                    minibatch_avg_cost
+                )
+            )
+
             if (iter + 1) % validation_frequency == 0:
                 validation_losses = [validate_model(i)
                                      for i in range(n_valid_batches)]
@@ -253,9 +263,9 @@ if __name__ == '__main__':
 
     np.random.seed(1)
     D = 10
-    K = 5
+    K = 9
     dataGenerator = DataGenerator(D, K)
-    sgd_optimization_lista(n_train_batches=100, n_valid_batches=20, n_test_batches=20, learning_rate=0.0001,
+    sgd_optimization_lista_old(n_train_batches=1000, n_valid_batches=20, n_test_batches=20, learning_rate=0.00001,
                            n_epochs=10000,
                            batch_size=100, D=D, K=K, L=2, data_generator=dataGenerator)
-    predict(D=D, K=K, data_generator=dataGenerator)
+    predict_old(D=D, K=K, data_generator=dataGenerator)

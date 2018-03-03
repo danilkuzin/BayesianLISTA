@@ -78,7 +78,7 @@ if __name__ == '__main__':
     # batch_size = 5000
     # validation_size = 100
 
-    saved_comparator_file_name = 'comparator_with_learnt_dictionary_10_iter.pkl'
+    saved_comparator_file_name = []#'comparator_with_learnt_dictionary_10000_train.pkl'
 
 
     if not saved_comparator_file_name:
@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
 
 
-    n_iter = 40
+    n_iter = 50
 
     for _ in tqdm(range(n_iter)):
         comparator.train_iteration()
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    with open('comparator_with_learnt_dictionary_50_iter.pkl', 'wb') as f:
+    with open('comparator_with_learnt_dictionary_10000_train_50_iter.pkl', 'wb') as f:
         pickle.dump(comparator, f)
 
 # train size = 1000, validation size = 100, K = 100 with random matrix X on the first 4 iterations gives promising results
