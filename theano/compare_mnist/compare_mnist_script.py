@@ -22,6 +22,7 @@ class MnistSequentialComparator(object):
         self.data = MnistData(K=K)
         self.data.check_download()
         self.data.learn_dictionary()
+        #self.data.generate_random_design_matrix()
         self.D = self.data.train_data.shape[1]
 
         self.freq_lista = FrequentistListaHandler(D=self.D, K=K, L=L, X=self.data.X, learning_rate=learning_rate)
@@ -77,9 +78,18 @@ if __name__ == '__main__':
     # batch_size = 5000
     # validation_size = 100
 
-    comparator = MnistSequentialComparator(K, L, learning_rate=0.0001)
+    saved_comparator_file_name = 'comparator_with_learnt_dictionary_10_iter.pkl'
 
-    n_iter = 5
+
+    if not saved_comparator_file_name:
+        comparator = MnistSequentialComparator(K, L, learning_rate=0.0001)
+    else:
+        comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
+
+
+
+
+    n_iter = 40
 
     for _ in tqdm(range(n_iter)):
         comparator.train_iteration()
@@ -95,4 +105,7 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-# D = 100, K = 50, L = 4, batch_size = 1000 - at iterations 0-200 bayesian loss is smaller than freq
+    with open('comparator_with_learnt_dictionary_50_iter.pkl', 'wb') as f:
+        pickle.dump(comparator, f)
+
+# train size = 1000, validation size = 100, K = 100 with random matrix X on the first 4 iterations gives promising results
