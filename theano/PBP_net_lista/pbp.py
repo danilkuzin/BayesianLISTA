@@ -223,3 +223,7 @@ class PBP_lista:
     def sample_ws(self):
 
         self.network.sample_ws()
+
+    def sample_mean_ws(self):
+
+        self.network.sample_mean_ws()

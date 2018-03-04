@@ -217,3 +217,16 @@ class Network:
         for i in range(len(self.layers)):
             self.params_W[i].set_value(W[i])
             self.params_S[i].set_value(S[i])
+
+    def sample_mean_ws(self):
+
+        W = []
+        S = []
+        for i in range(len(self.layers)):
+            W.append(self.params_W_M[i].get_value())
+
+            S.append(self.params_S_M[i].get_value())
+
+        for i in range(len(self.layers)):
+            self.params_W[i].set_value(W[i])
+            self.params_S[i].set_value(S[i])

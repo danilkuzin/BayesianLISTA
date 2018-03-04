@@ -184,3 +184,12 @@ class Network:
 
         self.params_W.set_value(W)
         self.params_S.set_value(S)
+
+    def sample_mean_ws(self):
+
+        W = self.params_W_M.get_value()
+
+        S = self.params_S_M.get_value()
+
+        self.params_W.set_value(W)
+        self.params_S.set_value(S)
