@@ -13,7 +13,7 @@ from freqLISTA.run_lista import sgd_optimization_lista, predict
 import matplotlib.pyplot as plt
 
 
-class SequentialComparator(object):
+class SequentialComparatorWithAlgotithmSelection(object):
     def __init__(self, D, K, L, learning_rate=0.0001, n_train_sample=1, n_validation_sample=1,
                  train_freq=True, train_bayes=True, train_shared_bayes=True):
 

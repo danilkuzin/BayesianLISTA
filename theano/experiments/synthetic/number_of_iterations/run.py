@@ -3,6 +3,8 @@ import numpy as np
 import six.moves.cPickle as pickle
 import matplotlib.pyplot as plt
 
+from compare_freq_bayes.compare_sequential_selected_algorithms import SequentialComparatorWithAlgotithmSelection
+
 np.random.seed(10)
 
 D = 10
@@ -20,7 +22,7 @@ freq_validation_loss = np.zeros(len(n_iter_array))
 for i, n_iter in enumerate(n_iter_array):
     print('iteration {}'.format(n_iter))
     print('compiling...')
-    comparator = SequentialComparator(D, K, L, learning_rate=0.0001, n_train_sample=batch_size,
+    comparator = SequentialComparatorWithAlgotithmSelection(D, K, L, learning_rate=0.0001, n_train_sample=batch_size,
                                       n_validation_sample=validation_size, train_freq=True, train_bayes=False, train_shared_bayes=False)
     print('training...')
 

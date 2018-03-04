@@ -12,14 +12,20 @@ class BayesianListaHandler(ListaHandler):
 
         self.pbp_instance = pbp.PBP_lista(L, D, K, X, mean_y_train, std_y_train)
 
-    def train_iteration(self, beta_train, y_train):
+    def train_iteration(self, beta_train, y_train, sample_mean=False):
         self.pbp_instance.do_pbp(beta_train, y_train, n_iterations=1)
-        self.pbp_instance.sample_ws()
+        if sample_mean:
+            self.pbp_instance.sample_mean_ws()
+        else:
+            self.pbp_instance.sample_ws()
         return self.test(beta_train, y_train)
 
-    def train_iteration_nmse(self, beta_train, y_train):
+    def train_iteration_nmse(self, beta_train, y_train, sample_mean=False):
         self.pbp_instance.do_pbp(beta_train, y_train, n_iterations=1)
-        self.pbp_instance.sample_ws()
+        if sample_mean:
+            self.pbp_instance.sample_mean_ws()
+        else:
+            self.pbp_instance.sample_ws()
         return self.test_nmse(beta_train, y_train)
 
     def test(self, beta_test, y_test):
