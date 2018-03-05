@@ -41,26 +41,10 @@ class SequentialComparatorWithAlgotithmSelection(object):
         self.beta_train, self.y_train, _ = self.data_generator.new_sample(n_train_sample)
         self.beta_validation, self.y_validation, _ = self.data_generator.new_sample(n_validation_sample)
 
-
-    def train_iteration(self, lr):
-
-        # self.freq_train_loss.append(
-        #     self.freq_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
-        # self.bayesian_train_loss.append(
-        #     self.bayesian_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
-        # self.shared_bayesian_train_loss.append(
-        #     self.shared_bayesian_lista.train_iteration(beta_train=self.beta_train, y_train=self.y_train))
-        #
-        # self.freq_validation_loss.append(
-        #     self.freq_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
-        # self.bayesian_validation_loss.append(
-        #     self.bayesian_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
-        # self.shared_bayesian_validation_loss.append(
-        #     self.shared_bayesian_lista.test(beta_test=self.beta_validation, y_test=self.y_validation))
-
+    def train_iteration(self):
         if self.train_freq:
             self.freq_train_loss.append(
-                self.freq_lista.train_iteration_nmse(beta_train=self.beta_train, y_train=self.y_train, learning_rate=lr))
+                self.freq_lista.train_iteration_nmse(beta_train=self.beta_train, y_train=self.y_train))
         if self.train_bayes:
             self.bayesian_train_loss.append(
                 self.bayesian_lista.train_iteration_nmse(beta_train=self.beta_train, y_train=self.y_train))
@@ -93,7 +77,7 @@ if __name__ == '__main__':
     saved_comparator_file_name = []#'best_model_bayes_lista_single_matrices.pkl'
 
     if not saved_comparator_file_name:
-        comparator = SequentialComparator(D, K, L, learning_rate=0.0001, n_train_sample=batch_size, n_validation_sample=validation_size)
+        comparator = SequentialComparatorWithAlgotithmSelection(D, K, L, learning_rate=0.0001, n_train_sample=batch_size, n_validation_sample=validation_size)
     else:
         comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
 
