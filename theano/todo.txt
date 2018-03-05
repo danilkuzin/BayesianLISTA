@@ -1,29 +1,45 @@
-plot nmse vs number of layers in LISTA
-
-predict deterministic based on mean of weights rather than random sample
-
-choose W(1, 1) and S(1, 1) and check history of their values in iterations in Lista and Bayesian Lista.
-For Bayesian Lista check mean, variance and random sample
-
-add f measure computation
-
-check more number of layers on MNIST
+-plot nmse vs number of layers in LISTA and Bayesian Lista
 
 
-LOOK! make mini-batch update of weights in Bayesian Lista, based on incorporating the likelihood term for mini-batch data rather than for single points only.
-
-Read https://arxiv.org/pdf/1609.00285.pdf since they show on which data freq LISTA does not work!
++predict deterministic based on mean of weights rather than random sample
 
 
-On synthetic data make plots with shaded std. It would be good to find an example where on a component both Lista and Bayesian Lista are wrong, but Bayesian Lista has a large std
++choose W(1, 1) and S(1, 1) and check history of their values in iterations in Lista and Bayesian Lista.
++For Bayesian Lista check mean, variance and random sample
+
+-add f measure computation
 
 
-Check matlab toolbox for HMC, where we can estimate posterior with it
+-check different number of layers on MNIST
 
 
-Make active learning experiments, for this compute
+-!check why weights on S drops from initial value after the first iteration
+
+
+-find good setup for synthetic data
+-experiment on nmse vs undersampling
+-On synthetic data make plots with shaded std. It would be good to find an example where on a component both
+Lista and Bayesian Lista are wrong, but Bayesian Lista has a large std
+
+
+-LOOK! make mini-batch update of weights in Bayesian Lista, based on incorporating the likelihood term for mini-batch data rather than for single points only.
+
+
++-Read https://arxiv.org/pdf/1609.00285.pdf since they show on which data freq LISTA does not work!
+
+
+-Check matlab toolbox for HMC, where we can estimate posterior with it
+
+
+-Add to text that we work with multivariate output of the neural network, which is much more complicated than scalar output
+
+
+-Make data normalisation
+
+
+-Make active learning experiments, for this compute
 entropy of spike and slab:
-uncertainty sampling approach, and we define uncertainty as variance
++uncertainty sampling approach, and we define uncertainty as variance
 
 https://pdfs.semanticscholar.org/c1e0/d6674ff6304b0ba35b78813187bdf45f395c.pdf -
 here conditional entropy is used, conditioned on omega, therefore, dealing only with entropy of Gaussian
@@ -67,4 +83,3 @@ the same formula can be obtain for spike and slab, and whether anybody uses this
 also http://ieeexplore.ieee.org/document/4648062/ this is on entropy approximation for Gaussian mixture
 
 
-Add to text that we work with multivariate output of the neural network, which is much more complicated than scalar output

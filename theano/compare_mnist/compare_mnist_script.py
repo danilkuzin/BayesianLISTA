@@ -51,7 +51,8 @@ class MnistSequentialComparator(object):
         #self.bayesian_train_loss.append(
         #    self.bayesian_lista.train_iteration_nmse(beta_train=self.data.train_data, y_train=self.data.y_train))
         self.shared_bayesian_train_loss.append(
-            self.shared_bayesian_lista.train_iteration_nmse(beta_train=self.data.train_data, y_train=self.data.y_train))
+            self.shared_bayesian_lista.train_iteration_nmse(beta_train=self.data.train_data, y_train=self.data.y_train,
+                                                            sample_mean=False))
 
         # self.freq_validation_loss.append(
         #     self.freq_lista.test(beta_test=self.data.validation_data, y_test=self.data.y_validation))
@@ -78,7 +79,7 @@ if __name__ == '__main__':
     # batch_size = 5000
     # validation_size = 100
 
-    saved_comparator_file_name = 'comparator_with_100_train_50_iter_10_layers_big_initial_var.pkl'
+    saved_comparator_file_name = 'comparator_with_learnt_dictionary_500_train_400_iter_10_layers.pkl'
 
 
     if not saved_comparator_file_name:
@@ -89,7 +90,7 @@ if __name__ == '__main__':
 
 
 
-    n_iter = 50
+    n_iter = 250
 
     for _ in tqdm(range(n_iter)):
         comparator.train_iteration()
@@ -105,7 +106,7 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    with open('comparator_with_100_train_100_iter_10_layers_big_initial_var.pkl', 'wb') as f:
+    with open('comparator_with_learnt_dictionary_500_train_650_iter_10_layers.pkl', 'wb') as f:
         pickle.dump(comparator, f)
 
 # train size = 1000, validation size = 100, K = 100 with random matrix X on the first 4 iterations gives promising results

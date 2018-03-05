@@ -2,8 +2,8 @@ compare_sequential:
 
     np.random.seed(1)
 
-    D = 784#100
-    K = 100#50
+    D = 100
+    K = 50
     L = 4
 
     batch_size = 1000
@@ -24,3 +24,8 @@ compare_sequential:
     for _ in tqdm(range(n_iter)):
         comparator.train_iteration()
 
+
+
+Normal variance in Bayesian Listas (both of them here)
+
+Freq Lista updates after each element

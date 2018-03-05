@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import six.moves.cPickle as pickle
 
 from compare_mnist.compare_mnist_script import MnistSequentialComparator
+from compare_freq_bayes.compare_sequential import SequentialComparator
 
 
 class PosteriorPlotter(object):
@@ -62,7 +63,7 @@ if __name__ == '__main__':
 
     np.random.seed(1)
 
-    saved_comparator_file_name = '../compare_mnist/comparator_with_learnt_dictionary_500_train_300_iter_10_layers.pkl'
+    saved_comparator_file_name = '../compare_freq_bayes/synthetic_data_comparator_good_results.pkl'
     comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
 
     plotter = PosteriorPlotter()

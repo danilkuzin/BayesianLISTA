@@ -8,8 +8,8 @@ class Prior:
         # We refine the factor for the prior variance on the weights
 
         n_samples = 3.0
-        #v_observed = 1.0
-        v_observed = 10000.0
+        v_observed = 1.0
+        #v_observed = 10000.0
         self.a_w = 2.0 * n_samples
         self.b_w = 2.0 * n_samples * v_observed
         self.a_s = 2.0 * n_samples
