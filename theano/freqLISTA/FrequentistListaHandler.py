@@ -12,17 +12,17 @@ class FrequentistListaHandler(ListaHandler):
         y = T.matrix('y')
         beta = T.matrix('beta')
 
-        lista = Lista(L, D, K, y, X)
+        self.lista = Lista(L, D, K, y, X)
 
-        cost = lista.mean_squared_error(beta)
+        cost = self.lista.mean_squared_error(beta)
 
-        cost_nmse = lista.normalised_mean_squared_error(beta)
+        cost_nmse = self.lista.normalised_mean_squared_error(beta)
 
-        g_S = T.grad(cost=cost, wrt=lista.S)
-        g_W = T.grad(cost=cost, wrt=lista.W)
+        g_S = T.grad(cost=cost, wrt=self.lista.S)
+        g_W = T.grad(cost=cost, wrt=self.lista.W)
 
-        updates = [(lista.S, lista.S - learning_rate * g_S),
-                   (lista.W, lista.W - learning_rate * g_W)]
+        updates = [(self.lista.S, self.lista.S - learning_rate * g_S),
+                   (self.lista.W, self.lista.W - learning_rate * g_W)]
 
         self.train_model = theano.function(
             inputs=[y, beta],
@@ -37,7 +37,7 @@ class FrequentistListaHandler(ListaHandler):
 
         self.predict_model = theano.function(
             inputs=[y],
-            outputs=lista.beta_estimator
+            outputs=self.lista.beta_estimator
         )
 
         self.compute_nmse = theano.function(
