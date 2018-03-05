@@ -44,12 +44,12 @@ class PosteriorPlotter(object):
 
     def plot_loss(self, comparator):
         plt.figure()
-        #plt.semilogy(comparator.freq_train_loss, label="freq train loss")
+        plt.semilogy(comparator.freq_train_loss, label="freq train loss")
         #plt.semilogy(comparator.bayesian_train_loss, label="bayes train loss")
-        #plt.semilogy(comparator.shared_bayesian_train_loss, label="shared bayes train loss")
+        plt.semilogy(comparator.shared_bayesian_train_loss, label="shared bayes train loss")
 
         plt.semilogy(comparator.freq_validation_loss, label="freq valid loss")
-        plt.semilogy(comparator.bayesian_validation_loss, label="bayes valid loss")
+        #plt.semilogy(comparator.bayesian_validation_loss, label="bayes valid loss")
         plt.semilogy(comparator.shared_bayesian_validation_loss, label="shared bayes valid loss")
 
         plt.legend()
@@ -62,13 +62,13 @@ if __name__ == '__main__':
 
     np.random.seed(1)
 
-    saved_comparator_file_name = '../compare_mnist/comparator_with_learnt_dictionary_10_iter.pkl'
+    saved_comparator_file_name = '../compare_mnist/comparator_with_learnt_dictionary_500_train_300_iter_10_layers.pkl'
     comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
 
     plotter = PosteriorPlotter()
 
     example_num = 7
 
-    plotter.plot_posterior_samples_mnist(comparator.bayesian_lista, comparator.data.y_validation[example_num], 3)
-    plotter.plot_posterior_parameters_mnist(comparator.bayesian_lista, comparator.data.y_validation[example_num])
+    #plotter.plot_posterior_samples_mnist(comparator.bayesian_lista, comparator.data.y_validation[example_num], 3)
+    #plotter.plot_posterior_parameters_mnist(comparator.bayesian_lista, comparator.data.y_validation[example_num])
     plotter.plot_loss(comparator)

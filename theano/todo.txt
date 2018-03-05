@@ -1,1 +1,70 @@
 plot nmse vs number of layers in LISTA
+
+predict deterministic based on mean of weights rather than random sample
+
+choose W(1, 1) and S(1, 1) and check history of their values in iterations in Lista and Bayesian Lista.
+For Bayesian Lista check mean, variance and random sample
+
+add f measure computation
+
+check more number of layers on MNIST
+
+
+LOOK! make mini-batch update of weights in Bayesian Lista, based on incorporating the likelihood term for mini-batch data rather than for single points only.
+
+Read https://arxiv.org/pdf/1609.00285.pdf since they show on which data freq LISTA does not work!
+
+
+On synthetic data make plots with shaded std. It would be good to find an example where on a component both Lista and Bayesian Lista are wrong, but Bayesian Lista has a large std
+
+
+Check matlab toolbox for HMC, where we can estimate posterior with it
+
+
+Make active learning experiments, for this compute
+entropy of spike and slab:
+uncertainty sampling approach, and we define uncertainty as variance
+
+https://pdfs.semanticscholar.org/c1e0/d6674ff6304b0ba35b78813187bdf45f395c.pdf -
+here conditional entropy is used, conditioned on omega, therefore, dealing only with entropy of Gaussian
+
+http://www.jmlr.org/papers/volume14/hernandez-lobato13a/hernandez-lobato13a.pdf -
+here they assumed that omega is marginalised and entropy again is based on Gaussian only
+
+http://burrsettles.com/pub/settles.activelearning.pdf - from here:
+"When there is only one parameter
+in the model, this strategy is straightforward. But for models of K parameters,
+Fisher information takes the form of a K × K covariance matrix (denoted earlier
+as F), and deciding what exactly to optimize is a bit tricky. In the OED literature,
+there are three types of optimal designs in such cases:
+• A-optimality minimizes the trace of the inverse information matrix,
+• D-optimality minimizes the determinant of the inverse matrix, and
+• E-optimality minimizes the maximum eigenvalue of the inverse matrix"
+
+"D-optimality, it turns out, is related to minimizing
+the expected posterior entropy (Chaloner and Verdinelli, 1995). Since the determinant
+can be thought of as a measure of volume, the D-optimal design criterion
+essentially aims to minimize the volume of the (noisy) version space, with boundaries
+estimated via entropy, which makes it somewhat analogous to the query-bycommittee
+algorithm (Section 3.2).
+A-optimal designs are considerably more popular, and aim to reduce the average
+variance of parameter estimates by focusing on values along the diagonal
+of the information matrix."
+
+we can say something similar for our covariance matrix, and estimate is either by A or D optimality
+
+Moreover from wiki on variance (https://en.wikipedia.org/wiki/Variance):
+Another natural generalization of variance for such vector-valued random variables X, which results in a scalar value
+rather than in a matrix, is obtained by interpreting the deviation between the random variable and its mean as
+the Euclidean distance. This results in E[(X-mu )^T(X-mu )]=trC, which is the trace of the covariance matrix.
+
+maybe also worth to check https://authors.library.caltech.edu/13795/1/MACnc92c.pdf
+
+from Bayesian optimisation there is also suitable utility function as GP-UCB
+(https://www.cse.wustl.edu/~garnett/cse515t/spring_2015/files/lecture_notes/12.pdf), but it is unclear whether
+the same formula can be obtain for spike and slab, and whether anybody uses this for active learning
+
+also http://ieeexplore.ieee.org/document/4648062/ this is on entropy approximation for Gaussian mixture
+
+
+Add to text that we work with multivariate output of the neural network, which is much more complicated than scalar output

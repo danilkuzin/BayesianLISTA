@@ -21,7 +21,7 @@ class MnistData(object):
         self.y_train = None
         self.y_validation = None
 
-        self.training_size = 10000
+        self.training_size = 100
         self.validation_size = 100
 
     def check_download(self):
