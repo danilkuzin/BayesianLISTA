@@ -34,3 +34,4 @@ theano/compare_mnist/mnist_100_train_20_layers_K_250_bayes_weights.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_250_beta_est.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_250_params.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_250_quality.npz
+theano/compare_mnist/mnist_results.zip
