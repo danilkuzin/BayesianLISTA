@@ -20,7 +20,7 @@ class SingleBayesianListaHandler(ListaHandler):
     #         self.pbp_instance.sample_ws()
     #     return self.test(beta_train, y_train)
 
-    def train_iteration(self, beta_train, y_train, sample_mean=False):
+    def train_iteration(self, beta_train, y_train, sample_mean=True):
         self.pbp_instance.do_pbp(beta_train, y_train, n_iterations=1)
         if sample_mean:
             self.pbp_instance.sample_mean_ws()

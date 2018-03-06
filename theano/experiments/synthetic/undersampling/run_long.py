@@ -49,17 +49,19 @@ np.savez('undersampling_measures', freq_train_loss=freq_train_loss, freq_validat
 
 plt.plot(K_array, freq_train_loss[:, -1], label="freq train")
 plt.plot(K_array, freq_validation_loss[:, -1], label="freq valid")
-plt.plot(K_array, sh_bayes_train_loss[:, -1], label="freq train")
-plt.plot(K_array, sh_bayes_validation_loss[:, -1], label="freq valid")
+plt.plot(K_array, sh_bayes_train_loss[:, -1], label="Bayes train")
+plt.plot(K_array, sh_bayes_validation_loss[:, -1], label="Bayes valid")
 
 plt.legend()
 plt.savefig('compare_nmse_vs_undersampling.eps', format='eps')
+plt.show()
 
 plt.plot(K_array, freq_train_f_measure[:, -1], label="freq train")
 plt.plot(K_array, freq_validation_f_measure[:, -1], label="freq valid")
-plt.plot(K_array, sh_bayes_train_f_measure[:, -1], label="freq train")
-plt.plot(K_array, sh_bayes_validation_f_measure[:, -1], label="freq valid")
+plt.plot(K_array, sh_bayes_train_f_measure[:, -1], label="Bayes train")
+plt.plot(K_array, sh_bayes_validation_f_measure[:, -1], label="Bayes valid")
 
 plt.legend()
 plt.savefig('compare_f_measure_vs_undersampling.eps', format='eps')
+plt.show()
 
