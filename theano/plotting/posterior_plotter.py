@@ -3,9 +3,6 @@ from PBP_net_lista.test_network_layer import random_spike_and_slab
 import matplotlib.pyplot as plt
 import six.moves.cPickle as pickle
 
-from compare_mnist.compare_mnist_script import MnistSequentialComparator
-from compare_freq_bayes.compare_sequential import SequentialComparator
-
 
 class PosteriorPlotter(object):
 
