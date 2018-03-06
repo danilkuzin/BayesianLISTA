@@ -18,6 +18,10 @@ class SequentialComparator(object):
     def __init__(self, D, K, L, learning_rate=0.0001, n_train_sample=1, n_validation_sample=1,
                  train_freq=True, train_bayes=True, train_shared_bayes=True, save_history=False):
 
+        self.D = D
+        self.K = K
+        self.L = L
+
         self.data_generator = DataGenerator(D, K)
 
         self.train_freq = train_freq
@@ -136,6 +140,39 @@ class SequentialComparator(object):
         plt.legend()
         plt.title('F measure')
         plt.show()
+
+    def save_numpy(self, filename):
+        freq_train_loss = self.freq_train_loss
+        freq_validation_loss = self.freq_validation_loss
+        shared_bayesian_train_loss = self.shared_bayesian_train_loss
+        shared_bayesian_validation_loss = self.shared_bayesian_validation_loss
+        freq_train_f_measure = self.freq_train_f_meas
+        freq_validation_f_measure = self.freq_validation_f_meas
+        shared_bayesian_train_f_measure = self.shared_bayesian_train_f_meas
+        shared_bayesian_validation_f_measure = self.shared_bayesian_validation_f_meas
+        freq_beta_train_est = self.freq_lista.predict(comparator.data.y_train)
+        freq_beta_validation_est = self.freq_lista.predict(comparator.data.y_validation)
+        shared_beta_train_est = self.shared_bayesian_lista.predict(comparator.data.y_train)
+        shared_beta_validation_est = self.shared_bayesian_lista.predict(comparator.data.y_validation)
+        train_size = self.y_train.shape[0]
+        bayes_W_M = self.shared_bayesian_lista.pbp_instance.network.params_W_M.get_value()
+        bayes_W_V = self.shared_bayesian_lista.pbp_instance.network.params_W_V.get_value()
+        bayes_S_M = self.shared_bayesian_lista.pbp_instance.network.params_S_M.get_value()
+        bayes_S_V = self.shared_bayesian_lista.pbp_instance.network.params_S_V.get_value()
+        np.savez('{}_bayes_weights'.format(filename), D=self.D, K=self.K, L=self.L, bayes_S_M=bayes_S_M,
+                 bayes_S_V=bayes_S_V, bayes_W_M=bayes_W_M, bayes_W_V=bayes_W_V)
+        np.savez('{}_beta_est'.format(filename), D=self.D, K=self.K, L=self.L, freq_beta_train_est=freq_beta_train_est,
+                 freq_beta_validation_est=freq_beta_validation_est, shared_beta_train_est=shared_beta_train_est,
+                 shared_beta_validation_est=shared_beta_validation_est, true_beta_train=self.beta_train,
+                 true_beta_validation=self.beta_validation, y_train=self.y_train, y_validation=self.y_validation)
+        np.savez('{}_quality'.format(filename), D=self.D, K=self.K, L=self.L, freq_train_f_measure=freq_train_f_measure,
+                 freq_train_loss=freq_train_loss, freq_validation_f_measure=freq_validation_f_measure,
+                 freq_validation_loss=freq_validation_loss,
+                 shared_bayesian_train_f_measure=shared_bayesian_train_f_measure,
+                 shared_bayesian_train_loss=shared_bayesian_train_loss,
+                 shared_bayesian_validation_f_measure=shared_bayesian_validation_f_measure,
+                 shared_bayesian_validation_loss=shared_bayesian_validation_loss)
+        np.savez('{}_params'.format(filename), D=self.D, K=self.K, L=self.L, train_size=train_size)
 
 if __name__ == '__main__':
 
