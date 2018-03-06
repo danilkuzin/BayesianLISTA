@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     np.random.seed(1)
 
-    K = 100
+    K = 250
     L = 20
 
     # batch_size = 5000
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     comparator.plot_quality_history()
 
-    with open('mnist_100_train_20_layers.pkl', 'wb') as f:
+    with open('mnist_100_train_20_layers_K_250.pkl', 'wb') as f:
         pickle.dump(comparator, f)
 
     # comparator.freq_w_hist = np.array(comparator.freq_w_hist)
