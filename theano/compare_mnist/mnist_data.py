@@ -35,6 +35,14 @@ class MnistData(object):
         self.validation_data = mnist.validation.images[random_validation_ind]
         #self.validation_labels = np.asarray(mnist.validation.labels, dtype=np.int32)
 
+        self.normalize()
+
+    def normalize(self):
+        self.train_mean = np.mean(self.train_data, axis=0)
+        self.train_std = np.std(self.train_data, axis=0)
+        self.train_data = (self.train_data - self.train_mean) / self.train_std
+        self.validation_data = (self.validation_data - self.train_mean) / self.train_std
+
     def learn_dictionary(self):
         print('Learning the dictionary...')
         t0 = time()
