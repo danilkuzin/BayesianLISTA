@@ -38,7 +38,7 @@ if __name__ == '__main__':
     np.random.seed(1)
 
     K = 100
-    L = 10
+    L = 20
 
     # batch_size = 5000
     # validation_size = 100
@@ -47,50 +47,52 @@ if __name__ == '__main__':
 
 
     if not saved_comparator_file_name:
-        comparator = MnistSequentialComparator_DFGHJDF(K, L, learning_rate=0.0001, train_bayes=False, save_history=True)
+        comparator = MnistSequentialComparator_DFGHJDF(K, L, learning_rate=0.0001,
+                                                       train_bayes=False, save_history=True,
+                                                       n_train_sample=100, n_validation_sample=100)
     else:
         comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
 
 
 
 
-    n_iter = 50
+    n_iter = 1000
 
     for _ in tqdm(range(n_iter)):
        comparator.train_iteration()
 
     comparator.plot_quality_history()
 
-    with open('test_S_convergence.pkl', 'wb') as f:
+    with open('mnist_100_train_20_layers.pkl', 'wb') as f:
         pickle.dump(comparator, f)
 
-    comparator.freq_w_hist = np.array(comparator.freq_w_hist)
-    comparator.shared_bayes_w_hist = np.array(comparator.shared_bayes_w_hist)
-    comparator.shared_bayes_w_var_hist = np.array(comparator.shared_bayes_w_var_hist)
-
-    i1 = 0
-    i2 = 0
-
-    plt.plot(np.linspace(0, n_iter, n_iter), comparator.freq_w_hist[:, i1, i2], label="freq w[0, 0]")
-    plt.plot(np.linspace(0, n_iter, n_iter), comparator.shared_bayes_w_hist[:, i1, i2], label="bayes w[0, 0]")
-
-    lower = comparator.shared_bayes_w_hist[:, i1, i2] - 2 * np.sqrt(comparator.shared_bayes_w_var_hist[:, i1, i2])
-    upper = comparator.shared_bayes_w_hist[:, i1, i2] + 2 * np.sqrt(comparator.shared_bayes_w_var_hist[:, i1, i2])
-    plt.fill_between(np.linspace(0, n_iter, n_iter), lower, upper, color='aquamarine', edgecolor='blue')
-
-    plt.legend()
-    plt.show()
-
-    comparator.freq_s_hist = np.array(comparator.freq_s_hist)
-    comparator.shared_bayes_s_hist = np.array(comparator.shared_bayes_s_hist)
-    comparator.shared_bayes_s_var_hist = np.array(comparator.shared_bayes_s_var_hist)
-
-    plt.plot(np.linspace(0, n_iter, n_iter), comparator.freq_s_hist[:, i1, i2], label="freq s[0, 0]")
-    plt.plot(np.linspace(0, n_iter, n_iter), comparator.shared_bayes_s_hist[:, i1, i2], label="bayes s[0, 0]")
-
-    lower = comparator.shared_bayes_s_hist[:, i1, i2] - 2 * np.sqrt(comparator.shared_bayes_s_var_hist[:, i1, i2])
-    upper = comparator.shared_bayes_s_hist[:, i1, i2] + 2 * np.sqrt(comparator.shared_bayes_s_var_hist[:, i1, i2])
-    plt.fill_between(np.linspace(0, n_iter, n_iter), lower, upper, color='aquamarine', edgecolor='blue')
-
-    plt.legend()
-    plt.show()
+    # comparator.freq_w_hist = np.array(comparator.freq_w_hist)
+    # comparator.shared_bayes_w_hist = np.array(comparator.shared_bayes_w_hist)
+    # comparator.shared_bayes_w_var_hist = np.array(comparator.shared_bayes_w_var_hist)
+    #
+    # i1 = 0
+    # i2 = 0
+    #
+    # plt.plot(np.linspace(0, n_iter, n_iter), comparator.freq_w_hist[:, i1, i2], label="freq w[0, 0]")
+    # plt.plot(np.linspace(0, n_iter, n_iter), comparator.shared_bayes_w_hist[:, i1, i2], label="bayes w[0, 0]")
+    #
+    # lower = comparator.shared_bayes_w_hist[:, i1, i2] - 2 * np.sqrt(comparator.shared_bayes_w_var_hist[:, i1, i2])
+    # upper = comparator.shared_bayes_w_hist[:, i1, i2] + 2 * np.sqrt(comparator.shared_bayes_w_var_hist[:, i1, i2])
+    # plt.fill_between(np.linspace(0, n_iter, n_iter), lower, upper, color='aquamarine', edgecolor='blue')
+    #
+    # plt.legend()
+    # plt.show()
+    #
+    # comparator.freq_s_hist = np.array(comparator.freq_s_hist)
+    # comparator.shared_bayes_s_hist = np.array(comparator.shared_bayes_s_hist)
+    # comparator.shared_bayes_s_var_hist = np.array(comparator.shared_bayes_s_var_hist)
+    #
+    # plt.plot(np.linspace(0, n_iter, n_iter), comparator.freq_s_hist[:, i1, i2], label="freq s[0, 0]")
+    # plt.plot(np.linspace(0, n_iter, n_iter), comparator.shared_bayes_s_hist[:, i1, i2], label="bayes s[0, 0]")
+    #
+    # lower = comparator.shared_bayes_s_hist[:, i1, i2] - 2 * np.sqrt(comparator.shared_bayes_s_var_hist[:, i1, i2])
+    # upper = comparator.shared_bayes_s_hist[:, i1, i2] + 2 * np.sqrt(comparator.shared_bayes_s_var_hist[:, i1, i2])
+    # plt.fill_between(np.linspace(0, n_iter, n_iter), lower, upper, color='aquamarine', edgecolor='blue')
+    #
+    # plt.legend()
+    # plt.show()
