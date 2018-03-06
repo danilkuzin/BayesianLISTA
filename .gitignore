@@ -26,6 +26,7 @@ theano/plotting/posterior_std.pdf
 theano/compare_freq_bayes/D_100_K_50_L_4_train_1000/loss.pdf
 theano/compare_freq_bayes/conclusions_so_fat.txt
 theano/compare_mnist/conclusions_so_far.txt
+*.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_100_bayes_weights.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_100_beta_est.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_100_params.npz
@@ -34,4 +35,6 @@ theano/compare_mnist/mnist_100_train_20_layers_K_250_bayes_weights.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_250_beta_est.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_250_params.npz
 theano/compare_mnist/mnist_100_train_20_layers_K_250_quality.npz
+
 theano/compare_mnist/mnist_results.zip
+
