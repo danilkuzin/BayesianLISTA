@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     np.random.seed(1)
 
-    saved_comparator_file_name = '../compare_freq_bayes/synthetic_data_comparator_good_results.pkl'
+    saved_comparator_file_name = '../compare_freq_bayes/best_model_bayes_lista_single_matrices.pkl'
     comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
 
     plotter = PosteriorPlotter()

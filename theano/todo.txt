@@ -83,3 +83,5 @@ the same formula can be obtain for spike and slab, and whether anybody uses this
 also http://ieeexplore.ieee.org/document/4648062/ this is on entropy approximation for Gaussian mixture
 
 
+
+ну, у нас там были проблемы, что если это спайк, то дисперсия 0, а мы пытаемся из нее семплить

@@ -54,6 +54,8 @@ class PBP_lista:
                                           updates=self.network.generate_updates(self.logZ, self.logZ1,
                                                                                 self.logZ2))
 
+        self.check_updates = theano.function([self.beta, self.y], T.grad(self.logZ, self.network.params_S_M))
+
         # We greate a theano function for the network predictive distribution
 
         self.predict_probabilistic = theano.function([self.y],
@@ -79,9 +81,6 @@ class PBP_lista:
             params = self.prior.refine_prior(params)
             self.network.set_params(params)
 
-            sys.stdout.write('{}\n'.format(0))
-            sys.stdout.flush()
-
             for i in range(int(n_iterations) - 1):
                 # We do one more pass
 
@@ -94,8 +93,6 @@ class PBP_lista:
                 params = self.prior.refine_prior(params)
                 self.network.set_params(params)
 
-                sys.stdout.write('{}\n'.format(i + 1))
-                sys.stdout.flush()
 
     def get_deterministic_output(self, Y_test):
 
@@ -136,19 +133,19 @@ class PBP_lista:
             w, m, v = self.predict_probabilistic(Y[i, :])
             logs = self.logs_output(Beta[i, :], Y[i, :])
             old_params = self.network.get_params()
+            # ttt = self.check_updates(Beta[i, :], Y[i, :])
+            # ttt1 = old_params['S_V']
+            # ttt2 = old_params['S_M']
+            # print('old mean:{}, var:{}, grad:{}'.format(ttt2[0, 0], ttt1[0, 0], ttt[0, 0]))
             Z = self.adf_update(Beta[i, :], Y[i, :])
             new_params = self.network.get_params()
+
+            # s_new = new_params['S_M']
+            # print(s_new[0 ,0 ])
             self.network.remove_invalid_updates(new_params, old_params)
             self.network.set_params(new_params)
 
-            if counter % 1000 == 0:
-                sys.stdout.write('.')
-                sys.stdout.flush()
-
             counter += 1
-
-        sys.stdout.write('\n')
-        sys.stdout.flush()
 
     def sample_ws(self):
 

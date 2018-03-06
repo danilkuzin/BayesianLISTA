@@ -24,3 +24,5 @@ theano/plotting/posterior_sample_2.pdf
 theano/plotting/posterior_spike_indicator.pdf
 theano/plotting/posterior_std.pdf
 theano/compare_freq_bayes/D_100_K_50_L_4_train_1000/loss.pdf
+theano/compare_freq_bayes/conclusions_so_fat.txt
+theano/compare_mnist/conclusions_so_far.txt
