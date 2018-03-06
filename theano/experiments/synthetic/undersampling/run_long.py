@@ -1,8 +1,10 @@
 import numpy as np
 import six.moves.cPickle as pickle
 
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
-from tqdm import tqdm, trange, tqdm_notebook, tnrange
+from tqdm import tqdm, trange
 
 from compare_freq_bayes.compare_sequential import SequentialComparator
 from experiments.synthetic.experiments_parameters import load_long_experiment

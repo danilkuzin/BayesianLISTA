@@ -1,19 +1,9 @@
 import numpy as np
-import theano
 import six.moves.cPickle as pickle
 from tqdm import tqdm
 
-from PBP_net_lista.BayesianListaHandler import BayesianListaHandler
-from PBP_net_lista.DataGenerator import DataGenerator
-from PBP_net_lista.net_lista import net_lista
-from PBP_net_lista_single_matrices.SingleBayesianListaHandler import SingleBayesianListaHandler
-from PBP_net_lista_single_matrices.net_lista import net_lista as net_list_single_matrices
 from compare_freq_bayes.compare_sequential import SequentialComparator
 from compare_mnist.mnist_data import MnistData
-from freqLISTA.FrequentistListaHandler import FrequentistListaHandler
-from freqLISTA.run_lista import sgd_optimization_lista, predict
-
-import matplotlib.pyplot as plt
 
 
 class MnistSequentialComparator_DFGHJDF(SequentialComparator):

@@ -1,11 +1,7 @@
-from tqdm import tqdm
-
 from compare_freq_bayes.compare_sequential import SequentialComparator
 import numpy as np
 import six.moves.cPickle as pickle
 import matplotlib.pyplot as plt
-
-import theano
 
 np.random.seed(10)
 
