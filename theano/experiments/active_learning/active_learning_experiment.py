@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 
 class ActiveLearningExperiments(object):
     def __init__(self, update_size):
-        self.L = 4
+        self.L = 20
         self.learning_rate = 0.0001
-        self.n_train_iter = 200
+        self.n_train_iter = 100
         self.update_size = update_size
 
         self.freq_validation_loss = []
@@ -27,7 +27,7 @@ class ActiveLearningExperiments(object):
 
     def get_mnist_data_active_learning(self):
         self.K=100
-        n_train, n_pool, n_test = 10, 1000, 100
+        n_train, n_pool, n_test = 50, 100, 100
         data = MnistData(K=self.K, train_size=n_train + n_pool, valid_size=n_test)
         data.check_download()
         data.learn_dictionary()
@@ -127,14 +127,15 @@ if __name__=='__main__':
     tf.set_random_seed(rseed)
 
     n_upd_iter = 5
-    active_learning_experiments = ActiveLearningExperiments(update_size=50)
-    active_learning_experiments.get_synthetic_data_active_learning()
+    active_learning_experiments = ActiveLearningExperiments(update_size=10)
+    #active_learning_experiments.get_synthetic_data_active_learning()
+    active_learning_experiments.get_mnist_data_active_learning()
     active_learning_experiments.init_and_pretrain_lista()
 
     for i in trange(n_upd_iter):
         active_learning_experiments.choose_next_random_from_pool()
         active_learning_experiments.choose_next_train_active_from_pool()
-        for j in range(50):
+        for j in range(100):
             active_learning_experiments.learning_iter()
         active_learning_experiments.update_quality()
 

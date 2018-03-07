@@ -13,7 +13,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 
-\title{Bayesian LISTA / Uncertainty propagation in deep neural networks for sparse coding}
+\title{Uncertainty propagation in deep neural networks for sparse coding}
 
 \author{} % LEAVE BLANK FOR ORIGINAL SUBMISSION.
           % UAI  reviewing is double-blind.
@@ -125,102 +125,145 @@ We initialise the $\widehat{\boldsymbol\beta}_{0}$ with the spike and slab distr
 
 Further in this section we show that the value of the next layer $\widehat{\boldsymbol\beta}_l$ can be approximated with spike and slab distribution and therefore it maintains the same family of distributions and allows to apply the extended probabilistic backpropagation algorithm that is proposed in Section~\ref{sec:backpropagation}: lemma \ref{thm:matrix_const} describes the probabilistic variant of LISTA step $\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y}$, lemma \ref{thm:matrix_vector} and \ref{thm:sum_vectors} describe the probabilistic variant of LISTA step $ \mathbf{c}_l = \mathbf{b}_l +\mathbf{S}$ and lemma \ref{thm:soft_thresholding} describes the soft thresholding step $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$. Overall the probabilistic layer is described by theorem \ref{thm:prob_layer}.
 
-\begin{lemma}[Moments of spike and slab]
+\begin{lemma}[Moments of spike and slab distribution]
 \label{thm:moments_spsl}
 Let the random variable $\xi$ have a spike and slab distribution with probability of spike $\omega$, slab mean $m$ and slab variance $v$. Then its moments are
+\begin{subequations}
 \begin{align}
 \mathbb{E}\xi &= (1-\omega)m \\
-%\mathbb{E}\xi^2 &= (1-\omega)(v + m^2) \\
-\text{Var }\xi & = (1-\omega)(v + \omega m^2)
+\operatorname{Var}\xi & = (1-\omega)(v + \omega m^2)
 \end{align}
-
+\end{subequations}
 \end{lemma}
+
 \begin{proof}
-\begin{align}
+\begin{align*}
+\begin{split}
 \mathbb{E}\xi &= \int x (\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v))dx \\
 & = \omega \int x \delta_0(x)dx + (1 - \omega)\int x \mathcal{N}(x; m, v)dx \\
-& = (1-\omega)m
-\end{align}
-\begin{align}
+& = (1-\omega)m \\
 \mathbb{E}\xi^2 &= \int x^2 (\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v))dx \\
 & = \omega \int x^2 \delta_0(x)dx + (1 - \omega)\int x^2 \mathcal{N}(x; m, v)dx \\
-& = (1-\omega)(v + m^2)
-\end{align}
-\begin{align}
-\text{Var }\xi &= \mathbb{E}\xi^2 - \left(\mathbb{E}\xi\right)^2\\
-& = (1-\omega)(v + \omega m^2)
-\end{align}
+& = (1-\omega)(v + m^2) \\
+\operatorname{Var}\xi &= \mathbb{E}\xi^2 - \left(\mathbb{E}\xi\right)^2 = (1-\omega)(v + \omega m^2)
+\end{split}
+\end{align*}
 \end{proof}
 
- \begin{lemma}
+ \begin{lemma}[Product of Gaussian matrix and constant vector]
  \label{thm:matrix_const}
- Let $\mathbf{W} \in \mathbb{R}^{D \times K}$ be a matrix of independent Gaussian-distributed random variables: $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $\mathbf{y} \in \mathbb{R}^K$ be a constant vector. Then their product $\mathbf{W} \mathbf{y}$ is a vector $\mathbf{b} \in \mathbb{R}^{D}$ of random variables $b_d \sim \mathcal{N}(m^b_d, w^b_d)$, where $m^b_d = \sum_{k=1}^Ky_k m^w_{dk}$, $w^b_d = \sum_{k=1}^Ky_k^2v^w_{dk}$. 
- %If we denote $M^W = [m^w_{dk}]_{d=1:D, k=1:K}$, $V^W = [v^w_{dk}]_{d=1:D, k=1:K}$, then $\mathbf{b}^m = W^My$, $\mathbf{b}^w = W^Vy^2$.
+ Let $\mathbf{W} \in \mathbb{R}^{D \times K}$ be a matrix of independent Gaussian-distributed random variables: $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $\mathbf{y} \in \mathbb{R}^K$ be a constant vector. Then their product $\mathbf{W} \mathbf{y}$ is a vector $\mathbf{b} \in \mathbb{R}^{D}$ of random variables $b_d \sim \mathcal{N}(m^b_d, w^b_d)$, where 
+\begin{subequations}
+\begin{align}
+m^b_d &= \sum_{k=1}^Ky_k m^w_{dk}, \\
+w^b_d &= \sum_{k=1}^Ky_k^2v^w_{dk}.
+ \end{align}
+\end{subequations}
+ 
  \end{lemma}
  \begin{proof}
  	The statement follows from the property that the family of normal distributions is closed under linear transformations.
  \end{proof}
  
-  \begin{lemma}
+  \begin{lemma}[Product of Gaussian matrix and Gaussian vector]
   \label{thm:matrix_vector}
- Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\boldsymbol\beta \in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\beta_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. Then their product can be approximated as a vector $\mathbf{d} \in \mathbb{R}^{D}$ of random variables $d_d \sim \mathcal{N}(d^d_m, d^d_w)$, where $m^d_d = \sum_{d'=1}^D m^s_{dd'}(1-\omega_{d'})m_{d'}$, $v^d_d = \sum_{d'=1}^D [(m^s_{dd'})^2(1-\omega_{d'})^2v_{d'} + (1-\omega_{d'})^2(m_{d'})^2v^s_{dd'} + v^s_{dd'}(1-\omega_{d'})^2v_{d'}]$.
+ Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\boldsymbol\beta \in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\beta_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. If their product is approximated as a vector $\mathbf{e} \in \mathbb{R}^{D}$ of random variables $e_d \sim \mathcal{N}(m^e_d, w^e_d)$, then 
+\begin{subequations}
+\begin{align}
+ m^e_d &= \sum_{d'=1}^D m^s_{dd'}(1-\omega_{d'})m_{d'}, \\
+ \begin{split}
+ v^e_d &= \sum_{d'=1}^D [(m^s_{dd'})^2(1-\omega_{d'})^2v_{d'} \\
+ & {}+ (1-\omega_{d'})^2(m_{d'})^2v^s_{dd'} + v^s_{dd'}(1-\omega_{d'})^2v_{d'}].
+ \end{split}
+ \end{align}
+\end{subequations}
  \end{lemma}
  \begin{proof}
- 	We compute the mean and variance of the product $\mathbf{S}\boldsymbol\beta$ and approximate resulting distribution as Gaussian.
-\begin{align}
-	&\mathbb{E}d_d = \mathbb{E} \left[\sum_{d'=1}^D s_{dd'}\beta_{d'}\right] =  \sum_{d'=1}^D \mathbb{E}[s_{dd'}\beta_{d'}] \\
-	&= \sum_{d'=1}^D \mathbb{E}s_{dd'}\mathbb{E}\beta_{d'} = \sum_{d'=1}^D m^s_{dd'}\mathbb{E}\beta_{d'}
-\end{align}
-\begin{align}
-	&\text{Var}d_d = \text{Var} \left[\sum_{d'=1}^D s_{dd'}\beta_{d'}\right] =  \sum_{d'=1}^D \text{Var}[s_{dd'}\beta_{d'}] = \\
-	&\sum_{d'=1}^D [(\mathbb{E}s_{dd'})^2 \text{Var}\beta_{d'} + (\mathbb{E}\beta_{d'})^2 \text{Var}s_{dd'} + \text{Var}\beta_{d'} \text{Var}s_{dd'}]
-\end{align}
-where $\mathbb{E}\beta_{d'}$, $\text{Var}\beta_{d'}$ are computed according to lemma~\ref{thm:moments_spsl}.
+ 	We compute the mean and variance of the product $\mathbf{S}\boldsymbol\beta$ with an assumption of independence of its components and approximate resulting distribution with Gaussian. The quality of this approximation is discussed in section \ref{sec:approx_quality}
+\begin{flalign*}
+	\mathbb{E}e_d &= \sum_{d'=1}^D \mathbb{E}[s_{dd'}\beta_{d'}]  = \sum_{d'=1}^D m^s_{dd'}\mathbb{E}\beta_{d'}\\
+	\operatorname{Var}e_d &= \sum_{d'=1}^D \operatorname{Var}[s_{dd'}\beta_{d'}] = \sum_{d'=1}^D [(\mathbb{E}s_{dd'})^2 \operatorname{Var}\beta_{d'} \\
+	&{}+ (\mathbb{E}\beta_{d'})^2 \operatorname{Var}s_{dd'} + \operatorname{Var}\beta_{d'} \operatorname{Var}s_{dd'}]
+\end{flalign*}
+where $\mathbb{E}\beta_{d'}$, $\operatorname{Var}\beta_{d'}$ are computed according to lemma~\ref{thm:moments_spsl}.
  \end{proof}
 
-\begin{lemma}
+\begin{lemma}[Sum of Gaussian vectors]
 \label{thm:sum_vectors}
-If $\mathbf{b} \in \mathbb{R}^{D}$ and $\mathbf{d} \in \mathbb{R}^{D}$ are both vectors of independent Gaussian-distributed random variables: $b_{d} \sim \mathcal{N}(m^b_{d}, v^b_{d})$, $d_{d} \sim \mathcal{N}(m^d_{d}, v^d_{d})$ then their sum $\mathbf{c} = \mathbf{b} + \mathbf{d}$ is a vector of independent Gaussian-distributed random variables $c_{d} \sim \mathcal{N}(m^c_{d}, v^c_{d})$ with $m^c_{d} = m^b_{d} + m^d_{d}$, $v^c_{d} = v^b_{d} + v^d_{d}$
+If $\mathbf{b} \in \mathbb{R}^{D}$ and $\mathbf{e} \in \mathbb{R}^{D}$ are both vectors of independent Gaussian-distributed random variables: $b_{d} \sim \mathcal{N}(m^b_{d}, v^b_{d})$, $e_{d} \sim \mathcal{N}(m^e_{d}, v^e_{d})$ then their sum $\mathbf{c} = \mathbf{b} + \mathbf{e}$ is a vector of independent Gaussian-distributed random variables $c_{d} \sim \mathcal{N}(m^c_{d}, v^c_{d})$ with 
+\begin{subequations}
+\begin{align}
+m^c_{d} &= m^b_{d} + m^e_{d}, \\
+v^c_{d} &= v^b_{d} + v^e_{d}.
+ \end{align}
+\end{subequations}
 \end{lemma}
 \begin{proof}
 Based on properties of Gaussian distributions.
 \end{proof}
 
-\begin{lemma}
+\begin{lemma}[Gaussian propagation through soft thresholding]
 \label{thm:soft_thresholding}
-When a Gaussian-distributed random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft-thresholding function it can be approximated with the spike and slab distribution on $x^*$ with the probability of spike $\omega^*$, slab mean $m^*$ and slab variance $v^*$ (Formulae are given in the proof).
+When a Gaussian-distributed random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft-thresholding function it can be approximated with the spike and slab distribution on $x^*$ with the probability of spike $\omega^*$, slab mean $m^*$ and slab variance $v^*$ (parameters of the approximating distribution are given in the proof).
 \end{lemma}
 \begin{proof}
-Soft-thresholding operator is defined as $h_\lambda(v) = \text{sign}(v) * \max(|v| - \lambda, 0)$. We need to compute the parameters of approximating distribution.
-\begin{enumerate}
-\item The probability of spike $\omega^*$ equals to the probability mass that lies in $(-\lambda, \lambda)$ of the original distribution and is flattened into zero by soft-thresholding operator. As the original distribution is Gaussian, this can be computed as $\omega^* = p(x^*=0) = p(x \in (-\lambda, \lambda)) = \Phi(\frac{\lambda-m}{\sqrt{v}}) - \Phi(\frac{-\lambda-m}{\sqrt{v}})$. 
-\item Soft-thresholding shifts elements that are greater than $\lambda$  or less than $-\lambda$ elements towards 0. Let $\psi(\cdot)$ denote the density of the soft-threshold distribution, $\phi(\cdot)$ denote the density of the original Gaussian distribution. Then the first moment of the resulting distribution is $m^* = \int_{-\infty}^{+\infty}x\psi(x)dx = \int_{-\infty}^{0}x\phi(x-\lambda)dx + \int_{0}^{+\infty}x\phi(x+\lambda)dx$. Integrals are computed below.
+
+The probability of spike $\omega^*$ equals to the probability mass of the original distribution that lies in $(-\lambda, \lambda)$  and is flattened into zero by soft-thresholding operator. As the original distribution is Gaussian, this can be computed as 
 \begin{align}
-&\int_{-\infty}^{0}x\phi(x-\lambda)dx = \\
-&-\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} \\
-& + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
+\begin{split}
+\omega^* &= p(x^*=0) = p(x \in [-\lambda, \lambda]) \\
+&= \Phi\left(\frac{\lambda-m}{\sqrt{v}}\right) - \Phi\left(\frac{-\lambda-m}{\sqrt{v}}\right). 
+\end{split}
 \end{align}
+
+Soft-thresholding shifts elements that are greater than $\lambda$  or less than $-\lambda$ elements towards 0. Let $\psi(\cdot)$ denote the density of the soft-threshold distribution, $\phi(\cdot)$ denote the density of the original Gaussian distribution. Then the first moment of the resulting distribution is 
+
 \begin{align}
-&\int_{0}^{+\infty}x\phi(x+\lambda)dx = \\
-& = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\\
+\begin{split}
+m^* &= \int_{-\infty}^{+\infty}x\psi(x)dx= \int_{-\infty}^{0}x\phi(x-\lambda)dx \\
+&{} + \int_{0}^{+\infty}x\phi(x+\lambda)dx.
+\end{split}
+\end{align}
+
+Integrals are computed as
+\begin{align}
+\begin{split}
+&\int_{-\infty}^{0}x\phi(x-\lambda)dx = -\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} \\
+&{} + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
+\end{split}\\
+\begin{split}
+&\int_{0}^{+\infty}x\phi(x+\lambda)dx = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\\
 & + (m - \lambda)\left(1 - \Phi\left(-\frac{\lambda-m}{\sqrt{v}}\right)\right)
+\end{split}
 \end{align}
-\item The second moment of the approximating distribution is computed as $s = \int_{-\infty}^{+\infty}x^2\psi(x)dx = \int_{-\infty}^{0}x^2\phi(x-\lambda)dx + \int_{0}^{+\infty}x^2\phi(x+\lambda)dx$.
+
+The second moment of the approximating distribution is computed as
 \begin{align}
+\begin{split}
+s &= \int_{-\infty}^{+\infty}x^2\psi(x)dx = \int_{-\infty}^{0}x^2\phi(x-\lambda)dx \\
+&{}+ \int_{0}^{+\infty}x^2\phi(x+\lambda)dx.
+\end{split}
+\end{align}
+
+Integrals are computed as
+\begin{align}
+\begin{split}
 &\int_{-\infty}^{0}x^2\phi(x-\lambda)dx = \\
 &-\frac{\sqrt{v}}{\sqrt{2\pi}} (\lambda+m)\exp\left\{\frac{-(\lambda+m)^2}{2v}\right\}\\
 & + (\sigma^2 + (\lambda+m)^2)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
-\end{align}
-\begin{align}
+\end{split}\\
+\begin{split}
 &\int_{0}^{+\infty}x^2\phi(x+\lambda)dx = \\
 &\frac{\sqrt{v}}{\sqrt{2\pi}} (m - \lambda)\exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\\
 & + (\sigma^2 + (m - \lambda)^2)\left(1 - \Phi\left(\frac{\lambda -m}{\sqrt{v}}\right)\right)
+\end{split}
 \end{align}
+
 Resulting variance is
 \begin{equation}
 v^* = s- (m^*)^2
 \end{equation}
-\end{enumerate}
+
 \end{proof}
 
 The proposed operations on Gaussian and spike-and-slab distributions allow to formulate the main result in this section that describes how the uncertainty propagation works.
@@ -228,14 +271,15 @@ The proposed operations on Gaussian and spike-and-slab distributions allow to fo
 \label{thm:prob_layer}
 The spike and slab distribution for $\boldsymbol\beta_{l-1}$ with parameters ($\boldsymbol\omega$, $\mathbf{m}$, $\mathbf{w}$) can be propagated through the LISTA layer and the parameters after propagation can be computed as following:
 \begin{enumerate}
-	\item $\mathbf{b} = Wy$ is computed according to lemma \ref{thm:matrix_const}
-	\item $\mathbf{d} = S\boldsymbol\beta_{l-1}$ is computed according to lemma \ref{thm:matrix_vector}
-	\item $\mathbf{c} = \mathbf{b} + \mathbf{d}$ is computed according to lemma \ref{thm:sum_vectors}
-	\item $\boldsymbol\beta_{l} = h_\lambda(\mathbf{c})$ is computed according to lemma \ref{thm:soft_thresholding}
+	\item $\mathbf{b} = \mathbf{W}\mathbf{y}$ is computed according to lemma \ref{thm:matrix_const};
+	\item $\mathbf{e} = \mathbf{S}\boldsymbol\beta_{l-1}$ is computed according to lemma \ref{thm:matrix_vector};
+	\item $\mathbf{c} = \mathbf{b} + \mathbf{e}$ is computed according to lemma \ref{thm:sum_vectors};
+	\item $\boldsymbol\beta_{l} = h_\lambda(\mathbf{c})$ is computed according to lemma \ref{thm:soft_thresholding}.
 \end{enumerate}
 \end{theorem}
 
 \subsection{Approximation quality}
+\label{sec:approx_quality}
 We have used two approximations in forward propagation of the uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike-and-slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft-thresholding of a Gaussian vector is approximated with the spike-and-slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
 Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:matrix_vector}. For sampled distribution, 10000 values were sampled from the Gaussian matrix and the Gaussian vector and their product was computed, then one of the dimensionalities was plotted. The approximated distribution was computed according to lemma \ref{thm:matrix_vector}.
