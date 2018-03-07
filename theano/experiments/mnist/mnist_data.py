@@ -38,14 +38,10 @@ class MnistData(object):
         self.normalize()
 
     def normalize(self):
-        self.train_mean = np.mean(np.append(self.train_data, self.validation_data, axis=0), axis=0)
-        self.train_std = np.std(np.append(self.train_data, self.validation_data, axis=0), axis=0)
-        self.train_data = self.train_data - self.train_mean
-        self.train_data[:, self.train_std != 0] = self.train_data[:, self.train_std != 0] / \
-                                                  self.train_std[self.train_std != 0]
-        self.validation_data = self.validation_data - self.train_mean
-        self.validation_data[:, self.train_std != 0] = self.validation_data[:, self.train_std != 0] / \
-                                                       self.train_std[self.train_std != 0]
+        self.train_mean = np.mean(self.train_data, axis=0)
+        self.train_std = np.std(self.train_data, axis=0)
+        self.train_data = (self.train_data - self.train_mean) / self.train_std
+        self.validation_data = (self.validation_data - self.train_mean) / self.train_std
 
     def learn_dictionary(self):
         print('Learning the dictionary...')

@@ -16,8 +16,8 @@
 -!check why weights on S drops from initial value after the first iteration
 
 
--find good setup for synthetic data
--experiment on nmse vs undersampling
++find good setup for synthetic data
++ in progress experiment on nmse vs undersampling
 -On synthetic data make plots with shaded std. It would be good to find an example where on a component both
 Lista and Bayesian Lista are wrong, but Bayesian Lista has a large std
 
@@ -28,7 +28,7 @@ Lista and Bayesian Lista are wrong, but Bayesian Lista has a large std
 +-Read https://arxiv.org/pdf/1609.00285.pdf since they show on which data freq LISTA does not work!
 
 
--Check matlab toolbox for HMC, where we can estimate posterior with it
++ not working Check matlab toolbox for HMC, where we can estimate posterior with it
 
 
 -Add to text that we work with multivariate output of the neural network, which is much more complicated than scalar output
