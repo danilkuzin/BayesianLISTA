@@ -38,3 +38,7 @@ theano/compare_mnist/mnist_100_train_20_layers_K_250_quality.npz
 
 theano/compare_mnist/mnist_results.zip
 
+
+theano/experiments/synthetic/number_of_layers/9/compare_f_measure_vs_number_of_layers.eps
+
+theano/experiments/synthetic/number_of_layers/9/compare_nmse_vs_number_of_layers.eps
