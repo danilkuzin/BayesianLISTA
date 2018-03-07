@@ -38,3 +38,4 @@ theano/compare_mnist/mnist_100_train_20_layers_K_250_quality.npz
 
 theano/compare_mnist/mnist_results.zip
 
+theano/compare_mnist/mnist_data_imac_work.py
