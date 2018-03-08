@@ -81,6 +81,7 @@ When this process is limited to the predefined set of iterations and weights of 
 
 The problem is an underdefined linear regression with assumption of sparse weights:
 \begin{equation}
+\label{eq:regression_problem}
 \mathbf{y} = \mathbf{X}\boldsymbol\beta + \varepsilon
 \end{equation}
 where $\mathbf{y}$ are observations, $\mathbf{X}$ is design matrix, $\boldsymbol\beta$ is unknown vector of weights larger than $\mathbf{y}$ with some of the elements equal to zero to achieve regularisation. $\varepsilon$ is Gaussian noise.
@@ -342,17 +343,42 @@ We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\mathbf{z}_L$ - output fr
 Then derivatives of $Z$ are computed w.r.t the weights and hyperparameters of the factorised distribution and then they are used for updates.
 
 \section{Experiments}
-\subsection{Synthetic data}
-We have generated the random Gaussian design matrix $\mathbf{X}$. Coefficients $\boldsymbol\beta$ are generated from the spike-and-slab distribution with truncated slab: each component of $\boldsymbol\beta$ is zero with probability 0.8 or is from standard Gaussian distribution without interval (-0.1, 0.1) with probability 0.2. The observations are generated accordingly. Size of observations is $K=100$, size of coefficients is $D=784$, number of layers is $L=4$. Size of the training set is $1000$, validation set is $100$. 
+
+The following quality measures are used:
+\begin{itemize}
+\item $\text{NMSE} (\text{normalised mean square error)})= \dfrac{\|\mathbf{X} - \widehat{\mathbf{X}}\|^2_{F}}{\|\mathbf{X}\|^2_{F}}$, where $\mathbf{X}$ is the true signal, $\widehat{\mathbf{X}}$ is the estimate, computed as the mean of the approximated posterior distribution, $\|\cdot\|_{F}$ is the Frobenius norm of a matrix;
+\item $\text{F-measure} = 2\dfrac{\text{precision}\cdot\text{recall}}{\text{precision} + \text{recall}}$ between non-zero elements of the true signal $\mathbf{X}$ and non-zero elements of the estimate $\widehat{\mathbf{X}}$. 
+\end{itemize}
+
+We demonstrate the performance on small datasets to highlight that the proposed algorithm can learn when the dataset size is not sufficient for LISTA.
+
+\subsection{Predictive performance on synthetic data}
+First, the predictive performance of the proposed Bayesian LISTA is analysed on synthetic data. We generate $N_\text{train}=500$ sparse coefficients vectors $\boldsymbol\beta_n$ each of size $D = 100$. Coefficients $\boldsymbol\beta$ are generated from the spike-and-slab distribution with truncated slab: each component of $\beta_{nd}$ is zero with probability $0.8$ or is from standard Gaussian distribution without interval $(-0.1, 0.1)$ with probability $0.2$. Truncation of the zeros allows to remove from support pattern values with insignificant contributions \cite{xin2016maximal}. To simulate sparse observations, we have generated the random Gaussian design matrix $\mathbf{X} \in \mathbb{K \times D}$.  The observations are generated according to the \ref{eq:regression_problem} with zero-mean Gaussian noise with standard deviation $0.5$. 
+
+We compare the proposed Bayesian LISTA with original LISTA algorithm \cite{gregor2010learning} and two deterministic algorithms: Iterative Shrinkage and Thresholding Algorithm (ISTA) \cite{daubechies2004iterative} and Fast ISTA (FISTA) \cite{beck2009fast}. ISTA and FISTA iterate recursive updates of the $\boldsymbol\beta$ estimator in a way similar to LISTA but without weights updates.  FISTA adds the momentum to ISTA and improves its convergence speed. We limit the number of iterations in these algorithms with $L$ that is the same as the number of layers in Bayesian LISTA and LISTA.
+
+In the Figure \ref{fig:number_of_layers_synthetic} prediction performance for increasing number of layers is presented. The proposed algorithm is superior in terms of NMSE
+
+\begin{figure*}[t]
+\subfloat[NMSE on train]{\includegraphics{graphics/synthetic_number_of_layers/nmse_train}}
+~
+\subfloat[NMSE on validation]{\includegraphics{graphics/synthetic_number_of_layers/nmse_validation}}
+\newline
+\subfloat[F measure on train]{\includegraphics{graphics/synthetic_number_of_layers/f_measure_train}}
+~
+\subfloat[F measure on validation]{\includegraphics{graphics/synthetic_number_of_layers/f_measure_validation}}
+\caption{Number of layers on synthetic data}
+\label{fig:number_of_layers_synthetic}
+\end{figure*}
 
 We compare two versions of the proposed Bayesian LISTA: with shared weight matrices and with individual matrices at each layer --- and LISTA.
 
-The NMSE is presented in figure \ref{fig:validation_synthetic}.
-\begin{figure}[t]
-\includegraphics[width=\columnwidth]{loss_synthetic}
-\caption{Validation NMSE on synthetic data}
-\label{fig:validation_synthetic}
-\end{figure}
+%The NMSE is presented in figure \ref{fig:validation_synthetic}.
+%\begin{figure}[t]
+%\includegraphics[width=\columnwidth]{loss_synthetic}
+%\caption{Validation NMSE on synthetic data}
+%\label{fig:validation_synthetic}
+%\end{figure}
 
 \subsection{MNIST}
 Here we evaluate the proposed Bayesian LISTA in terms of predictive performance on the MNIST dataset \cite{lecun2010mnist}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is learned on 5000 images with the minibatch online algorithm (J. Mairal, et al 2009). The resulting size of $\mathbf{X}$ is $100 \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta$ are images converted to vectors. We use randomly selected 1000 images for training and 100 for validation. 

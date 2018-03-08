@@ -85,3 +85,14 @@ theano/experiments/synthetic/undersampling/results/f_measure_validation.eps
 theano/experiments/synthetic/undersampling/results/nmse_train.eps
 theano/experiments/synthetic/undersampling/results/nmse_validation.eps
 
+paper/BayesianLISTA.bbl
+paper/BayesianLISTA.blg
+paper/BayesianLISTA.out
+paper/BayesianLISTA.pdf
+paper/d_testing-eps-converted-to.pdf
+paper/z_new_testing-eps-converted-to.pdf
+paper/graphics/synthetic_number_of_layers/nmse_validation-eps-converted-to.pdf
+paper/graphics/synthetic_number_of_layers/nmse_train-eps-converted-to.pdf
+paper/graphics/synthetic_number_of_layers/f_measure_validation-eps-converted-to.pdf
+paper/graphics/synthetic_number_of_layers/f_measure_train-eps-converted-to.pdf
+theano/experiments/active_learning/mnist_test_2_results/Screen Shot 2018-03-08 at 06.06.02.png

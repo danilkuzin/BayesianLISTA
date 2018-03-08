@@ -29,7 +29,7 @@ class ActiveLearningExperiments(object):
 
     def get_mnist_data_active_learning(self):
         self.K=100
-        n_train, n_pool, n_test = 50, 100, 100
+        n_train, n_pool, n_test = 50, 500, 100
         data = MnistData(K=self.K, train_size=n_train + n_pool, valid_size=n_test)
         data.check_download()
         data.learn_dictionary()
@@ -150,7 +150,7 @@ if __name__=='__main__':
     saved_file_name = []#'synthetic_D_100_K_50_L_8_200_iter_train_900_train_size.pkl'
 
     n_upd_iter = 10
-    update_size = 1
+    update_size = 5
 
     if not saved_file_name:
         active_learning_experiments = ActiveLearningExperiments(update_size=update_size)
@@ -162,17 +162,12 @@ if __name__=='__main__':
     #    with open('synthetic_D_100_K_50_L_8_200_iter_train_900_train_size.pkl', 'wb') as f:
     #        pickle.dump(active_learning_experiments, f)
 
-    print('freq loss {}'.format(active_learning_experiments.freq_validation_loss))
-    print('bayes loss {}'.format(active_learning_experiments.non_active_shared_bayesian_validation_loss))
-    print('active bayes loss {}'.format(active_learning_experiments.active_bayesian_validation_loss))
 
-    active_learning_experiments.update_size = update_size
+    for i in trange(n_upd_iter):
+        active_learning_experiments.choose_next_random_from_pool()
+        active_learning_experiments.choose_next_train_active_from_pool()
+        for j in range(50):
+            active_learning_experiments.learning_iter()
+        active_learning_experiments.update_quality()
 
-    # for i in trange(n_upd_iter):
-    #     active_learning_experiments.choose_next_random_from_pool()
-    #     active_learning_experiments.choose_next_train_active_from_pool()
-    #     for j in range(200):
-    #         active_learning_experiments.learning_iter()
-    #     active_learning_experiments.update_quality()
-    #
-    # active_learning_experiments.plot()
+    active_learning_experiments.plot()
