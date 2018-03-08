@@ -96,3 +96,7 @@ paper/graphics/synthetic_number_of_layers/nmse_train-eps-converted-to.pdf
 paper/graphics/synthetic_number_of_layers/f_measure_validation-eps-converted-to.pdf
 paper/graphics/synthetic_number_of_layers/f_measure_train-eps-converted-to.pdf
 theano/experiments/active_learning/mnist_test_2_results/Screen Shot 2018-03-08 at 06.06.02.png
+paper/graphics/synthetic_undersampling/nmse_validation-eps-converted-to.pdf
+paper/graphics/synthetic_undersampling/nmse_train-eps-converted-to.pdf
+paper/graphics/synthetic_undersampling/f_measure_validation-eps-converted-to.pdf
+paper/graphics/synthetic_undersampling/f_measure_train-eps-converted-to.pdf

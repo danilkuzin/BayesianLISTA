@@ -357,21 +357,35 @@ First, the predictive performance of the proposed Bayesian LISTA is analysed on 
 
 We compare the proposed Bayesian LISTA with original LISTA algorithm \cite{gregor2010learning} and two deterministic algorithms: Iterative Shrinkage and Thresholding Algorithm (ISTA) \cite{daubechies2004iterative} and Fast ISTA (FISTA) \cite{beck2009fast}. ISTA and FISTA iterate recursive updates of the $\boldsymbol\beta$ estimator in a way similar to LISTA but without weights updates.  FISTA adds the momentum to ISTA and improves its convergence speed. We limit the number of iterations in these algorithms with $L$ that is the same as the number of layers in Bayesian LISTA and LISTA.
 
-In the Figure \ref{fig:number_of_layers_synthetic} prediction performance for increasing number of layers is presented. The proposed algorithm is superior in terms of NMSE
+In the Figure \ref{fig:number_of_layers_synthetic} prediction performance for different number of layers $L$ is presented. The observation size is set as $K=50$. 
 
-\begin{figure*}[t]
-\subfloat[NMSE on train]{\includegraphics{graphics/synthetic_number_of_layers/nmse_train}}
+In the Figure \ref{fig:unsersampling_synthetic} prediction performance for different observation sizes $K$ is presented. The number of layers is set as $L=4$.
+
+\begin{figure}[t]
+\subfloat[NMSE on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/nmse_train}}
 ~
-\subfloat[NMSE on validation]{\includegraphics{graphics/synthetic_number_of_layers/nmse_validation}}
+\subfloat[NMSE on validation]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/nmse_validation}}
 \newline
-\subfloat[F measure on train]{\includegraphics{graphics/synthetic_number_of_layers/f_measure_train}}
+\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/f_measure_train}}
 ~
-\subfloat[F measure on validation]{\includegraphics{graphics/synthetic_number_of_layers/f_measure_validation}}
+\subfloat[F measure on validation]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/f_measure_validation}}
 \caption{Number of layers on synthetic data}
 \label{fig:number_of_layers_synthetic}
-\end{figure*}
+\end{figure}
 
-We compare two versions of the proposed Bayesian LISTA: with shared weight matrices and with individual matrices at each layer --- and LISTA.
+\begin{figure}[t]
+\subfloat[NMSE on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/nmse_train}}
+~
+\subfloat[NMSE on validation]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/nmse_validation}}
+\newline
+\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/f_measure_train}}
+~
+\subfloat[F measure on validation]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/f_measure_validation}}
+\caption{Size of observations on synthetic data}
+\label{fig:unsersampling_synthetic}
+\end{figure}
+
+%We compare two versions of the proposed Bayesian LISTA: with shared weight matrices and with individual matrices at each layer --- and LISTA.
 
 %The NMSE is presented in figure \ref{fig:validation_synthetic}.
 %\begin{figure}[t]
