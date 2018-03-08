@@ -100,3 +100,5 @@ paper/graphics/synthetic_undersampling/nmse_validation-eps-converted-to.pdf
 paper/graphics/synthetic_undersampling/nmse_train-eps-converted-to.pdf
 paper/graphics/synthetic_undersampling/f_measure_validation-eps-converted-to.pdf
 paper/graphics/synthetic_undersampling/f_measure_train-eps-converted-to.pdf
+paper/z_new_testing.pdf
+theano/experiments/active_learning/mnist_test_3.png
