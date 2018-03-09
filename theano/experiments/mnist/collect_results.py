@@ -114,7 +114,7 @@ class MnistExperimentResultsCollector(object):
         plt.plot()
         plt.legend()
         plt.ylabel(r'F measure')
-        plt.xlabel(r'n iter')
+        plt.xlabel(r'Number of iterations')
         plt.savefig('results/normalised_f_measure_valid.eps', format='eps')
         plt.show()
 
@@ -135,8 +135,8 @@ class MnistExperimentResultsCollector(object):
         plt.plot(self.sh_bayes_loss_validation, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.plot()
         plt.legend()
-        plt.ylabel(r'NMSE')
-        plt.xlabel(r'n iter')
+        plt.ylabel(r'\textsc{nmse}')
+        plt.xlabel(r'Number of iterations')
         plt.savefig('results/normalised_nmse_valid.eps', format='eps')
         plt.show()
 

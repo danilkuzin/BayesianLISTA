@@ -381,16 +381,18 @@ The only hyperparameter in the proposed Bayesian \textsc{lista} is the shrinkage
 
 \section{Experiments}
 \label{sec:experiments}
-The proposed Bayesian \textsc{lista} is evaluated in the context of the sparse inverse problem[CITE?], where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
+The proposed Bayesian \textsc{lista} is evaluated in the context of the sparse inverse problem, where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
 
-We compare the proposed Bayesian \textsc{lista} with the classical \textsc{lista}~\citep{gregor2010learning} in terms of the predictive accuracy. As baselines we also use \textsc{ista} \citep{daubechies2004iterative} and fast \textsc{ista} (\textsc{fista}) \citep{beck2009fast}. \textsc{fista} adds the momentum to \textsc{ista} and improves its convergence speed. We limit the number of iterations in these algorithms with $L$ that is the same as the number of layers in Bayesian \textsc{lista} and \textsc{lista}.
-
-The following quality measures are used:
-\begin{itemize}
-\item $\text{\textsc{nmse}} (\text{normalised mean square error)})= \dfrac{\|\mathbf{X} - \widehat{\mathbf{X}}\|^2_{F}}{\|\mathbf{X}\|^2_{F}}$, where $\mathbf{X}$ is the true signal, $\widehat{\mathbf{X}}$ is the estimate, computed as the mean of the approximated posterior distribution, $\|\cdot\|_{F}$ is the Frobenius norm of a matrix;
-\item $\text{F-measure} = 2\dfrac{\text{precision}\cdot\text{recall}}{\text{precision} + \text{recall}}$ between non-zero elements of the true signal $\mathbf{X}$ and non-zero elements of the estimate $\widehat{\mathbf{X}}$. 
-\end{itemize}
-
+We compare the proposed Bayesian \textsc{lista} with the classical \textsc{lista}~\citep{gregor2010learning} in terms of the predictive accuracy. As baselines we also use \textsc{ista} \citep{daubechies2004iterative} and Fast \textsc{ista} (\textsc{fista}) \citep{beck2009fast}. \textsc{fista} adds the momentum to \textsc{ista} and improves its convergence speed. We limit the number of iterations in these algorithms with $L$ that is the same as the number of layers in Bayesian \textsc{lista} and \textsc{lista}. To measure the performance of the algorithms the normalised mean square error(\textsc{nmse}) and F measure are used. \textsc{nmse} for a batch of data $\{\boldsymbol\beta^{(n)}\}_{n=1}^{N}$ and estimators $\{\widehat{\boldsymbol\beta}^{(n)}\}_{n=1}^{N}$ is computed as
+\begin{equation}
+\text{\textsc{nmse}} = \frac{1}{N}\sum\limits_{n=1}^N\sqrt{\frac{\sum\limits_{d=1}^D\left(\widehat{\beta}_{d}^{(n)} - \beta_d^{(n)}\right)^2}{\sum\limits_{d=1}^D\left(\beta_{d}^{(n)}\right)^2}}
+\end{equation}
+In sparse coding it is usually more important to obtain the correct locations of spikes (i.e zeros) and slabs (i.e. non-zeros) in the estimator than to minimise \textsc{nmse}. The problem is therefore viewed as a skewed two-class classification problem where the number of spikes is higher than the number of slabs. F measure is used to evaluate the accuracy of such problems. 
+F measure is computed as the harmonic mean of precision and recall
+\begin{equation}
+\text{F measure} = 2\dfrac{\text{precision}\cdot\text{recall}}{\text{precision} + \text{recall}}
+\end{equation} 
+where precision is the fraction of estimated slab locations that are correct, recall is the fraction of true slab locations among all predicted slab locations.
 We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for \textsc{lista} to learn anything. 
 
 \subsection{Predictive performance on synthetic data}
@@ -436,21 +438,21 @@ In the Figure \ref{fig:unsersampling_synthetic} prediction performance for diffe
 \subsection{Predictive performance on \textsc{mnist} data}
 Here we evaluate the proposed Bayesian \textsc{lista} in terms of predictive performance on the \textsc{mnist} dataset \citep{lecun1998gradient}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is learned on 5000 images with the minibatch online algorithm \citep{mairal2009online}. The resulting size of $\mathbf{X}$ is $K \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta$ are images converted to vectors. We use randomly selected $100$ images for training and $100$ for validation. $\lambda$ is assumed fixed as $0.1$.
 
-Figures \ref{fig:mnist_100}, \ref{fig:mnist_250} present \textsc{nmse} loss on the validation set with dictionaries $100$ and $250$. 
+Figure \ref{fig:mnist_250} presents \textsc{nmse} loss on the validation set with dictionary of size $250$. 
 
-Proposed Bayesian \textsc{lista} networks estimate posterior distribution for $\boldsymbol\beta$. Figure \ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and ?igure \ref{fig:posterior_distribution} shows the parameters of this posterior.
+Proposed Bayesian \textsc{lista} networks estimate posterior distribution for $\boldsymbol\beta$. Figure \ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
 
-\begin{figure}[t]
-%\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_nmse_train}}
-%~
-\subfloat[\textsc{nmse} on validation]{\includegraphics[width=\columnwidth]{graphics/mnist/100_normalised_nmse_valid}}
-\newline
-%\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_f_measure_train}}
-%~
-\subfloat[F measure on validation]{\includegraphics[width=\columnwidth]{graphics/mnist/100_normalised_f_measure_valid}}
-\caption{\textsc{mnist} with dictionary $100$}
-\label{fig:mnist_100}
-\end{figure}
+%\begin{figure}[t]
+%%\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_nmse_train}}
+%%~
+%\subfloat[\textsc{nmse} on validation]{\includegraphics[width=\columnwidth]{graphics/mnist/100_normalised_nmse_valid}}
+%\newline
+%%\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_f_measure_train}}
+%%~
+%\subfloat[F measure on validation]{\includegraphics[width=\columnwidth]{graphics/mnist/100_normalised_f_measure_valid}}
+%\caption{\textsc{mnist} with dictionary $100$}
+%\label{fig:mnist_100}
+%\end{figure}
 
 \begin{figure}[t]
 %\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_nmse_train}}

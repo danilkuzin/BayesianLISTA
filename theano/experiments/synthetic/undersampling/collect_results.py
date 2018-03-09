@@ -111,19 +111,19 @@ class UndersamplingExperimentReultsCollector(object):
 
         ista_marker= 'o'
         ista_color='blue'
-        ista_label='ista'
+        ista_label=r'\textsc{ista}'
 
         fista_marker= 'v'
         fista_color='red'
-        fista_label='fista'
+        fista_label=r'\textsc{fista}'
 
         freq_marker= 's'
         freq_color='black'
-        freq_label='freq lista'
+        freq_label=r'\textsc{lista}'
 
         sh_bayes_marker='d'
         sh_bayes_color='green'
-        sh_bayes_label='sh bayes'
+        sh_bayes_label=r'Bayesian \textsc{lista}'
 
         plt.plot(self.K_array, self.ista_f_meas_train, label=ista_label, color=ista_color, marker=ista_marker, linewidth=linewidth, markersize=markersize)
         plt.errorbar(self.K_array, self.ista_f_meas_train, yerr=std_multiplier * self.ista_f_meas_train_std, color=ista_color)
@@ -163,7 +163,7 @@ class UndersamplingExperimentReultsCollector(object):
         plt.errorbar(self.K_array, self.sh_bayes_loss_train, yerr=3 * self.sh_bayes_loss_train_std, color=sh_bayes_color)
         plt.legend()
         plt.xlabel(r'K')
-        plt.ylabel(r'NMSE')
+        plt.ylabel(r'\textsc{nmse}')
         plt.savefig('results/nmse_train.eps', format='eps')
         plt.show()
 
@@ -177,7 +177,7 @@ class UndersamplingExperimentReultsCollector(object):
         plt.errorbar(self.K_array, self.sh_bayes_loss_validation, yerr=3 * self.sh_bayes_loss_validation_std, color=sh_bayes_color)
         plt.legend()
         plt.xlabel(r'K')
-        plt.ylabel(r'NMSE')
+        plt.ylabel(r'\textsc{nmse}')
         plt.savefig('results/nmse_validation.eps', format='eps')
         plt.show()
 
