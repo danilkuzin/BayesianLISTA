@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 class ActiveExperimentMnistResultsCollector(object):
     def __init__(self):
-        self.n_rseed = 10
+        self.n_rseed = 20
         self.n_upd_iter = 10
         self.freq_validation_loss = np.zeros((self.n_rseed, self.n_upd_iter+1))
         self.non_active_bayes_validation_loss = np.zeros((self.n_rseed, self.n_upd_iter+1))
@@ -161,4 +161,4 @@ class ActiveExperimentSyntheticResultsCollector(object):
 if __name__=='__main__':
     collector = ActiveExperimentMnistResultsCollector()
     collector.collect_all()
-    collector.plot_each()
+    collector.plot_all()
