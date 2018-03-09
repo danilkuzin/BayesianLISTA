@@ -409,17 +409,42 @@ In the Figure \ref{fig:unsersampling_synthetic} prediction performance for diffe
 %\label{fig:validation_synthetic}
 %\end{figure}
 
-\subsection{MNIST}
-Here we evaluate the proposed Bayesian \textsc{lista} in terms of predictive performance on the \textsc{mnist} dataset \citep{lecun2010mnist}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is learned on 5000 images with the minibatch online algorithm \citep{mairal2009online}. The resulting size of $\mathbf{X}$ is $100 \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta$ are images converted to vectors. We use randomly selected 1000 images for training and 100 for validation. 
+\subsection{Predictive performance on synthetic data}
+Here we evaluate the proposed Bayesian \textsc{lista} in terms of predictive performance on the \textsc{mnist} dataset \citep{lecun2010mnist}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is learned on 5000 images with the minibatch online algorithm \citep{mairal2009online}. The resulting size of $\mathbf{X}$ is $K \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta$ are images converted to vectors. We use randomly selected $100$ images for training and $100$ for validation. 
 
-Figure \ref{fig:validation} presents \textsc{nmse} loss on the validation set. 
+Figures \ref{fig:mnist_100}, \ref{fig:mnist_250} presents \textsc{nmse} loss on the validation set with dictionaries $100$ and $250$. 
 
 Proposed Bayesian \textsc{lista} networks estimate posterior distribution for $\boldsymbol\beta$. Figure \ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
+
 \begin{figure}[t]
-\includegraphics[width=\columnwidth]{loss}
-\caption{Validation \textsc{nmse}}
-\label{fig:validation}
+\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_nmse_train}}
+~
+\subfloat[\textsc{nmse} on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_nmse_valid}}
+\newline
+\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_f_measure_train}}
+~
+\subfloat[F measure on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_f_measure_valid}}
+\caption{\textsc{mnist} with dictionary $100$}
+\label{fig:mnist_100}
 \end{figure}
+
+\begin{figure}[t]
+\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_nmse_train}}
+~
+\subfloat[\textsc{nmse} on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_nmse_valid}}
+\newline
+\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_f_measure_train}}
+~
+\subfloat[F measure on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_f_measure_valid}}
+\caption{\textsc{mnist} with dictionary $250$}
+\label{fig:mnist_250}
+\end{figure}
+
+%\begin{figure}[t]
+%\includegraphics[width=\columnwidth]{loss}
+%\caption{Validation \textsc{nmse}}
+%\label{fig:validation}
+%\end{figure}
 \begin{figure*}[t]
 \subfloat[$\beta$ posterior mean]{\includegraphics[width=0.66\columnwidth]{posterior_mean}}
 \subfloat[$\beta$ posterior std]{\includegraphics[width=0.66\columnwidth]{posterior_std}}
