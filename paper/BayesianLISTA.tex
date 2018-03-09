@@ -54,27 +54,27 @@
 \maketitle
 
 \begin{abstract}
-In the Bayesian neural network framework prior distributions are imposed on weights of a network and a posterior distribution of an output is inferred, rather than a point prediction in the conventional neural networks. Therefore, Bayesian neural networks estimate both an output for a test data and uncertainty of this prediction. Uncertainty of the prediction is a result of propagating weight uncertainty via layers of a network. We propose a method of propagating uncertainty through the soft-thresholding nonlinearity. The method expands the area of Bayesian neural networks and allows the soft-thresholding nonlinearity to be used in novel Bayesian sparse coding deep neural networks. As an example we design a Bayesian Learned Iterative Shrinkage-Thresdholding Algorithm (Bayesian \textsc{lista}) network. We develop a highly efficient posterior inference algorithm based on probabilistic backpropagation. A series of experiments show that the proposed framework provide both accurate predictions and reasonable estimates of uncertainty in these predictions.
+In the Bayesian neural network framework prior distributions are imposed on weights of a network and a posterior distribution of an output is inferred, rather than a point prediction provided by conventional neural networks. Therefore, Bayesian neural networks estimate both an output for a test data and uncertainty of this prediction. Uncertainty of the prediction is a result of propagating weight uncertainty via layers of a network. We propose a novel method of propagating uncertainty through the soft-thresholding nonlinearity. The method expands the area of Bayesian neural networks and enables the soft-thresholding nonlinearity to be included in Bayesian deep neural networks for the first time. As an example we design a Bayesian Learned Iterative Shrinkage-Thresdholding Algorithm (Bayesian \textsc{lista}) network. We develop a highly efficient posterior inference algorithm based on probabilistic backpropagation. A series of experiments on sparse coding show that the proposed framework provide both accurate predictions and quantified estimates of uncertainty in these predictions.
 \end{abstract}
 
 \section{Introduction}
 Though the idea of Bayesian learning in neural networks is not new \citep{neal2012bayesian}, it has regained its attention recently with the development of distributed approximate inference techniques \citep{li2015stochastic, hoffman2013stochastic}  and general boost in popularity of deep learning. In some spheres, such as self-driving cars or healthcare, uncertainty estimates are very important and Bayesian learning allows to obtain them. 
 
-In general, when distributions are included in a network, Bayesian inference complexity scales exponentially with the number of layers. Thus, in general it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques were proposed to handle specific types of neural networks. For example, feed-forward networks with rectified linear units nonlinearity~\citep{hernandez2015probabilistic}, networks with discrete distributions~\citep{soudry2014expectation}, recurrent networks~\citep{mcdermott2017bayesian}. 
+In general, when distributions are included in a network, Bayesian inference complexity scales exponentially with the number of layers. Thus, it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques have been proposed to handle specific types of neural networks. For example, feed-forward networks with rectified linear units nonlinearity~\citep{hernandez2015probabilistic}, networks with discrete distributions~\citep{soudry2014expectation}, recurrent networks~\citep{mcdermott2017bayesian}. 
 
-There are currently two approaches for Bayesian neural networks: distributions of weights can be included in the network \citep{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing uncertainty \citep{gal2016dropout}. In this paper we use the first way and impose distributions on weights and parameters to obtain posterior estimates of parameters, weights and predictions with uncertainty estimated.
+There are currently two approaches in Bayesian neural networks: explicit distributions of weights can be included in a network \citep{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing uncertainty \citep{gal2016dropout}. In this paper we use the first way and impose distributions on weights to obtain posterior estimates of weights and predictions with uncertainty estimated.
 
-The sparse coding and sparse inverse problems can be viewed as linear regression problems with the additional assumption that many of the basis representation coefficients should be zeros. They arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse}, non-invasive brain activity areas discovery \citep{baillet1997bayesian, jas2017learning}. 
+Sparse coding can be viewed as a linear regression problem with the additional assumption that many of the basis representation coefficients should be zeros. They arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse}, neuroscience~\citep{baillet1997bayesian, jas2017learning}. 
 
-The usual approach in neural networks for sparse coding is to use the soft-thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose the approach to propagate uncertainty through the soft-thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike-and-slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights for dense layers. The distribution of the target vector propagated through a dense layer and soft-thresholding nonlinearity can then be closely approximated with a distribution from the same family.
+Neural networks address the sparse coding problem with the soft-thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft-thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike-and-slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and soft-thresholding nonlinearity can then be closely approximated with a distribution from the same family.
 
-The proposed method of uncertainty propagation for sparse coding allows to derive the gradients of the logarithms of normalisation constants, which are used in probabilistic backpropagation to update weights distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
+The proposed method of uncertainty propagation for the soft-thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update weights distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
 
-The main contributions of this paper can be summarised~as (ITEMS NEED VERBS): 
+The main contributions of this paper can be summarised~as: 
 \begin{itemize}
-\item for the first time we propose uncertainty propagation through the soft-thresholding nonlinearity for a Bayesian neural network
-\item efficient posterior inference for weights and outputs of neural networks with the soft-thresholding nonlinearity
-\item novel Bayesian neural network for sparse coding
+\item for the first time we propose a method for uncertainty propagation through the soft-thresholding nonlinearity for a Bayesian neural network
+\item we develop efficient posterior inference for weights and outputs of neural networks with the soft-thresholding nonlinearity
+\item we design a novel Bayesian neural network for sparse coding
 \end{itemize}
 
 The paper is organised as following: first, we review neural networks for sparse coding in section \ref{sec:nn_sc} and present a novel Bayesian neural network in section \ref{sec:bayesian_lista}. We then describe uncertainty propagation to obtain the spike-and-slab distribution for an output of a network in section \ref{sec:fprop} and how probabilistic backpropagation is organised to update distributions of weights in section \ref{sec:backpropagation}. After that, we show the experimental results of the algorithm in section \ref{sec:experiments} and finish with discussion and conclusions in sections \ref{sec:discussion} and \ref{sec:conclusions}.
@@ -143,18 +143,20 @@ The shrinkage parameter $\lambda$ is a hyperparameter of the model.
 
 \section{Uncertainty propagation through soft thresholding}
 \label{sec:fprop}
-For every layer of the Baysian \textsc{lista} we assume that $\widehat{\boldsymbol\beta}_{l-1}$ has the spike and slab distribution with parameters $\boldsymbol\omega$, $\mathbf{m}$, $\mathbf{v}$
+For every layer of the Baysian \textsc{lista} we assume that $\widehat{\boldsymbol\beta}_{l-1}$ has the spike and slab distribution with parameters: $\boldsymbol\omega$ is a probability of a spike, $\mathbf{m}$ is a mean of a slab Gaussian distribution, and $\mathbf{v}$ is a variance of the slab distribution:
 \begin{equation}
 [\boldsymbol\beta_{l-1}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d),
 \end{equation}
-where $\omega_d$, $m_d$, and $v_d$ are components of vectors $\boldsymbol\omega$, $\mathbf{m}$, and $\mathbf{v}$, respectively.
-We initialise $\widehat{\boldsymbol\beta}_{0}$ with the spike and slab distribution with parameters $\boldsymbol\omega = \mathbf{0}$, $\mathbf{m} = \mathbf{0}$, $\mathbf{v} = \mathbf{1}$. 
+where $\omega_d$, $m_d$, and $v_d$ are components of vectors $\boldsymbol\omega$, $\mathbf{m}$, and $\mathbf{v}$, respectively, $\delta_0$ is the delta-function that represents a spike. 
+We initialise $\widehat{\boldsymbol\beta}_{0}$ with the spike and slab distribution with parameters $\boldsymbol\omega = \mathbf{0}$, $\mathbf{m} = \mathbf{0}$, and $\mathbf{v} = \mathbf{1}$. 
 
-Further in this section we show that the value of the next layer $\widehat{\boldsymbol\beta}_l$ can be approximated with a spike and slab distribution and, therefore, it maintains the same family of distributions and allows to apply the probabilistic backpropagation algorithm that is proposed in Section~\ref{sec:backpropagation}: lemma \ref{thm:matrix_const} describes the probabilistic variant of \textsc{lista} step $\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y}$, lemma \ref{thm:matrix_vector} and \ref{thm:sum_vectors} describe the probabilistic variant of \textsc{lista} step $ \mathbf{c}_l = \mathbf{b}_l +\mathbf{S}$ and lemma \ref{thm:soft_thresholding} describes the soft-thresholding step $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$. Overall the probabilistic layer is described by theorem \ref{thm:prob_layer}.
+Later in this section we show that the value of the next layer $\widehat{\boldsymbol\beta}_l$ can be approximated with a spike and slab distribution and, therefore, it maintains the same family of distributions. This leads to the proposed probabilistic backpropagation algorithm that is described in Section~\ref{sec:backpropagation}. We now describe how to propagate uncertainty through the layers of the Bayesian \textsc{lista} step by step stating meanwhile theoretical facts required for the method.
+
+%lemma \ref{thm:matrix_const} describes the probabilistic variant of \textsc{lista} step $\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y}$, lemma \ref{thm:matrix_vector} and \ref{thm:sum_vectors} describe the probabilistic variant of \textsc{lista} step $ \mathbf{c}_l = \mathbf{b}_l +\mathbf{S}$ and lemma \ref{thm:soft_thresholding} describes the soft-thresholding step $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$. Overall the probabilistic layer is described by theorem \ref{thm:prob_layer}.
 
 \begin{lemma}[Moments of spike and slab distribution]
 \label{thm:moments_spsl}
-Let the random variable $\xi$ have a spike and slab distribution with probability of spike $\omega$, slab mean $m$ and slab variance $v$. Then its moments are
+Let a random variable $\xi$ have a spike and slab distribution with probability of spike $\omega$, slab mean $m$ and slab variance $v$. Then its moments are
 \begin{subequations}
 \begin{align}
 \mathbb{E}\xi &= (1-\omega)m \\
@@ -166,10 +168,10 @@ Let the random variable $\xi$ have a spike and slab distribution with probabilit
 \begin{proof}
 \begin{align*}
 \begin{split}
-\mathbb{E}\xi &= \int x (\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v))dx \\
+\mathbb{E}\xi &= \int x \big(\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v)\big)dx \\
 & = \omega \int x \delta_0(x)dx + (1 - \omega)\int x \mathcal{N}(x; m, v)dx \\
 & = (1-\omega)m \\
-\mathbb{E}\xi^2 &= \int x^2 (\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v))dx \\
+\mathbb{E}\xi^2 &= \int x^2 \big(\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v)\big)dx \\
 & = \omega \int x^2 \delta_0(x)dx + (1 - \omega)\int x^2 \mathcal{N}(x; m, v)dx \\
 & = (1-\omega)(v + m^2) \\
 \operatorname{Var}\xi &= \mathbb{E}\xi^2 - \left(\mathbb{E}\xi\right)^2 = (1-\omega)(v + \omega m^2)
