@@ -81,14 +81,14 @@ The paper is organised as following: first, we review neural networks for sparse
 
 \section{Neural networks for sparse coding}
 
-The problem of sparse coding is the linear regression with assumption of sparse weights
+The sparse coding and sparse inverse problems are the linear regression with the assumption of sparse weights
 \begin{equation}
 \label{eq:regression_problem}
 \mathbf{y} = \mathbf{X}\boldsymbol\beta + \varepsilon
 \end{equation}
-where $\mathbf{y} \in \mathbb{R}^K$ is the observation, $\mathbf{X} \in \mathbb{R}^{K \times D}$ is the design matrix, $\boldsymbol\beta \in \mathbb{R}^D$ is unknown vector of weights such that $K < D$ with some of its elements $\beta_d$ equal to zero to achieve regularisation. $\varepsilon \in \mathbb{R}^K$ is the independent Gaussian noise.
+where $\mathbf{y} \in \mathbb{R}^K$ is the observation, $\mathbf{X} \in \mathbb{R}^{K \times D}$ is the design matrix, $\boldsymbol\beta \in \mathbb{R}^D$ is the unknown vector of weight with many elements $\beta_d$ equal to zero. $\varepsilon \in \mathbb{R}^K$ is the independent Gaussian noise.
 
-One of the popular families of the sparse coding algorithms is the iterative shrinkage algorithms, and notably the Iterative Shrinkage and Thresholding Algorithm(\textsc{ista}) \citep{daubechies2004iterative}. It iteratively obtains the new approximation of the coefficients vector $\widehat{\boldsymbol\beta}_l$ as the linear transformation of the input $\mathbf{y}$ with previous approximation $\widehat{\boldsymbol\beta}_{l-1}$ and then propagates the new approximation through the soft thresholding function $h_\lambda(\cdot)$
+One of the popular families of the sparse coding algorithms is the iterative shrinkage algorithms, and notably the Iterative Shrinkage and Thresholding Algorithm(\textsc{ista}) \citep{daubechies2004iterative}. It iteratively obtains the new approximation of the coefficient vector $\widehat{\boldsymbol\beta}_l$ at the iteration $l$ as the linear transformation of the input $\mathbf{y}$ with previous approximation $\widehat{\boldsymbol\beta}_{l-1}$ and then propagates the new approximation through the soft thresholding function $h_\lambda(\cdot)$
 \begin{equation}
 h_\lambda(v) = \text{sgn}(v) \max(|v| - \lambda, 0)
 \end{equation}
@@ -97,9 +97,9 @@ The linear transformation is
 \begin{equation}
 \widehat{\boldsymbol\beta}_l = \mathbf{W}\mathbf{y} + \mathbf{S}_l\widehat{\boldsymbol\beta}_{l-1}
 \end{equation}
-with weights $\mathbf{W} = \mathbf{X}^\top / E$, $E$ - upper bound on the largest eigenvalue of $\mathbf{X}^\top\mathbf{X}$ and $\mathbf{S} = \mathbf{I}_{D \times D} - \mathbf{W}\mathbf{X}$.
+with weights $\mathbf{W} = \mathbf{X}^\top / E$, $E$ - upper bound on the largest eigenvalue of $\mathbf{X}^\top\mathbf{X}$ and $\mathbf{S} = \mathbf{I}_{D \times D} - \mathbf{W}\mathbf{X}$ ($\mathbf{I}_{D \times D}$ is the identity matrix of size $D$).
 
-Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} algorithm allows to learn the values of matrices $\mathbf{W}$, $\mathbf{S}$. To achieve this, \textsc{ista} algorithm is limited with the fixed amount of iterations, $L$ and interpreted as a recurrent neural network. Overall, it has the following scheme
+The Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} algorithm allows to learn the values of matrices $\mathbf{W}$, $\mathbf{S}$ based on set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, \textsc{ista} algorithm is limited with the fixed amount of iterations, $L$ and interpreted as a recurrent neural network. Overall, it has the following scheme of predicting a coefficient vector $\boldsymbol\beta$ for an observation $\mathbf{y}$
 \begin{align}
 &\mathbf{b} = \mathbf{W}\mathbf{y}\\
 &\widehat{\boldsymbol\beta}_0 = h_\lambda(\mathbf{b}_0) \\
@@ -109,35 +109,45 @@ Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} algorithm allo
 & \widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_{L}
 \end{align}
 
-Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$, $\mathbf{b}$ are intermediate vectors that describe forward propagation. $\boldsymbol\beta_l$ is the current approximation of the target coefficients vector.
+Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$, $\mathbf{b}$ are intermediate vectors that describe forward propagation. $\boldsymbol\beta_l$ is the current approximation of the target coefficient vector at the layer $l$.
 
 \section{Bayesian neural network for sparse coding}
-To formulate the Bayesian version of \textsc{lista} we impose the prior distributions on the unknown weights
+This section presents the proposed Bayesian neural network for sparse coding. To formulate the Bayesian version of \textsc{lista} we impose the prior distributions on the unknown weights
 \begin{align}
-&p(\mathbf{W}) = \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{ij, l} | 0, \eta^{-1}), \\
-&p(\mathbf{S}) = \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd'', l} | 0, \eta^{-1}),
+&p(\mathbf{W}) = \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{ij} | 0, \eta^{-1}), \\
+&p(\mathbf{S}) = \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd''} | 0, \eta^{-1}),
 \end{align}
-where $w_{ij, l}$ is the component of the matrix $\mathbf{W}_l$, $s_{d'd'', l}$ is the component of the matrix $\mathbf{S}_l$ from the layer $l$.
-Likelihood of the output $\mathbf{y}$ is defined as 
-\begin{equation}
+where $w_{ij}$ is a component of the matrix $\mathbf{W}$, $s_{d'd''}$ is a component of the matrix $\mathbf{S}$, $\eta$ is the precision of the Gaussian distribution.
+The likelihood of $\mathbf{B}$ is defined as 
+\begin{align}
+p(&\mathbf{B}| \mathbf{Y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda) \nonumber \\
 \label{eq:likelihood}
-p(\mathbf{y}; \mathbf{W}, \mathbf{S}, \gamma) = \prod_{d=1}^D\mathcal{N}([\mathbf{y}]_d; [f(\mathbf{y}; \mathbf{W}, \mathbf{S})]_d, \gamma^{-1}),
-\end{equation}
-where $f(\mathbf{y}; \mathbf{W}, \mathbf{S})$ is the output of the \textsc{lista} neural network.
-The posterior distribution is 
-\begin{equation}
+= &\prod_{n=1}^N\prod_{d=1}^D\mathcal{N}(\beta_d^{(n)}; [f(\mathbf{y^{(n)}}; \mathbf{W}, \mathbf{S}, \lambda)]_d, \gamma^{-1}),
+\end{align}
+where $[\cdot]_d$ is the d-th component of a vector, $f(\mathbf{y}^{(n)}; \mathbf{W}, \mathbf{S}, \lambda)$ is the output of the Bayesian \textsc{lista} neural network, $\gamma$ is the precision of the Gaussian distribution.
+The prior of the introduced Gaussian precisions are set to the Gamma distribution with parameters $a^{\cdot}$ and $b^{\cdot}$:
+\begin{align}
+&p(\gamma) = \text{Gam}\left(\gamma; a^{\gamma}, b^{\gamma}\right), \\
+&p(\eta) = \text{Gam}\left(\eta; 	a^{\eta}, b^{\eta}\right)
+\end{align}
+
+The posterior distribution is then
+\begin{align}
+p(&\mathbf{W}, \mathbf{S}, \gamma, \eta | \mathbf{B}, \mathbf{Y}, \lambda) \nonumber \\
 \label{eq:posterior}
-p(\mathbf{W}, \mathbf{S}, \gamma, \eta | D) = \frac{p(\mathbf{y} | \mathbf{W},  \mathbf{S}, \gamma) p(\mathbf{W} | \eta )p(\mathbf{S} | \eta) p(\eta) p(\gamma)}{p(\mathbf{y})}
-\end{equation}
+= & \frac{p(\mathbf{B} | \mathbf{Y}, \mathbf{W},  \mathbf{S}, \gamma, \lambda) p(\mathbf{W} | \eta )p(\mathbf{S} | \eta) p(\eta) p(\gamma)}{p(\mathbf{B} | \mathbf{Y}, \lambda)}
+\end{align}
 The shrinkage parameter $\lambda$ is a hyperparameter of the model.
 
 \section{Uncertainty propagation through soft thresholding}
-We initialise the $\widehat{\boldsymbol\beta}_{0}$ with the spike and slab distribution with parameters $\boldsymbol\omega = \mathbf{0}$, $\mathbf{m} = \mathbf{0}$, $\mathbf{v} = \mathbf{1}$. For every layer we assume that $\widehat{\boldsymbol\beta}_{l-1}$ has the spike and slab distribution with parameters $\boldsymbol\omega$, $\mathbf{m}$, $\mathbf{v}$
+For every layer of the Baysian \textsc{LISTA} we assume that $\widehat{\boldsymbol\beta}_{l-1}$ has the spike and slab distribution with parameters $\boldsymbol\omega$, $\mathbf{m}$, $\mathbf{v}$
 \begin{equation}
-[\boldsymbol\beta_{l-1}]_d \sim [\boldsymbol\omega]_d \delta_0 + (1 - [\boldsymbol\omega]_d)\mathcal{N}([\mathbf{m}]_d, [\mathbf{v}]_d)
+[\boldsymbol\beta_{l-1}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d),
 \end{equation}
+where $\omega_d$, $m_d$, and $v_d$ are components of vectors $\boldsymbol\omega$, $\mathbf{m}$, and $\mathbf{v}$, respectively.
+We initialise $\widehat{\boldsymbol\beta}_{0}$ with the spike and slab distribution with parameters $\boldsymbol\omega = \mathbf{0}$, $\mathbf{m} = \mathbf{0}$, $\mathbf{v} = \mathbf{1}$. 
 
-Further in this section we show that the value of the next layer $\widehat{\boldsymbol\beta}_l$ can be approximated with spike and slab distribution and therefore it maintains the same family of distributions and allows to apply the extended probabilistic backpropagation algorithm that is proposed in Section~\ref{sec:backpropagation}: lemma \ref{thm:matrix_const} describes the probabilistic variant of \textsc{lista} step $\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y}$, lemma \ref{thm:matrix_vector} and \ref{thm:sum_vectors} describe the probabilistic variant of \textsc{lista} step $ \mathbf{c}_l = \mathbf{b}_l +\mathbf{S}$ and lemma \ref{thm:soft_thresholding} describes the soft thresholding step $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$. Overall the probabilistic layer is described by theorem \ref{thm:prob_layer}.
+Further in this section we show that the value of the next layer $\widehat{\boldsymbol\beta}_l$ can be approximated with a spike and slab distribution and, therefore, it maintains the same family of distributions and allows to apply the probabilistic backpropagation algorithm that is proposed in Section~\ref{sec:backpropagation}: lemma \ref{thm:matrix_const} describes the probabilistic variant of \textsc{lista} step $\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y}$, lemma \ref{thm:matrix_vector} and \ref{thm:sum_vectors} describe the probabilistic variant of \textsc{lista} step $ \mathbf{c}_l = \mathbf{b}_l +\mathbf{S}$ and lemma \ref{thm:soft_thresholding} describes the soft-thresholding step $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$. Overall the probabilistic layer is described by theorem \ref{thm:prob_layer}.
 
 \begin{lemma}[Moments of spike and slab distribution]
 \label{thm:moments_spsl}
@@ -179,7 +189,7 @@ w^b_d &= \sum_{k=1}^Ky_k^2v^w_{dk}.
  	The statement follows from the property that the family of normal distributions is closed under linear transformations.
  \end{proof}
  
-  \begin{lemma}[Product of Gaussian matrix and Gaussian vector]
+  \begin{lemma}[Product of Gaussian matrix and spike and slab vector]
   \label{thm:matrix_vector}
  Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\boldsymbol\beta \in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\beta_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. If their product is approximated as a vector $\mathbf{e} \in \mathbb{R}^{D}$ of random variables $e_d \sim \mathcal{N}(m^e_d, w^e_d)$, then 
 \begin{subequations}
@@ -294,11 +304,11 @@ The spike and slab distribution for $\boldsymbol\beta$ with can be propagated th
 
 \subsection{Approximation quality}
 \label{sec:approx_quality}
-We have used two approximations in forward propagation of the uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike-and-slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft-thresholding of a Gaussian vector is approximated with the spike-and-slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
+We have used two approximations in forward propagation of uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike-and-slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft-thresholding of a Gaussian vector is approximated with the spike-and-slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
-Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:matrix_vector}. For sampled distribution, $10000$ values were sampled from the Gaussian matrix and the Gaussian vector and their product was computed, then one of the dimensionalities was plotted. The approximated distribution was computed according to lemma \ref{thm:matrix_vector}.
+Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:matrix_vector}. For sampled distribution, $10000$ values were sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The approximated distribution is computed according to lemma \ref{thm:matrix_vector}.
 
-Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:soft_thresholding}. For sampled distribution, $10000$ values were sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities was plotted. The approximated distribution was computed according to lemma \ref{thm:soft_thresholding}.
+Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:soft_thresholding}. For sampled distribution, $10000$ values are sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities is plotted. The approximated distribution is computed according to lemma \ref{thm:soft_thresholding}.
 \begin{figure}[t]
 \includegraphics[width=\columnwidth]{d_testing}
 \caption{Approximation of product of Gaussians.}
@@ -315,51 +325,59 @@ Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distri
 \section{Backpropagation}
 \label{sec:backpropagation}
 \subsection{Likelihood}
-We use the probabilistic backpropagation algorithm \citep{hernandez2015probabilistic} for computing parameters updates. It is based on assumed density filtering and expectation propagation and allows to update parameters of the distributions based on the derivative of the logarithm of the normalisation constant. 
-The exact posterior \ref{eq:posterior} is approximated with a factorised distribution
+For Bayesian inference we significantly expend the probabilistic backpropagation algorithm~\citep{hernandez2015probabilistic} for computing parameter updates. It is based on assumed density filtering (ADF) and expectation propagation (EP) and allows to update parameters of the distributions based on the derivative of the logarithm of a normalisation constant. ADF is based on iteratively incorporating factors from the true posterior to a factorised approximating distribution, whereas in EP factors in an approximating distribution are iteratively replaced by factors from the true posterior.
+
+The exact posterior (\ref{eq:posterior}) is approximated with a factorised distribution
 \begin{align}
 \begin{split}
-q(\mathbf{W}, \mathbf{S}, \gamma, \eta) &= \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{dk, l} | m^w_{dk, l}, v^w_{dk, l}) \\
-&\times \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd'', l} | m^s_{d'd'', l}, v^s_{d'd'', l}) \\
-&\times \text{Gam}(\gamma; \alpha^\gamma, \beta^\gamma) \text{Gam}(\eta; \alpha^\eta, \beta^\eta) 
+q(\mathbf{W}, \mathbf{S}, \gamma, \eta) &= \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{dk} | m^w_{dk}, v^w_{dk}) \\
+&\times \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd''} | m^s_{d'd''}, v^s_{d'd''}) \\
+&\times \text{Gam}(\gamma; a^\gamma, b^\gamma) \text{Gam}(\eta; a^\eta, b^\eta) 
 \end{split}
 \end{align}
-The normalisation constant of the approximating distribution $q$ with the likelihood~\ref{eq:likelihood} term incorporated can be computed as follows
+
+With the likelihood factors~(\ref{eq:likelihood}) of the true posterior we employ the ADF approach and iteratively incorporate them into the approximating distribution $q$. The normalisation constant of the approximating distribution $q$ with the likelihood term for the data point $n$ incorporated can be computed as follows (to simplify notation the superscript $(n)$ is omitted)
 \begin{align}
 \label{eq:Z}
 \begin{split}
 Z = \int \prod_{d=1}^{D} \big[&\mathcal{N}(\beta_d | f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda), \gamma^{-1}) \\
- &q(\mathbf{S}, \mathbf{W}, \eta, \gamma)\big] \mathrm{d}\mathbf{S} \mathrm{d}\mathbf{W} \mathrm{d}\eta \mathrm{d}\gamma
+ &q(\mathbf{W}, \mathbf{S}, \gamma, \eta)\big] \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
  \end{split}
 \end{align}
-We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\mathbf{z}_L$ - output from the network
+We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\mathbf{z}_L = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$, that is the output from the network and approximated with the spike and slab distribution with parameters $\boldsymbol\omega^{z_L}$, $\mathbf{m}^{z_l}$, and $\mathbf{v}^{z_L}$
 \begin{align}
-&Z \approx \int \prod_{d=1}^{D} \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma_d^{-1}) \nonumber \\
-&\times (\omega^{z_L}_d \delta_0([\mathbf{z}_L]_d) + (1 - \omega^{z_L}_d)\mathcal{N}(m^{z_L}_d, v^{z_L}_d)) \nonumber\\
-&\times \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}\mathbf{z}_L \mathrm{d}\boldsymbol\gamma  \nonumber\\
-&= \prod_{d=1}^{D} \Big[\omega^{z_L}_d \int \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma_d^{-1})  \delta_0([z_L]_d) \nonumber \\
-&\times \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}[{z}_L]_d \mathrm{d}\gamma_d  \nonumber\\
-& + (1 - \omega^{z_L}_d)\int \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma_d^{-1})\mathcal{N}(m^{z_L}_d, v^{z_L}_d))  \nonumber\\
-&\times \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}[{z}_L]_d \mathrm{d}\gamma_d\Big]  \nonumber\\
-& = \prod_{d=1}^{D} \Big[\omega^{z_L}_d \int \mathcal{N}(\beta_d | 0, \gamma_d^{-1})  \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma) d\gamma_d  \nonumber\\
+&Z \approx \int \prod_{d=1}^{D} \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma^{-1}) \nonumber \\
+&\times (\omega^{z_L}_d \delta_0([\mathbf{z}_L]_d) + (1 - \omega^{z_L}_d)\mathcal{N}([\mathbf{z}_L]_d | m^{z_L}_d, v^{z_L}_d)) \nonumber\\
+&\times \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}\mathbf{z}_L \mathrm{d}\gamma  \nonumber\\
+&= \prod_{d=1}^{D} \Big[\omega^{z_L}_d \int \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma^{-1})  \delta_0([\mathbf{z}_L]_d) \nonumber \\
+&\times \text{Gam} (\gamma; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}[\mathbf{z}_L]_d \mathrm{d}\gamma  \nonumber\\
+& + (1 - \omega^{z_L}_d)\int \big[\mathcal{N}(\beta_d | [\mathbf{z}_L]_d, \gamma^{-1})\nonumber\\
+&\times \mathcal{N}([\mathbf{z}_L]_d | m^{z_L}_d, v^{z_L}_d)) \text{Gam} (\gamma; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}[\mathbf{z}_L]_d \mathrm{d}\gamma\Big]  \nonumber\\
+& = \prod_{d=1}^{D} \Big[\omega^{z_L}_d \int \mathcal{N}(\beta_d | 0, \gamma^{-1})  \text{Gam} (\gamma; \alpha^\gamma, \beta^\gamma) d\gamma  \nonumber\\
 & + (1 - \omega^{z_L}_d)\int \big[\mathcal{T}(\beta_d | [\mathbf{z}_L]_d, \frac{\beta^\gamma}{\alpha^\gamma}, 2\alpha^\gamma)  \nonumber\\
-&\times \mathcal{N}(m^{z_L}_d, v^{z_L}_d))\big] \mathrm{d}[{z}_L]_d\Big]  \nonumber\\
+&\times \mathcal{N}([\mathbf{z_L}]_d| m^{z_L}_d, v^{z_L}_d))\big] \mathrm{d}[\mathbf{z}_L]_d\Big]  \nonumber\\
 & \approx \prod_{d=1}^D \Big[\omega^{z_L}_d  \mathcal{T}(\beta_d | 0, \frac{\beta^\gamma}{\alpha^\gamma}, 2\alpha^\gamma) \nonumber \\ 
 \label{eq:Z_approx}
-&+ (1 - \omega^{z_L}_d)\mathcal{N}(m^{z_L}_d, \frac{\beta^\gamma}{\alpha^\gamma - 1} + v^{z_L})\Big]
+&+ (1 - \omega^{z_L}_d)\mathcal{N}(\beta_d | m^{z_L}_d, \frac{\beta^\gamma}{\alpha^\gamma - 1} + v^{z_L})\Big]
 \end{align}
 
-The Student t density, can be parametrised in different ways. In this paper the following parametrisation is used 
+The Student t density can be parametrised in different ways. In this paper the following parametrisation is used 
 \begin{equation}
 \mathcal{T}(x; \mu, \beta, \nu) = \frac{\Gamma\left(\frac{\nu + 1}{2}\right)}{\Gamma\left(\frac{\nu}{2}\right)\sqrt{\pi \nu \beta}} \left(1 + \frac{(x - \mu)^2}{\nu\beta}\right)^{-\frac{\nu + 1}{2}}
 \end{equation}
 where $\Gamma(\cdot)$ denotes the Gamma function.
 
-Then derivatives of $Z$ are computed w.r.t the weights and hyperparameters of the factorised distribution and then they are used for updates.
+Then derivatives of $Z$ are computed w.r.t the weights and Gaussian precision parameters of the factorised distribution and then they are used for updates. [REWRITE]
+
+[ADD ON EP UPDATE OF PRIOR INCORPORATED]
+
 \subsection{Hyperparameter optimisation}
 The only hyperparameter in the proposed Bayesian \textsc{lista} is the shrinkage parameter $\lambda$. It can be optimised using the Type II maximum likelihood procedure. The Type II likelihood, i.e. the evidence $p(\boldsymbol\beta | \mathbf{y}, \lambda)$, of the Bayesian \textsc{lista} is equal to the normalisation constant $Z$ (\ref{eq:Z}) computed for the whole training dataset $\boldsymbol\beta$. Given the approximation~(\ref{eq:Z_approx}) the optimal hyperparameter $\lambda$ can be found by a gradient-based optimiser.
 
 \section{Experiments}
+The proposed Bayesian \textsc{LISTA} is evaluated in the context of the sparse inverse problem[CITE?], where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
+
+We compare the proposed Bayesian \textsc{LISTA} with the classical  \textsc{LISTA}~\citep{gregor2010learning} in terms of the predictive accuracy. As baselines we also use ISTA[CITE] and FISTA[CITE].
 
 The following quality measures are used:
 \begin{itemize}
@@ -367,7 +385,7 @@ The following quality measures are used:
 \item $\text{F-measure} = 2\dfrac{\text{precision}\cdot\text{recall}}{\text{precision} + \text{recall}}$ between non-zero elements of the true signal $\mathbf{X}$ and non-zero elements of the estimate $\widehat{\mathbf{X}}$. 
 \end{itemize}
 
-We demonstrate the performance on small datasets to highlight that the proposed algorithm can learn when the dataset size is not sufficient for \textsc{lista}.
+We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for \textsc{lista} to learn anything. 
 
 \subsection{Predictive performance on synthetic data}
 First, the predictive performance of the proposed Bayesian \textsc{lista} is analysed on synthetic data. We generate $N_\text{train}=500$ sparse coefficients vectors $\boldsymbol\beta_n$ each of size $D = 100$. Coefficients $\boldsymbol\beta$ are generated from the spike-and-slab distribution with truncated slab: each component of $\beta_{nd}$ is zero with probability $0.8$ or is from standard Gaussian distribution without interval $(-0.1, 0.1)$ with probability $0.2$. Truncation of the zeros allows to remove from support pattern values with insignificant contributions \citep{xin2016maximal}. To simulate sparse observations, we have generated the random Gaussian design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$.  The observations are generated according to the \ref{eq:regression_problem} with zero-mean Gaussian noise with standard deviation $0.5$. 
@@ -411,7 +429,7 @@ In the Figure \ref{fig:unsersampling_synthetic} prediction performance for diffe
 %\label{fig:validation_synthetic}
 %\end{figure}
 
-\subsection{Predictive performance on synthetic data}
+\subsection{Predictive performance on \textsc{mnist} data}
 Here we evaluate the proposed Bayesian \textsc{lista} in terms of predictive performance on the \textsc{mnist} dataset \citep{lecun2010mnist}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is learned on 5000 images with the minibatch online algorithm \citep{mairal2009online}. The resulting size of $\mathbf{X}$ is $K \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta$ are images converted to vectors. We use randomly selected $100$ images for training and $100$ for validation. 
 
 Figures \ref{fig:mnist_100}, \ref{fig:mnist_250} presents \textsc{nmse} loss on the validation set with dictionaries $100$ and $250$. 
