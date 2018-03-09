@@ -42,19 +42,19 @@
 %(if needed)\\
 %}
 
-\author{ {\bf Danil Kuzin} \\
-\And
-{\bf Olga Isupova}  \\
-\And
-{\bf Lyudmila Mihaylova}   \\
-}
+%\author{ {\bf Danil Kuzin} \\
+%\And
+%{\bf Olga Isupova}  \\
+%\And
+%{\bf Lyudmila Mihaylova}   \\
+%}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-In the Bayesian neural network framework prior distributions are imposed on weights of a network and a posterior distribution of an output is inferred, rather than a point prediction provided by conventional neural networks. Therefore, Bayesian neural networks estimate both an output for a test data and uncertainty of this prediction. Uncertainty of the prediction is a result of propagating weight uncertainty via layers of a network. We propose a novel method of propagating uncertainty through the soft-thresholding nonlinearity. The method expands the area of Bayesian neural networks and enables the soft-thresholding nonlinearity to be included in Bayesian deep neural networks for the first time. As an example we design a Bayesian Learned Iterative Shrinkage-Thresdholding Algorithm (Bayesian \textsc{lista}) network. We develop a highly efficient posterior inference algorithm based on probabilistic backpropagation. A series of experiments on sparse coding show that the proposed framework provide both accurate predictions and quantified estimates of uncertainty in these predictions.
+In the Bayesian neural network framework prior distributions are imposed on weights of a network and a posterior distribution of an output is inferred, rather than a point prediction provided by conventional neural networks. Therefore, Bayesian neural networks estimate both an output for a test data and uncertainty of this prediction. Uncertainty of the prediction is a result of propagating weight uncertainty through layers of a network. We propose a novel method of propagating uncertainty through the soft thresholding nonlinearity. The method expands the area of Bayesian neural networks and enables the soft thresholding nonlinearity to be included in Bayesian deep neural networks for the first time. As an example we design a Bayesian Learned Iterative Shrinkage-Thresdholding Algorithm (Bayesian \textsc{lista}) network. We develop a highly efficient posterior inference algorithm based on probabilistic backpropagation. A series of experiments on sparse coding shows that the proposed framework provide both accurate predictions and quantified estimates of uncertainty in these predictions.
 \end{abstract}
 
 \section{Introduction}
@@ -66,15 +66,15 @@ There are currently two approaches in Bayesian neural networks: explicit distrib
 
 Sparse coding can be viewed as a linear regression problem with the additional assumption that many of the basis representation coefficients should be zeros. They arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse}, neuroscience~\citep{baillet1997bayesian, jas2017learning}. 
 
-Neural networks address the sparse coding problem with the soft-thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft-thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike-and-slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and soft-thresholding nonlinearity can then be closely approximated with a distribution from the same family.
+Neural networks address the sparse coding problem with the soft thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike-and-slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and soft thresholding nonlinearity can then be closely approximated with a distribution from the same family.
 
-The proposed method of uncertainty propagation for the soft-thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update weights distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
+The proposed method of uncertainty propagation for the soft thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update weights distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
 
 The main contributions of this paper can be summarised~as: 
 \begin{itemize}
-\item for the first time we propose a method for uncertainty propagation through the soft-thresholding nonlinearity for a Bayesian neural network
-\item we develop efficient posterior inference for weights and outputs of neural networks with the soft-thresholding nonlinearity
-\item we design a novel Bayesian neural network for sparse coding
+\item for the first time we propose a method for uncertainty propagation through the soft thresholding nonlinearity for a Bayesian neural network;
+\item we develop efficient posterior inference for weights and outputs of neural networks with the soft thresholding nonlinearity;
+\item we design a novel Bayesian neural network for sparse coding.
 \end{itemize}
 
 The paper is organised as following: first, we review neural networks for sparse coding in section \ref{sec:nn_sc} and present a novel Bayesian neural network in section \ref{sec:bayesian_lista}. We then describe uncertainty propagation to obtain the spike-and-slab distribution for an output of a network in section \ref{sec:fprop} and how probabilistic backpropagation is organised to update distributions of weights in section \ref{sec:backpropagation}. After that, we show the experimental results of the algorithm in section \ref{sec:experiments} and finish with discussion and conclusions in sections \ref{sec:discussion} and \ref{sec:conclusions}.
@@ -152,7 +152,7 @@ We initialise $\widehat{\boldsymbol\beta}_{0}$ with the spike and slab distribut
 
 Later in this section we show that the value of the next layer $\widehat{\boldsymbol\beta}_l$ can be approximated with a spike and slab distribution and, therefore, it maintains the same family of distributions. This leads to the proposed probabilistic backpropagation algorithm that is described in Section~\ref{sec:backpropagation}. We now describe how to propagate uncertainty through the layers of the Bayesian \textsc{lista} step by step stating meanwhile theoretical facts required for the method.
 
-Lemma \ref{thm:matrix_const} describes the probabilistic variant of \textsc{lista} step $\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y}$, lemma \ref{thm:matrix_vector} and \ref{thm:sum_vectors} describe the probabilistic variant of \textsc{lista} step $ \mathbf{c}_l = \mathbf{b}_l +\mathbf{S}$ and lemma \ref{thm:soft_thresholding} describes the soft-thresholding step $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$. Overall the probabilistic layer is described by theorem \ref{thm:prob_layer}.
+Lemma \ref{thm:matrix_const} describes the probabilistic variant of \textsc{lista} step $\quad \mathbf{b}_l = \mathbf{W}_l \mathbf{y}$, lemma \ref{thm:matrix_vector} and \ref{thm:sum_vectors} describe the probabilistic variant of \textsc{lista} step $ \mathbf{c}_l = \mathbf{b}_l +\mathbf{S}$ and lemma \ref{thm:soft_thresholding} describes the soft thresholding step $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$. Overall the probabilistic layer is described by theorem \ref{thm:prob_layer}.
 
 \begin{lemma}[Moments of spike and slab distribution]
 \label{thm:moments_spsl}
@@ -233,11 +233,11 @@ Based on properties of Gaussian distributions.
 
 \begin{lemma}[Gaussian propagation through soft thresholding]
 \label{thm:soft_thresholding}
-When a Gaussian-distributed random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft-thresholding function it can be approximated with the spike and slab distribution on $x^*$ with the probability of spike $\omega^*$, slab mean $m^*$ and slab variance $v^*$ (parameters of the approximating distribution are given in the proof).
+When a Gaussian-distributed random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft thresholding function it can be approximated with the spike and slab distribution on $x^*$ with the probability of spike $\omega^*$, slab mean $m^*$ and slab variance $v^*$ (parameters of the approximating distribution are given in the proof).
 \end{lemma}
 \begin{proof}
 
-The probability of spike $\omega^*$ equals to the probability mass of the original distribution that lies in $(-\lambda, \lambda)$  and is flattened into zero by soft-thresholding operator. As the original distribution is Gaussian, this can be computed as 
+The probability of spike $\omega^*$ equals to the probability mass of the original distribution that lies in $(-\lambda, \lambda)$  and is flattened into zero by soft thresholding operator. As the original distribution is Gaussian, this can be computed as 
 \begin{align}
 \begin{split}
 \omega^* &= p(x^*=0) = p(x \in [-\lambda, \lambda]) \\
@@ -245,7 +245,7 @@ The probability of spike $\omega^*$ equals to the probability mass of the origin
 \end{split}
 \end{align}
 
-Soft-thresholding shifts elements that are greater than $\lambda$  or less than $-\lambda$ elements towards 0. Let $\psi(\cdot)$ denote the density of the soft-threshold distribution, $\phi(\cdot)$ denote the density of the original Gaussian distribution. Then the first moment of the resulting distribution is 
+Soft thresholding shifts elements that are greater than $\lambda$  or less than $-\lambda$ elements towards 0. Let $\psi(\cdot)$ denote the density of the soft thresholded distribution, $\phi(\cdot)$ denote the density of the original Gaussian distribution. Then the first moment of the resulting distribution is 
 
 \begin{align}
 \begin{split}
@@ -309,7 +309,7 @@ The spike and slab distribution for $\boldsymbol\beta$ with can be propagated th
 
 \subsection{Approximation quality}
 \label{sec:approx_quality}
-We have used two approximations in forward propagation of uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike-and-slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft-thresholding of a Gaussian vector is approximated with the spike-and-slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
+We have used two approximations in forward propagation of uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike-and-slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft thresholding of a Gaussian vector is approximated with the spike-and-slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
 Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:matrix_vector}. For sampled distribution, $10000$ values were sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The approximated distribution is computed according to lemma \ref{thm:matrix_vector}.
 
