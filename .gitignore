@@ -132,3 +132,15 @@ theano/PBP_net_lista/z_new_testing.eps
 paper/graphics/active_mnist/f_measure_validation-eps-converted-to.pdf
 
 paper/graphics/active_mnist/nmse_validation-eps-converted-to.pdf
+
+theano/experiments/mnist/posterior_mean.pdf
+
+theano/experiments/mnist/posterior_sample_0.pdf
+
+theano/experiments/mnist/posterior_sample_1.pdf
+
+theano/experiments/mnist/posterior_sample_2.pdf
+
+theano/experiments/mnist/posterior_spike_indicator.pdf
+
+theano/experiments/mnist/posterior_std.pdf
