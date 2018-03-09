@@ -61,25 +61,26 @@ if __name__ == '__main__':
 
     np.random.seed(1)
 
-    bayes_weights = np.load('./normalised_results/mnist_100_train_20_layers_K_250_bayes_weights.npz')
-    dictionary = np.load('./normalised_results/mnist_100_train_20_layers_K_250_dictionary.npz')
-    data = np.load('./normalised_results/mnist_100_train_20_layers_K_250_beta_est.npz')
+    bayes_weights = np.load('./non_normalised_results/mnist_100_train_20_layers_K_250_bayes_weights.npz')
+    data = np.load('./non_normalised_results/mnist_100_train_20_layers_K_250_beta_est.npz')
 
     y_validation = data['y_validation']
     beta_validation = data['true_beta_validation']
 
-    bayes_lista = SingleBayesianListaHandler(bayes_weights['D'],
-                                             bayes_weights['K'], bayes_weights['L'], dictionary['X'])
-
-    bayes_lista.pbp_instance.network.params_W_M.set_value(bayes_weights['bayes_W_M'])
-    bayes_lista.pbp_instance.network.params_W_V.set_value(bayes_weights['bayes_W_V'])
-    bayes_lista.pbp_instance.network.params_S_M.set_value(bayes_weights['bayes_S_M'])
-    bayes_lista.pbp_instance.network.params_S_V.set_value(bayes_weights['bayes_S_V'])
 
 
-    plotter = PosteriorPlotter()
-
-    example_num = 0
-
-    plotter.plot_posterior_samples_mnist(bayes_lista, y_validation[example_num], 3)
-    plotter.plot_posterior_parameters_mnist(bayes_lista, y_validation[example_num])
+    # bayes_lista = SingleBayesianListaHandler(bayes_weights['D'],
+    #                                          bayes_weights['K'], bayes_weights['L'], dictionary['X'])
+    #
+    # bayes_lista.pbp_instance.network.params_W_M.set_value(bayes_weights['bayes_W_M'])
+    # bayes_lista.pbp_instance.network.params_W_V.set_value(bayes_weights['bayes_W_V'])
+    # bayes_lista.pbp_instance.network.params_S_M.set_value(bayes_weights['bayes_S_M'])
+    # bayes_lista.pbp_instance.network.params_S_V.set_value(bayes_weights['bayes_S_V'])
+    #
+    #
+    # plotter = PosteriorPlotter()
+    #
+    # example_num = 0
+    #
+    # plotter.plot_posterior_samples_mnist(bayes_lista, y_validation[example_num], 3)
+    # plotter.plot_posterior_parameters_mnist(bayes_lista, y_validation[example_num])

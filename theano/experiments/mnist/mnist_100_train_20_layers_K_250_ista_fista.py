@@ -16,7 +16,7 @@ class MnistSequentialComparatorIstaFista(SequentialComparatorIstaFista):
                  train_freq=False, train_bayes=False, train_shared_bayes=False, use_ista=True, use_fista=True, save_history=False):
 
         self.data = MnistData(K=K)
-        self.data.check_download()
+        self.data.check_download(normalise=False)
         self.data.learn_dictionary()
         self.D = self.data.train_data.shape[1]
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     np.random.seed(1)
 
-    K = 100
+    K = 250
     L = 20
 
     comparator = MnistSequentialComparatorIstaFista(K, L, learning_rate=0.0001, n_train_sample=100,
@@ -52,4 +52,4 @@ if __name__ == '__main__':
     comparator.plot_quality_history()
 
 
-    comparator.save_numpy('ista_fista/results')
+    comparator.save_numpy('ista_fista/results_{}_K'.format(K))
