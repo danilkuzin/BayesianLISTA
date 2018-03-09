@@ -12,6 +12,8 @@
 
 \usepackage{natbib}
 
+\usepackage{bbm}
+
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 
@@ -52,30 +54,30 @@
 \maketitle
 
 \begin{abstract}
-We propose the method of propagating the uncertainty through the multilevel soft-thresholding nonlinearity. This allows to use it as a building block for sparse coding deep neural networks. As an example we develop the Bayesian LISTA algorithm with probabilistic backpropagation. It allows to obtain the variance estimates for parameters and posterior distributions.
+Bayesian neural networks impose prior distributions on weights of a network and infer a posterior distribution of an output, rather than a point prediction as in the conventional neural networks. Therefore, Bayesian neural networks estimate both an output for an unseen data and uncertainty of this prediction. Uncertainty of the prediction is a result of propagating weight uncertainty via layers of a network. We propose a method of propagating uncertainty through the multilevel soft-thresholding nonlinearity. The method expands the area of Bayesian neural networks. It allows the soft-thresholding nonlinearity to be used as a building block for novel Bayesian sparse coding deep neural networks. As an example we design a Bayesian Learned Iterative Shrinkage-Thresdholding Algorithm (\textsc{LISTA}) network. We develop a highly efficient posterior inference algorithm based on probabilistic backpropagation. A series of experiments show that the proposed framework provide both accurate predictions and reasonable estimates of uncertainty in these predictions.
 \end{abstract}
 
 \section{Introduction}
-Though the idea of Bayesian learning in neural networks is not new \citep{neal2012bayesian}, it has gained its attention only recently, with the development of distributed approximate inference techniques \citep{li2015stochastic, hoffman2013stochastic}  and general boost in popularity of deep learning. In some spheres, such as self-driving cars or healthcare, posterior estimates are very important and Bayesian learning allows to obtain them. 
+Though the idea of Bayesian learning in neural networks is not new \citep{neal2012bayesian}, it has regained its attention recently with the development of distributed approximate inference techniques \citep{li2015stochastic, hoffman2013stochastic}  and general boost in popularity of deep learning. In some spheres, such as self-driving cars or healthcare, uncertainty estimates are very important and Bayesian learning allows to obtain them. 
 
-In general, when distributions are included in the network, Bayesian inference complexity scales exponentially with the number of layers, thus making it difficult to be implemented for deep neural networks in general. Nevertheless, recently several techniques were proposed to handle specific types of neural networks. For example, dense layers \citep{hernandez2015probabilistic}, networks with discrete distributions \citep{soudry2014expectation}, recurrent networks \citep{mcdermott2017bayesian}. 
+In general, when distributions are included in a network, Bayesian inference complexity scales exponentially with the number of layers. Thus, in general it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques were proposed to handle specific types of neural networks. For example, feed-forward networks with rectified linear units nonlinearity~\citep{hernandez2015probabilistic}, networks with discrete distributions~\citep{soudry2014expectation}, recurrent networks~\citep{mcdermott2017bayesian}. 
 
-There are currently two approaches for Bayesian neural networks: distributions of weights can be included in the network \citep{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing the uncertainty \citep{gal2016dropout}. In this paper we are using the first way and impose distributions on weights and parameters to obtain posterior estimates of parameters, weights and predictions with uncertainty estimated.
+There are currently two approaches for Bayesian neural networks: distributions of weights can be included in the network \citep{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing uncertainty \citep{gal2016dropout}. In this paper we use the first way and impose distributions on weights and parameters to obtain posterior estimates of parameters, weights and predictions with uncertainty estimated.
 
-Sparse coding problem can be viewed as the linear regression problem with the additional assumption that some of the basis representation coefficients should be zeros. It arises in different applications, such as compressive sensing~\cite{candes2008introduction}, image and video processing~\cite{mairal2014sparse}, non-invasive brain activity areas discovery \cite{baillet1997bayesian}. 
+The sparse coding and sparse inverse problems can be viewed as linear regression problems with the additional assumption that many of the basis representation coefficients should be zeros. They arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse}, non-invasive brain activity areas discovery \citep{baillet1997bayesian, jas2017learning}. 
 
-The usual approach in neural networks for sparse coding is to use the soft thresholding nonlinearity, that shifts current estimates towards zero \citep{lecun2010mnist}. It allows to obtain predictions containing zeros. In this paper we propose the approach to propagate uncertainty through the soft-thresholding nonlinearity. At every layer the current distribution of the target vector is represented as spike-and-slab distribution \citep{mitchell1988bayesian}, and we show that it can be effectively combined with Gaussian weights for dense layers and after soft-thresholding it can be closely approximated with distribution from the same family.
+The usual approach in neural networks for sparse coding is to use the soft-thresholding nonlinearity, that shifts current estimates towards zero \citep{lecun2010mnist}. In this paper we propose the approach to propagate uncertainty through the soft-thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike-and-slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights for dense layers. The distribution of the target vector propagated through a dense layer and soft-thresholding nonlinearity can then be closely approximated with a distribution from the same family.
 
-The proposed method of uncertainty propagation for sparse coding allows to derive the gradients of the normalisation constant logarithm of the model likelihood which is used in probabilistic backpropagation to update weights distribution, therefore it can be applied to Bayesian neural networks for sparse coding.
+The proposed method of uncertainty propagation for sparse coding allows to derive the gradients of the logarithms of normalisation constants, which are used in probabilistic backpropagation to update weights distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
 
-The paper is organised as following: first, we describe the uncertainty propagation to obtain the spike-and-slab distribution - output from the network, then we describe how the backpropagation is organised to update distributions of weights and their priors. After that we show how the algorithm is performed on \textsc{mnist} data and demonstrate the obtained posterior estimates.
-
-The main contributions are: 
+The main contributions of this paper can be summarised~as: 
 \begin{itemize}
-\item for the first time we propose uncertainty propagation through the soft-thresholding nonlinearity for Bayesian neural network
+\item for the first time we propose uncertainty propagation through the soft-thresholding nonlinearity for a Bayesian neural network
 \item efficient posterior inference for weights and outputs of neural networks with the soft-thresholding nonlinearity
-\item novel Bayesian neural network network for sparse coding
+\item novel Bayesian neural network for sparse coding
 \end{itemize}
+
+The paper is organised as following: first, we review neural networks for sparse coding and present a novel Bayesian neural network. We then describe uncertainty propagation to obtain the spike-and-slab distribution for an output of a network and how probabilistic backpropagation is organised to update distributions of weights. After that, we show the experimental results of the algorithm.
 
 \section{Neural networks for sparse coding}
 
@@ -464,7 +466,8 @@ Proposed Bayesian \textsc{lista} networks estimate posterior distribution for $\
 As far as we are aware, this is the first implementation of Bayesian deep sparse coding algorithm, there are works on Bayesian sparsity in context of neural networks \citep{he2017bayesian}, but it is not the Bayesian Neural Network. We find not only correct predictions but also useful posterior estimates for the predictions that show how the model is confident in its decision. 
 Though EP is not suited for distributed inference, some variations of ADF can be used \citep{li2015stochastic}. This allows the proposed approach to scale.
 
-\bibliographystyle{agsm}
+
 \bibliography{bibliography}
+\bibliographystyle{icml2018}
 
 \end{document}
