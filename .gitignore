@@ -128,3 +128,7 @@ theano/experiments/mnist/results/250_normalised_nmse_train.eps
 theano/experiments/mnist/results/250_normalised_nmse_valid.eps
 theano/PBP_net_lista/d_testing.eps
 theano/PBP_net_lista/z_new_testing.eps
+
+paper/graphics/active_mnist/f_measure_validation-eps-converted-to.pdf
+
+paper/graphics/active_mnist/nmse_validation-eps-converted-to.pdf
