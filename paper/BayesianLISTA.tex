@@ -66,7 +66,7 @@ There are currently two approaches in Bayesian neural networks: explicit distrib
 
 Sparse coding can be viewed as a linear regression problem with the additional assumption that many of the basis representation coefficients should be zeros. They arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse}, neuroscience~\citep{baillet1997bayesian, jas2017learning}. 
 
-Neural networks address the sparse coding problem with the soft thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike-and-slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and soft thresholding nonlinearity can then be closely approximated with a distribution from the same family.
+Neural networks address the sparse coding problem with the soft thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike and slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and soft thresholding nonlinearity can then be closely approximated with a distribution from the same family.
 
 The proposed method of uncertainty propagation for the soft thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update weights distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
 
@@ -77,11 +77,11 @@ The main contributions of this paper can be summarised~as:
 \item we design a novel Bayesian neural network for sparse coding.
 \end{itemize}
 
-The paper is organised as following: first, we review neural networks for sparse coding in section \ref{sec:nn_sc} and present a novel Bayesian neural network in section \ref{sec:bayesian_lista}. We then describe uncertainty propagation to obtain the spike-and-slab distribution for an output of a network in section \ref{sec:fprop} and how probabilistic backpropagation is organised to update distributions of weights in section \ref{sec:backpropagation}. After that, we show the experimental results of the algorithm in section \ref{sec:experiments} and finish with discussion and conclusions in sections \ref{sec:discussion} and \ref{sec:conclusions}.
+The paper is organised as following: first, we review neural networks for sparse coding in section \ref{sec:nn_sc} and present a novel Bayesian neural network in section \ref{sec:bayesian_lista}. We then describe uncertainty propagation to obtain the spike and slab distribution for an output of a network in section \ref{sec:fprop} and how probabilistic backpropagation is organised to update distributions of weights in section \ref{sec:backpropagation}. After that, we show the experimental results of the algorithm in section \ref{sec:experiments} and finish with discussion and conclusions in sections \ref{sec:discussion} and \ref{sec:conclusions}.
 
 \section{\uppercase{Neural networks for sparse coding}}
 \label{sec:nn_sc}
-The sparse coding and sparse inverse problems are the linear regression with the assumption of sparse weights
+The sparse coding problem is the linear regression with the assumption of sparse weights
 \begin{equation}
 \label{eq:regression_problem}
 \mathbf{y} = \mathbf{X}\boldsymbol\beta + \varepsilon
@@ -113,7 +113,7 @@ The Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} algorithm 
 & \widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_{L}
 \end{align}
 
-Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$, $\mathbf{b}$ are intermediate vectors that describe forward propagation. $\boldsymbol\beta_l$ is the current approximation of the target coefficient vector at the layer $l$.
+Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$, $\mathbf{b}$ are intermediate vectors that describe forward propagation. 
 
 \section{\uppercase{Bayesian neural network for sparse coding}}
 \label{sec:bayesian_lista}
@@ -338,7 +338,7 @@ We have covered all steps of the Bayesian \textsc{lista} and derived distributio
 
 \subsection{\uppercase{Approximation quality}}
 \label{sec:approx_quality}
-We have used two approximations in forward propagation of uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike-and-slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft thresholding of a Gaussian vector is approximated with the spike-and-slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
+We have used two approximations in forward propagation of uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
 Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:matrix_vector}. For sampled distribution, $10000$ values were sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The approximated distribution is computed according to lemma \ref{thm:matrix_vector}.
 
@@ -428,7 +428,7 @@ The only hyperparameter in the proposed Bayesian \textsc{lista} is the shrinkage
 
 \section{\uppercase{Experiments}}
 \label{sec:experiments}
-The proposed Bayesian \textsc{lista} is evaluated in the context of the sparse inverse problem, where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
+The proposed Bayesian \textsc{lista} is evaluated in the context of the sparse coding problem with underdefined dictionary, where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
 
 We compare the proposed Bayesian \textsc{lista} with the classical \textsc{lista}~\citep{gregor2010learning} in terms of the predictive accuracy. As baselines we also use \textsc{ista} \citep{daubechies2004iterative} and Fast \textsc{ista} (\textsc{fista}) \citep{beck2009fast}. \textsc{fista} adds the momentum to \textsc{ista} and improves its convergence speed. We limit the number of iterations in these algorithms with $L$ that is the same as the number of layers in Bayesian \textsc{lista} and \textsc{lista}. To measure the performance of the algorithms the normalised mean square error(\textsc{nmse}) and F measure are used. \textsc{nmse} for a batch of data $\{\boldsymbol\beta^{(n)}\}_{n=1}^{N}$ and estimators $\{\widehat{\boldsymbol\beta}^{(n)}\}_{n=1}^{N}$ is computed as
 \begin{equation}
@@ -440,14 +440,14 @@ F measure is computed as the harmonic mean of precision and recall
 \text{F measure} = 2\dfrac{\text{precision}\cdot\text{recall}}{\text{precision} + \text{recall}}
 \end{equation} 
 where precision is the fraction of estimated slab locations that are correct, recall is the fraction of true slab locations among all predicted slab locations.
-We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for \textsc{lista} to learn anything. 
+We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for \textsc{lista} to learn. 
 
 \subsection{\uppercase{Predictive performance on synthetic data}}
-First, the predictive performance of the proposed Bayesian \textsc{lista} is analysed on synthetic data. We generate $N_\text{train}=500$ sparse coefficients vectors $\boldsymbol\beta_n$ each of size $D = 100$. Coefficients $\boldsymbol\beta$ are generated from the spike-and-slab distribution with truncated slab: each component of $\beta_{nd}$ is zero with probability $0.8$ or is from standard Gaussian distribution without interval $(-0.1, 0.1)$ with probability $0.2$. Truncation of the zeros allows to remove from support pattern values with insignificant contributions \citep{xin2016maximal}. To simulate sparse observations, we have generated the random Gaussian design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$.  The observations are generated according to the \ref{eq:regression_problem} with zero-mean Gaussian noise with standard deviation $0.5$. $\lambda$ is assumed fixed as $0.1$.
+First, the predictive performance of the proposed Bayesian \textsc{lista} is analysed on synthetic data. We generate $N_\text{train}=500$ sparse coefficients vectors $\boldsymbol\beta_n$ each of size $D = 100$. Coefficients $\boldsymbol\beta$ are generated from the spike and slab distribution with truncated slab: each component of $\beta_{nd}$ is zero with probability $0.8$ or is from standard Gaussian distribution without interval $(-0.1, 0.1)$ with probability $0.2$. Truncation of the zeros allows to remove from support pattern values with insignificant contributions \citep{xin2016maximal}. To simulate sparse observations, we have generated the random Gaussian design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$.  The observations are generated according to the \ref{eq:regression_problem} with zero-mean Gaussian noise with standard deviation $0.5$. $\lambda$ is assumed fixed as $0.1$.
 
-In the Figure \ref{fig:number_of_layers_synthetic} prediction performance for different number of layers $L$ is presented. The observation size is set as $K=50$. 
+In the Figure \ref{fig:number_of_layers_synthetic} prediction performance for different number of layers $L$ is presented. The observation size is set as $K=50$. In both experiments the performance of the Bayesian \textsc{lista} is better than the performance of \textsc{lista}. Although the baseline \textsc{ista} and \textsc{fista} show better performance in terms of F measure, Bayesian \textsc{lista} has lower \textsc{nmse}.
 
-In the Figure \ref{fig:unsersampling_synthetic} prediction performance for different observation sizes $K$ is presented. The number of layers is set as $L=4$.
+In the Figure \ref{fig:unsersampling_synthetic} prediction performance for different observation sizes $K$ is presented. The number of layers is set as $L=4$ which is the value of the poorest performance of Bayesian \textsc{lista} according to the previous experiment. Bayesian \textsc{lista} provides better results than {lista} for $K \ge 30$ and better results than other algorithms for $K \ge 70$.
 
 \begin{figure}[t]
 %\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/nmse_train}}
@@ -485,7 +485,7 @@ In the Figure \ref{fig:unsersampling_synthetic} prediction performance for diffe
 \subsection{\uppercase{Predictive performance on mnist data}}
 Here we evaluate the proposed Bayesian \textsc{lista} in terms of predictive performance on the \textsc{mnist} dataset \citep{lecun1998gradient}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is learned on 5000 images with the minibatch online algorithm \citep{mairal2009online}. The resulting size of $\mathbf{X}$ is $K \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta$ are images converted to vectors. We use randomly selected $100$ images for training and $100$ for validation. $\lambda$ is assumed fixed as $0.1$.
 
-Figures \ref{fig:mnist_100} and \ref{fig:mnist_250} present quality on the validation set with dictionaries of size $100$ and $250$. 
+Figures \ref{fig:mnist_100} and \ref{fig:mnist_250} present quality on the validation set with dictionaries of size $100$ and $250$.  When $K=100$ Bayesian \textsc{lista} shows better performance that other algorithms and on $K=250$ it  converges to similar values as \textsc{lista}.
 
 Proposed Bayesian \textsc{lista} networks estimate posterior distribution for $\boldsymbol\beta$. Figure \ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
 
@@ -518,27 +518,27 @@ Proposed Bayesian \textsc{lista} networks estimate posterior distribution for $\
 %\caption{Validation \textsc{nmse}}
 %\label{fig:validation}
 %\end{figure}
-\begin{figure*}[t]
-\subfloat[$\beta$ posterior mean]{\includegraphics[width=0.66\columnwidth]{posterior_mean}}
-\subfloat[$\beta$ posterior std]{\includegraphics[width=0.66\columnwidth]{posterior_std}}
-\subfloat[$\beta$ posterior spike indicator]{\includegraphics[width=0.66\columnwidth]{posterior_spike_indicator}}
+\begin{figure}[t]
+\subfloat[$\beta$ posterior mean]{\includegraphics[width=0.33\columnwidth]{posterior_mean}}~
+\subfloat[$\beta$ posterior std]{\includegraphics[width=0.33\columnwidth]{posterior_std}}~
+\subfloat[$\beta$ posterior spike indicator]{\includegraphics[width=0.33\columnwidth]{posterior_spike_indicator}}
 \caption{Posterior for the digit 7.}
 \label{fig:posterior_distribution}
-\end{figure*}
-\begin{figure*}[t]
-\subfloat[]{\includegraphics[width=0.66\columnwidth]{posterior_sample_0}}
-\subfloat[]{\includegraphics[width=0.66\columnwidth]{posterior_sample_1}}
-\subfloat[]{\includegraphics[width=0.66\columnwidth]{posterior_sample_2}}
+\end{figure}
+\begin{figure}[t]
+\subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_0}}~
+\subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_1}}~
+\subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_2}}
 \caption{Samples from the posterior for the digit 7.}
 \label{fig:posterior_samples}
-\end{figure*}
+\end{figure}
 
 \subsection{\uppercase{Active learning on mnist}}
 To demonstrate the potential scenario that can benefit from uncertainty estimates of the Bayesian \textsc{lista} we consider the active learning example \citep{settles.tr09}. Active learning area researches ways to select new training subsets to reduce total number of required supervision. One of the approaches for active learning is uncertainty sampling when the data with the least certain predictions is used for training. The uncertainty can be measured with entropy or variance. In our example no closed form for entropy of spike and slab exist, therefore we use variance from lemma \ref{thm:moments_spsl} as a measure of uncertainty.
 
 The data in this example is the same \textsc{mnist} dataset with learnt dictionary of size $K=100$. It is divided into train data of size $50$, pool data of size $500$,  and test data of size $100$. The algorithm learns on the train data for $50$ iterations. After that, the Bayesian \textsc{lista} algorithm iteratively estimates the variance of the predictions on the pool data, selects the element with the maximum variance, moves it from pool set to the training set and runs additional training iteration. Overall, $10$ pool iterations are performed.
 
-The performance on the actively updated train data is compared with the performance on the randomly updated train data, when at every iteration the random element is moved from pool set to train set. Both algorithms of new data sampling were run with $20$ random seeds and their performance was averaged. Figure \ref{fig:active_learning_mnist} demonstrates their performance.
+The performance on the actively updated train data is compared with the performance on the randomly updated train data, when at every iteration the random element is moved from pool set to train set. Both algorithms of new data sampling were run with $20$ random seeds and their performance was averaged. Figure \ref{fig:active_learning_mnist} demonstrates their performance.The uncertainty sampling has some advantage compared to random sampling, this means that the posterior variance is adequately estimated.
 \begin{figure}[t]
 \subfloat[\textsc{nmse}]{\includegraphics[width=\columnwidth]{graphics/active_mnist/nmse_validation}} \\
 \subfloat[F measure]{\includegraphics[width=\columnwidth]{graphics/active_mnist/f_measure_validation}}
@@ -548,7 +548,7 @@ The performance on the actively updated train data is compared with the performa
 
 \section{\uppercase{Discussion}}
 \label{sec:discussion}
-As far as the authors aware, this is the first implementation of Bayesian deep sparse coding algorithm. Although there are works on Bayesian sparsity in context of neural networks \citep{he2017bayesian}, they are not the Bayesian neural networks in the same sense as Bayesian \textsc{lista} but rather the interpretation of the sparse Bayesian  learning algorithm as the long short-term memory network. We find not only correct predictions but also useful posterior estimates for the predictions that show how the model is confident in its decisions. 
+To the best of our knowledge, this is the first implementation of Bayesian deep sparse coding algorithm. Although there are works on Bayesian sparsity in context of neural networks \citep{he2017bayesian}, they are not the Bayesian neural networks in the same sense as Bayesian \textsc{lista} but rather the interpretation of the sparse Bayesian  learning algorithm as the long short-term memory network. We find not only correct predictions but also useful posterior estimates for the predictions that show how the model is confident in its decisions. 
 
 %The inference is based on the expectation propagation algorithm and though it is not suited for distributed inference, stochastic variant of assumed density filtering can potentially be used \citep{li2015stochastic}. This would allow the proposed approach to scale.
 
