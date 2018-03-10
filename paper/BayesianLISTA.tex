@@ -428,7 +428,7 @@ The only hyperparameter in the proposed Bayesian \textsc{lista} is the shrinkage
 
 \section{\uppercase{Experiments}}
 \label{sec:experiments}
-The proposed Bayesian \textsc{lista} is evaluated in the context of the sparse coding problem with underdefined dictionary, where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
+The proposed Bayesian \textsc{lista} is evaluated in the context of the sparse coding problem with an undercomplete dictionary, where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
 
 We compare the proposed Bayesian \textsc{lista} with the classical \textsc{lista}~\citep{gregor2010learning} in terms of the predictive accuracy. As baselines we also use \textsc{ista} \citep{daubechies2004iterative} and Fast \textsc{ista} (\textsc{fista}) \citep{beck2009fast}. \textsc{fista} adds the momentum to \textsc{ista} and improves its convergence speed. We limit the number of iterations in these algorithms with $L$ that is the same as the number of layers in Bayesian \textsc{lista} and \textsc{lista}. To measure the performance of the algorithms the normalised mean square error(\textsc{nmse}) and F measure are used. \textsc{nmse} for a batch of data $\{\boldsymbol\beta^{(n)}\}_{n=1}^{N}$ and estimators $\{\widehat{\boldsymbol\beta}^{(n)}\}_{n=1}^{N}$ is computed as
 \begin{equation}
@@ -450,26 +450,26 @@ In the Figure \ref{fig:number_of_layers_synthetic} prediction performance for di
 In the Figure \ref{fig:unsersampling_synthetic} prediction performance for different observation sizes $K$ is presented. The number of layers is set as $L=4$ which is the value of the poorest performance of Bayesian \textsc{lista} according to the previous experiment. Bayesian \textsc{lista} provides better results than {lista} for $K \ge 30$ and better results than other algorithms for $K \ge 70$.
 
 \begin{figure}[t]
+\centering
 %\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/nmse_train}}
 %~
-\subfloat[\textsc{nmse} on validation]{\includegraphics[width=\columnwidth]{graphics/synthetic_number_of_layers/nmse_validation}}
-\newline
+\subfloat[\textsc{nmse} on validation]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/nmse_validation}}
 %\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/f_measure_train}}
 %~
-\subfloat[F measure on validation]{\includegraphics[width=\columnwidth]{graphics/synthetic_number_of_layers/f_measure_validation}}
-\caption{Number of layers on synthetic data}
+\subfloat[F measure on validation]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/f_measure_validation}}
+\caption{Predictive accuracy on different number of layers (for neural networks) or iterations (for baselines) on the synthetic data}
 \label{fig:number_of_layers_synthetic}
 \end{figure}
 
 \begin{figure}[t]
+\centering
 %\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/nmse_train}}
 %~
-\subfloat[\textsc{nmse} on validation]{\includegraphics[width=\columnwidth]{graphics/synthetic_undersampling/nmse_validation}}
-\newline
+\subfloat[\textsc{nmse} on validation]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/nmse_validation}}
 %\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/f_measure_train}}
 %~
-\subfloat[F measure on validation]{\includegraphics[width=\columnwidth]{graphics/synthetic_undersampling/f_measure_validation}}
-\caption{Size of observations on synthetic data}
+\subfloat[F measure on validation]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/f_measure_validation}}
+\caption{Predictive performance on different size of observations on the synthetic data}
 \label{fig:unsersampling_synthetic}
 \end{figure}
 
@@ -490,26 +490,26 @@ Figures \ref{fig:mnist_100} and \ref{fig:mnist_250} present quality on the valid
 Proposed Bayesian \textsc{lista} networks estimate posterior distribution for $\boldsymbol\beta$. Figure \ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
 
 \begin{figure}[t]
+\centering
 %\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_nmse_train}}
 %~
-\subfloat[\textsc{nmse} on validation]{\includegraphics[width=\columnwidth]{graphics/mnist/100_normalised_nmse_valid}}
-\newline
+\subfloat[\textsc{nmse} on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_nmse_valid}}
 %\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_f_measure_train}}
 %~
-\subfloat[F measure on validation]{\includegraphics[width=\columnwidth]{graphics/mnist/100_normalised_f_measure_valid}}
-\caption{\textsc{mnist} with dictionary $100$}
+\subfloat[F measure on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_f_measure_valid}}
+\caption{Predictive performance on number of iterations on the \textsc{mnist} data with dictionary size $K = 100$}
 \label{fig:mnist_100}
 \end{figure}
 
 \begin{figure}[t]
+\centering
 %\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_nmse_train}}
 %~
-\subfloat[\textsc{nmse} on validation]{\includegraphics[width=\columnwidth]{graphics/mnist/250_normalised_nmse_valid}}
-\newline
+\subfloat[\textsc{nmse} on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_nmse_valid}}
 %\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_f_measure_train}}
 %~
-\subfloat[F measure on validation]{\includegraphics[width=\columnwidth]{graphics/mnist/250_normalised_f_measure_valid}}
-\caption{\textsc{mnist} with dictionary $250$}
+\subfloat[F measure on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_f_measure_valid}}
+\caption{Predictive performance on number of iterations on the \textsc{mnist} data with dictionary size $K = 250$}
 \label{fig:mnist_250}
 \end{figure}
 
@@ -519,30 +519,33 @@ Proposed Bayesian \textsc{lista} networks estimate posterior distribution for $\
 %\label{fig:validation}
 %\end{figure}
 \begin{figure}[t]
+\centering
 \subfloat[$\beta$ posterior mean]{\includegraphics[width=0.33\columnwidth]{posterior_mean}}~
 \subfloat[$\beta$ posterior std]{\includegraphics[width=0.33\columnwidth]{posterior_std}}~
 \subfloat[$\beta$ posterior spike indicator]{\includegraphics[width=0.33\columnwidth]{posterior_spike_indicator}}
-\caption{Posterior for the digit 7.}
+\caption{Posterior parameters for an image of digit 7.}
 \label{fig:posterior_distribution}
 \end{figure}
 \begin{figure}[t]
+\centering
 \subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_0}}~
 \subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_1}}~
 \subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_2}}
-\caption{Samples from the posterior for the digit 7.}
+\caption{Samples from the posterior for an image of digit 7.}
 \label{fig:posterior_samples}
 \end{figure}
 
-\subsection{\uppercase{Active learning on mnist}}
+\subsection{\uppercase{Active learning}}
 To demonstrate the potential scenario that can benefit from uncertainty estimates of the Bayesian \textsc{lista} we consider the active learning example \citep{settles.tr09}. Active learning area researches ways to select new training subsets to reduce total number of required supervision. One of the approaches for active learning is uncertainty sampling when the data with the least certain predictions is used for training. The uncertainty can be measured with entropy or variance. In our example no closed form for entropy of spike and slab exist, therefore we use variance from lemma \ref{thm:moments_spsl} as a measure of uncertainty.
 
 The data in this example is the same \textsc{mnist} dataset with learnt dictionary of size $K=100$. It is divided into train data of size $50$, pool data of size $500$,  and test data of size $100$. The algorithm learns on the train data for $50$ iterations. After that, the Bayesian \textsc{lista} algorithm iteratively estimates the variance of the predictions on the pool data, selects the element with the maximum variance, moves it from pool set to the training set and runs additional training iteration. Overall, $10$ pool iterations are performed.
 
 The performance on the actively updated train data is compared with the performance on the randomly updated train data, when at every iteration the random element is moved from pool set to train set. Both algorithms of new data sampling were run with $20$ random seeds and their performance was averaged. Figure \ref{fig:active_learning_mnist} demonstrates their performance.The uncertainty sampling has some advantage compared to random sampling, this means that the posterior variance is adequately estimated.
 \begin{figure}[t]
-\subfloat[\textsc{nmse}]{\includegraphics[width=\columnwidth]{graphics/active_mnist/nmse_validation}} \\
-\subfloat[F measure]{\includegraphics[width=\columnwidth]{graphics/active_mnist/f_measure_validation}}
-\caption{Active learning on \textsc{mnist}.}
+\centering
+\subfloat[\textsc{nmse}]{\includegraphics[width=0.5\columnwidth]{graphics/active_mnist/nmse_validation}}%
+\subfloat[F measure]{\includegraphics[width=0.5\columnwidth]{graphics/active_mnist/f_measure_validation}}
+\caption{Performance in the active learning experiment on the \textsc{mnist} data. }
 \label{fig:active_learning_mnist}
 \end{figure}
 
