@@ -107,6 +107,8 @@ class NumberOfLayersExperimentReultsCollector(object):
         linewidth = .25
         markersize = 5.
         std_multiplier = 2
+        label_fontsize = 18
+        legend_fontsize = 14
 
         ista_marker= 'o'
         ista_color='blue'
@@ -132,9 +134,9 @@ class NumberOfLayersExperimentReultsCollector(object):
         plt.errorbar(self.L_array, self.freq_f_meas_train, yerr=2 * self.freq_f_meas_train_std, color=freq_color)
         plt.plot(self.L_array, self.sh_bayes_f_meas_train, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.errorbar(self.L_array, self.sh_bayes_f_meas_train, yerr=2 * self.sh_bayes_f_meas_train_std, color=sh_bayes_color)
-        plt.legend()
-        plt.xlabel(r'L')
-        plt.ylabel(r'F measure')
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'L', fontsize=label_fontsize)
+        plt.ylabel(r'F measure', fontsize=label_fontsize)
         plt.savefig('results/f_measure_train.eps', format='eps')
         plt.show()
 
@@ -146,9 +148,9 @@ class NumberOfLayersExperimentReultsCollector(object):
         plt.errorbar(self.L_array, self.freq_f_meas_validation, yerr=3 * self.freq_f_meas_validation_std, color=freq_color)
         plt.plot(self.L_array, self.sh_bayes_f_meas_validation, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.errorbar(self.L_array, self.sh_bayes_f_meas_validation, yerr=3 * self.sh_bayes_f_meas_validation_std, color=sh_bayes_color)
-        plt.legend()
-        plt.xlabel(r'L')
-        plt.ylabel(r'F measure')
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'L', fontsize=label_fontsize)
+        plt.ylabel(r'F measure', fontsize=label_fontsize)
         plt.savefig('results/f_measure_validation.eps', format='eps')
         plt.show()
 
@@ -160,9 +162,9 @@ class NumberOfLayersExperimentReultsCollector(object):
         plt.errorbar(self.L_array, self.freq_loss_train, yerr=3 * self.freq_loss_train_std, color=freq_color)
         plt.plot(self.L_array, self.sh_bayes_loss_train, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.errorbar(self.L_array, self.sh_bayes_loss_train, yerr=3 * self.sh_bayes_loss_train_std, color=sh_bayes_color)
-        plt.legend()
-        plt.xlabel(r'L')
-        plt.ylabel(r'\textsc{nmse}')
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'L', fontsize=label_fontsize)
+        plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
         plt.savefig('results/nmse_train.eps', format='eps')
         plt.show()
 
@@ -174,9 +176,9 @@ class NumberOfLayersExperimentReultsCollector(object):
         plt.errorbar(self.L_array, self.freq_loss_validation, yerr=3 * self.freq_loss_validation_std, color=freq_color)
         plt.plot(self.L_array, self.sh_bayes_loss_validation, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.errorbar(self.L_array, self.sh_bayes_loss_validation, yerr=3 * self.sh_bayes_loss_validation_std, color=sh_bayes_color)
-        plt.legend()
-        plt.xlabel(r'L')
-        plt.ylabel(r'\textsc{nmse}')
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'L', fontsize=label_fontsize)
+        plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
         plt.savefig('results/nmse_validation.eps', format='eps')
         plt.show()
 

@@ -16,7 +16,7 @@ class ActiveExperimentMnistResultsCollector(object):
 
     def collect_all(self):
         for rseed in range(self.n_rseed):
-            res = np.load('mnist_results/mnist_active_rseed_{}.npz'.format(rseed))
+            res = np.load('mnist_results_normalised/mnist_active_rseed_{}.npz'.format(rseed))
             self.freq_validation_loss[rseed] = res['freq_validation_loss']
             self.non_active_bayes_validation_loss[rseed] = res['non_active_bayes_validation_loss']
             self.active_bayes_validation_loss[rseed] = res['active_bayes_validation_loss']
@@ -26,7 +26,7 @@ class ActiveExperimentMnistResultsCollector(object):
 
     def plot_each(self):
         for rseed in range(self.n_rseed):
-            res = np.load('mnist_results/mnist_active_rseed_{}.npz'.format(rseed))
+            res = np.load('mnist_results_normalised/mnist_active_rseed_{}.npz'.format(rseed))
 
             plt.plot(res['active_bayes_validation_loss'], label='active')
             plt.plot(res['non_active_bayes_validation_loss'], label='non active')
@@ -43,6 +43,8 @@ class ActiveExperimentMnistResultsCollector(object):
         linewidth = .25
         markersize = 5.
         std_multiplier = 1
+        label_fontsize = 18
+        legend_fontsize = 14
 
         non_active_bayes_marker = 'v'
         non_active_bayes_color = 'red'
@@ -70,9 +72,9 @@ class ActiveExperimentMnistResultsCollector(object):
         plt.errorbar(np.arange(0, self.n_upd_iter + 1), np.mean(self.non_active_bayes_validation_loss, axis=0),
                      yerr=std_multiplier * np.std(self.non_active_bayes_validation_loss, axis=0), color=non_active_bayes_color)
 
-        plt.legend()
-        plt.xlabel(r'K')
-        plt.ylabel(r'NMSE')
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'K', fontsize=label_fontsize)
+        plt.ylabel(r'NMSE', fontsize=label_fontsize)
         plt.savefig('mnist_results_plots/nmse_validation.eps', format='eps')
         plt.show()
 
@@ -90,9 +92,9 @@ class ActiveExperimentMnistResultsCollector(object):
         plt.errorbar(np.arange(0, self.n_upd_iter + 1), np.mean(self.non_active_bayes_validation_f_measure, axis=0),
                      yerr=std_multiplier * np.std(self.non_active_bayes_validation_f_measure, axis=0), color=non_active_bayes_color)
 
-        plt.legend()
-        plt.xlabel(r'K')
-        plt.ylabel(r'F measure')
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'K', fontsize=label_fontsize)
+        plt.ylabel(r'F measure', fontsize=label_fontsize)
         plt.savefig('mnist_results_plots/f_measure_validation.eps', format='eps')
         plt.show()
 
@@ -127,6 +129,8 @@ class ActiveExperimentSyntheticResultsCollector(object):
         linewidth = .25
         markersize = 5.
         std_multiplier = 2
+        label_fontsize = 24
+        legend_fontsize = 14
 
         non_active_bayes_marker = 'v'
         non_active_bayes_color = 'red'
@@ -152,9 +156,9 @@ class ActiveExperimentSyntheticResultsCollector(object):
                  label=active_bayes_label, color=active_bayes_color, marker=active_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.errorbar(np.arange(0, self.n_upd_iter + 1), np.mean(self.active_bayes_validation_loss, axis=0),
                      yerr=std_multiplier * np.std(self.active_bayes_validation_loss, axis=0), color=active_bayes_color)
-        plt.legend()
-        plt.xlabel(r'K')
-        plt.ylabel(r'NMSE')
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'K', fontsize=label_fontsize)
+        plt.ylabel(r'NMSE', fontsize=label_fontsize)
         plt.savefig('synthetic_results_plots/nmse_validation.eps', format='eps')
         plt.show()
 
