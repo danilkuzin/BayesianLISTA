@@ -66,7 +66,7 @@ There are currently two approaches in Bayesian neural networks: explicit distrib
 
 Sparse coding can be viewed as a linear regression problem with the additional assumption that many of the basis representation coefficients should be zeros. They arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse}, neuroscience~\citep{baillet1997bayesian, jas2017learning}. 
 
-Neural networks address the sparse coding problem with the soft thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike-and-slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and soft thresholding nonlinearity can then be closely approximated with a distribution from the same family.
+Neural networks address the sparse coding problem with the soft thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike and slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and soft thresholding nonlinearity can then be closely approximated with a distribution from the same family.
 
 The proposed method of uncertainty propagation for the soft thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update weights distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
 
@@ -77,7 +77,7 @@ The main contributions of this paper can be summarised~as:
 \item we design a novel Bayesian neural network for sparse coding.
 \end{itemize}
 
-The paper is organised as following: first, we review neural networks for sparse coding in section \ref{sec:nn_sc} and present a novel Bayesian neural network in section \ref{sec:bayesian_lista}. We then describe uncertainty propagation to obtain the spike-and-slab distribution for an output of a network in section \ref{sec:fprop} and how probabilistic backpropagation is organised to update distributions of weights in section \ref{sec:backpropagation}. After that, we show the experimental results of the algorithm in section \ref{sec:experiments} and finish with discussion and conclusions in sections \ref{sec:discussion} and \ref{sec:conclusions}.
+The paper is organised as following: first, we review neural networks for sparse coding in section \ref{sec:nn_sc} and present a novel Bayesian neural network in section \ref{sec:bayesian_lista}. We then describe uncertainty propagation to obtain the spike and slab distribution for an output of a network in section \ref{sec:fprop} and how probabilistic backpropagation is organised to update distributions of weights in section \ref{sec:backpropagation}. After that, we show the experimental results of the algorithm in section \ref{sec:experiments} and finish with discussion and conclusions in sections \ref{sec:discussion} and \ref{sec:conclusions}.
 
 \section{\uppercase{Neural networks for sparse coding}}
 \label{sec:nn_sc}
@@ -109,7 +109,7 @@ The Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} algorithm 
 & \widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_{L}
 \end{align}
 
-Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$, $\mathbf{b}$ are intermediate vectors that describe forward propagation. $\boldsymbol\beta_l$ is the current approximation of the target coefficient vector at the layer $l$.
+Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$, $\mathbf{b}$ are intermediate vectors that describe forward propagation. 
 
 \section{\uppercase{Bayesian neural network for sparse coding}}
 \label{sec:bayesian_lista}
@@ -315,7 +315,7 @@ The spike and slab distribution for $\widehat{\boldsymbol\beta}$ with can be pro
 
 \subsection{\uppercase{Approximation quality}}
 \label{sec:approx_quality}
-We have used two approximations in forward propagation of uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike-and-slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft thresholding of a Gaussian vector is approximated with the spike-and-slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
+We have used two approximations in forward propagation of uncertainty. First, in lemma \ref{thm:matrix_vector} a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, in lemma \ref{thm:soft_thresholding} the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
 Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:matrix_vector}. For sampled distribution, $10000$ values were sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The approximated distribution is computed according to lemma \ref{thm:matrix_vector}.
 
@@ -420,7 +420,7 @@ where precision is the fraction of estimated slab locations that are correct, re
 We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for \textsc{lista} to learn. 
 
 \subsection{\uppercase{Predictive performance on synthetic data}}
-First, the predictive performance of the proposed Bayesian \textsc{lista} is analysed on synthetic data. We generate $N_\text{train}=500$ sparse coefficients vectors $\boldsymbol\beta_n$ each of size $D = 100$. Coefficients $\boldsymbol\beta$ are generated from the spike-and-slab distribution with truncated slab: each component of $\beta_{nd}$ is zero with probability $0.8$ or is from standard Gaussian distribution without interval $(-0.1, 0.1)$ with probability $0.2$. Truncation of the zeros allows to remove from support pattern values with insignificant contributions \citep{xin2016maximal}. To simulate sparse observations, we have generated the random Gaussian design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$.  The observations are generated according to the \ref{eq:regression_problem} with zero-mean Gaussian noise with standard deviation $0.5$. $\lambda$ is assumed fixed as $0.1$.
+First, the predictive performance of the proposed Bayesian \textsc{lista} is analysed on synthetic data. We generate $N_\text{train}=500$ sparse coefficients vectors $\boldsymbol\beta_n$ each of size $D = 100$. Coefficients $\boldsymbol\beta$ are generated from the spike and slab distribution with truncated slab: each component of $\beta_{nd}$ is zero with probability $0.8$ or is from standard Gaussian distribution without interval $(-0.1, 0.1)$ with probability $0.2$. Truncation of the zeros allows to remove from support pattern values with insignificant contributions \citep{xin2016maximal}. To simulate sparse observations, we have generated the random Gaussian design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$.  The observations are generated according to the \ref{eq:regression_problem} with zero-mean Gaussian noise with standard deviation $0.5$. $\lambda$ is assumed fixed as $0.1$.
 
 In the Figure \ref{fig:number_of_layers_synthetic} prediction performance for different number of layers $L$ is presented. The observation size is set as $K=50$. In both experiments the performance of the Bayesian \textsc{lista} is better than the performance of \textsc{lista}. Although the baseline \textsc{ista} and \textsc{fista} show better performance in terms of F measure, Bayesian \textsc{lista} has lower \textsc{nmse}.
 
