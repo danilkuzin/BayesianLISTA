@@ -196,7 +196,7 @@ The distribution of $x^*$ can be parametrised by the probability of being zero, 
 The probability of a zero $\omega^*$ equals to the probability mass of the original distribution from the interval $[-\lambda, \lambda]$
 \begin{align}
 \begin{split}
-\omega^* &= \mathbb{P}(x^*=0) = \mathbb{P}(x \in [-\lambda, \lambda]) \\
+\omega^* &=\operatorname{P}(x^*=0) = \operatorname{P}(x \in [-\lambda, \lambda]) \\
 &= \Phi\left(\frac{\lambda-m}{\sqrt{v}}\right) - \Phi\left(\frac{-\lambda-m}{\sqrt{v}}\right). 
 \end{split}
 \end{align}
@@ -342,16 +342,27 @@ We have used two approximations in forward propagation of uncertainty. First, in
 Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:matrix_vector}. For sampled distribution, $10000$ values were sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The approximated distribution is computed according to lemma \ref{thm:matrix_vector}.
 
 Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for lemma \ref{thm:soft_thresholding}. For sampled distribution, $10000$ values are sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities is plotted. The approximated distribution is computed according to lemma \ref{thm:soft_thresholding}.
-\begin{figure}[t]
-\includegraphics[width=\columnwidth]{d_testing}
-\caption{Approximation of product of Gaussians.}
-\label{fig:d_testing}
-\end{figure}
+
+%\subfloat[\textsc{nmse} on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_non_normalised_nmse_valid}}
+
+%\begin{figure}[t]
+%\includegraphics[width=\columnwidth]{d_testing}
+%\caption{Approximation of product of Gaussians.}
+%\label{fig:d_testing}
+%\end{figure}
+%
+%\begin{figure}[t]
+%\includegraphics[width=\columnwidth]{z_new_testing}
+%\caption{Approximation of propagation through soft thresholding}
+%\label{fig:z_new_testing}
+%\end{figure}
 
 \begin{figure}[t]
-\includegraphics[width=\columnwidth]{z_new_testing}
-\caption{Approximation of propagation through soft thresholding}
-\label{fig:z_new_testing}
+\subfloat[Approximation of the \newline product of Gaussians]{\includegraphics[width=0.5\columnwidth]{d_testing}}
+%\label{fig:d_testing}
+\subfloat[Approximation of the propagation through soft thresholding]{\includegraphics[width=0.5\columnwidth]{z_new_testing}}
+%\caption{Approximation of propagation through soft thresholding}
+%\label{fig:z_new_testing}
 \end{figure}
 
 
@@ -445,9 +456,9 @@ First, the predictive performance of the proposed Bayesian \textsc{lista} is ana
 
 In Figure \ref{fig:number_of_layers_synthetic} predictive performance for different number of layers $L$ is presented. The observation size is set to $K=50$. The Bayesian \textsc{lista} outperforms \textsc{lista} in terms of both measures. Although the baselines \textsc{ista} and \textsc{fista} show better performance in terms of F measure, the Bayesian \textsc{lista} has the lowest \textsc{nmse}.
 
-Figure~\ref{fig:unsersampling_synthetic} gives the results of predictive performance for different observation sizes $K$. The number of layers is set as $L=4$. In the previous experiment both Bayesian and classical \textsc{lista} shows similar results with this number of layers. The results of Figure~\ref{fig:unsersampling_synthetic} confirms this competitive behaviour between two \textsc{lista} networks. Baselines show similar results in terms of F measure and underperform in terms of \textsc{nmse}.
+Figure~\ref{fig:unsersampling_synthetic} gives the results of predictive performance for different observation sizes $K$. The number of layers is set as $L=4$. In the previous experiment Bayesian and classical \textsc{lista} show similar results with this number of layers. The results of Figure~\ref{fig:unsersampling_synthetic} confirms this competitive behaviour between two \textsc{lista} networks. Baselines show similar results in terms of F measure and underperform in terms of \textsc{nmse}.
 
-The experiments on synthetic data demonstrate that Bayesian \textsc{lista} provides competitive results in terms of predictive accuracy while additionally estimating uncertainty of predictions.
+Overall, the experiments on synthetic data demonstrate that Bayesian \textsc{lista} provides competitive results in terms of predictive accuracy.
 
 \begin{figure}[t]
 \centering
@@ -485,7 +496,7 @@ The experiments on synthetic data demonstrate that Bayesian \textsc{lista} provi
 \subsection{\uppercase{Predictive performance on mnist data}}
 Here we evaluate the proposed Bayesian \textsc{lista} in terms of predictive performance on the \textsc{mnist} dataset \citep{lecun1998gradient}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is learned on 5000 images with the minibatch online algorithm \citep{mairal2009online}. The resulting size of $\mathbf{X}$ is $K \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta$ are images converted to vectors. We use $100$ images for training and $100$ for validation. The shrinkage parameter $\lambda$ is fixed as $0.1$.
 
-Figures \ref{fig:mnist_100} and \ref{fig:mnist_250} present quality on the validation set with dictionaries of size $100$ and $250$.  The experiment with $K=100$ presents ``severe'' conditions for the algorithms: the very limited size of the training dataset combined with the small dimensionality of observations. The Baysian \textsc{lista} is able to learn even under these conditions, significantly outperforming \textsc{lista} that demonstrate very poor results. Under easier condition of the second experiment with $K=250$ both \textsc{lista} networks converge to the similar results. However, the Bayesian \textsc{lista} demonstrates remarkably better convergence rate. Both baselines are unable to learn in these experiments.
+Figures \ref{fig:mnist_100} and \ref{fig:mnist_250} present quality on the validation set with dictionaries of size $100$ and $250$.  The experiment with $K=100$ presents severe conditions for the algorithms: the very limited size of the training dataset combined with the small dimensionality of observations. The Bayesian \textsc{lista} is able to learn under these conditions, outperforming \textsc{lista} that demonstrates poor results. Under better conditions of the second experiment with $K=250$ both \textsc{lista} networks converge to the similar results. However, the Bayesian \textsc{lista} demonstrates remarkably better convergence rate. Both baselines are unable to perform well in these experiments.
 
 The proposed Bayesian \textsc{lista} network also estimates the posterior distribution for $\boldsymbol\beta$. Figure~\ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
 
