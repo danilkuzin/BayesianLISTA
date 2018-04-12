@@ -324,14 +324,23 @@ Therefore, $\mathbf{c}_l$ is a vector of Gaussian-distributed components, which 
 
 Then $\widehat{\boldsymbol\beta}_{l}$ at the step (\ref{eq:l_thr}) of the Bayesian \textsc{lista} is the result of soft thresholding of a Gaussian distribution, which is approximated with the spike and slab distribution,  similar to the step (\ref{eq:thr_first}). 
 
+\begin{figure}[!t]
+\subfloat[Approximation of the \newline product of Gaussians]{\includegraphics[width=0.5\columnwidth]{d_testing}\label{fig:d_testing}}
+%\label{fig:d_testing}
+\subfloat[Approximation of the propagation through soft thresholding]{\includegraphics[width=0.5\columnwidth]{z_new_testing}\label{fig:z_new_testing}}
+\caption{Approximations of Bayesian \textsc{lista}}
+%\label{fig:z_new_testing}
+\end{figure}
+
 \subsection{\uppercase{Bayesian lista forward propagation}}
 We have covered all steps of the Bayesian \textsc{lista} and derived distributions for outputs of these steps. Now we can formulate the main result of this section that describes how the proposed uncertainty propagation works.
 
 \begin{enumerate}
 	\item $\mathbf{b} = \mathbf{W}\mathbf{y}$ is the Gaussian distribution with parameters computed according to lemma \ref{thm:matrix_const};
+	\item $\widehat{\boldsymbol\beta}_{0} = h_\lambda(\mathbf{b})$ is approximated with the spike and slab distribution, which parameters are computed according to lemma \ref{thm:soft_thresholding}.
 	\item $\mathbf{e}_l = \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ is approximated with the Gaussian distribution, which parameters are computed according to lemma \ref{thm:matrix_vector};
-	\item $\mathbf{c} = \mathbf{b} + \mathbf{e}$ is the Gaussian distribution with parameters computed according to lemma \ref{thm:sum_vectors};
-	\item $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c})$ is approximated with the spike and slab distribution, which parameters are computed according to lemma \ref{thm:soft_thresholding}.
+	\item $\mathbf{c}_l = \mathbf{b} + \mathbf{e}_l$ is the Gaussian distribution with parameters computed according to lemma \ref{thm:sum_vectors};
+	\item $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$ is approximated with the spike and slab distribution, which parameters are computed according to lemma \ref{thm:soft_thresholding}.
 \end{enumerate}
 
 
@@ -356,14 +365,6 @@ Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distri
 %\caption{Approximation of propagation through soft thresholding}
 %\label{fig:z_new_testing}
 %\end{figure}
-
-\begin{figure}[t]
-\subfloat[Approximation of the \newline product of Gaussians]{\includegraphics[width=0.5\columnwidth]{d_testing}\label{fig:d_testing}}
-%\label{fig:d_testing}
-\subfloat[Approximation of the propagation through soft thresholding]{\includegraphics[width=0.5\columnwidth]{z_new_testing}\label{fig:z_new_testing}}
-\caption{Approximations of Bayesian \textsc{lista}}
-%\label{fig:z_new_testing}
-\end{figure}
 
 
 \section{\uppercase{Backpropagation}}
