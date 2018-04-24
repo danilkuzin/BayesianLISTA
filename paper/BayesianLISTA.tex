@@ -328,8 +328,8 @@ Then $\widehat{\boldsymbol\beta}_{l}$ at the step (\ref{eq:l_thr}) of the Bayesi
 We have covered all steps of the Bayesian \textsc{lista} and derived distributions for outputs of these steps. Now we can formulate the main result of this section that describes how the proposed uncertainty propagation works.
 
 \begin{enumerate}
-	\item $\mathbf{b} = \mathbf{W}\mathbf{y}$ is the Gaussian distribution with parameters computed according to lemma \ref{thm:matrix_const};
-	\item $\mathbf{e}_l = \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ is approximated with the Gaussian distribution, which parameters are computed according to lemma \ref{thm:matrix_vector};
+	\item \textit{Initialisation dense layer}. $\mathbf{b} = \mathbf{W}\mathbf{y}$ is the Gaussian distribution with parameters computed according to lemma \ref{thm:matrix_const};
+	\item \textit{Initialisation soft thresholding layer}. $\mathbf{e}_l = \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ is approximated with the Gaussian distribution, which parameters are computed according to lemma \ref{thm:matrix_vector};
 	\item $\mathbf{c} = \mathbf{b} + \mathbf{e}$ is the Gaussian distribution with parameters computed according to lemma \ref{thm:sum_vectors};
 	\item $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c})$ is approximated with the spike and slab distribution, which parameters are computed according to lemma \ref{thm:soft_thresholding}.
 \end{enumerate}
