@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage[letterpaper, margin=1in]{geometry}
 \usepackage{color}
+\usepackage{mathtools}
 \begin{document}
 
 \title{UAI 2018 Reply to Reviewers}
@@ -8,127 +9,128 @@
 \maketitle
 
 \section*{Reviewer 1}
-\begin{quote}
-\textit{It's not so surprising that probabilistic versions of ISTA should do better in the limited dictionary case. What I'm curious about is how fast the proposed algorithm is, not in terms of iterations, but wall clock time.}
-\end{quote}
-\textcolor{blue}{We'll check the clock time.}
+Thank you for the helpful suggestions.
 
-\begin{quote}
-\textit{Please enlarge the figures, as they are very hard to read.}
-\end{quote}
-We will enlarge the figures and move some of the proofs from section 4 to appendix to get space for figures.
+Q: It's not so surprising that probabilistic versions of ISTA should do better in the limited dictionary case. What I'm curious about is how fast the proposed algorithm is, not in terms of iterations, but wall clock time.
 
-% \begin{quote}
-% \textit{\ldots light experimental results \ldots}
-% \end{quote}
-% We can try to add heavier experiments, but time is limited by one week.
+A: We will add the wall clock time comparison. Preliminary results show that LISTA and Bayesian LISTA require the same running time to achieve similar accuracy. One iteration of Bayesian LISTA takes more time, but the convergence rate is also higher for Bayesian LISTA.
+\newline
+\newline
 
-\begin{quote}
-\textit{What's the intuitive reason for baseline ISTA/FISTA to have better performance in the synthetic data case?}
-\end{quote}
-\textcolor{blue}{We'll think about it. May be because of priors.}
+Q: Please enlarge the figures, as they are very hard to read.
 
-\begin{quote}
-\textit{What is the expected difference between Bayesian and non-Bayesian as the number of layers increases (ie, you expect the gap to close, stay the same, etc.)?}
-\end{quote}
-\textcolor{blue}{It's related with previous question. We'll think how to answer it. Really, we don't know. But maybe gap will reduce as prior will influence less?}
+A: We will enlarge the figures and move some of the proofs from section 4 to appendix to get space for figures.
+\newline
+\newline
 
-\begin{quote}
-\textit{Do you expect it to be possible to replace the soft thresholding with some other nonlinearity and to produce a similar algorithms? This isn't something I expect to be done easily, but do you expect it to be feasible, or is the combination of soft threshold with the spike/slab distribution critical?}
-\end{quote}
-Soft-thresholding nonlinearity seems to be the most popular as it is optimal in some sense [1]. There are several nonlinearities that are used in sparse coding, for example some of them are described in sec. IV-B of [2]. We can approximate other nonlinearities with the spike and slab distribution to see if these approximations are different in quality. This is an interesting future direction.
+Q: What's the intuitive reason for baseline ISTA/FISTA to have better performance in the synthetic data case?
 
-The main motivation of the spike and slab distribution is to get sparse approximations, that is critical for sparse coding. There is an alternative Bernoulli-Gaussian distribution, that leads to similar results. There is no intuition or motivation to use these distributions for networks with dense data.
+A: We believe this is because there is not enough data for LISTA and Bayesian LISTA to learn the matrices.
+\newline
+\newline
 
-[1] Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society, 267-288.
-[2] Borgerding, M., Schniter, P., Rangan, S. (2017). AMP-Inspired Deep Networks for Sparse Linear Inverse Problems. IEEE Transactions on Signal Processing, 65(16), 4293-4308.
+Q: What is the expected difference between Bayesian and non-Bayesian as the number of layers increases (ie, you expect the gap to close, stay the same, etc.)?
+
+A: Based on the current results, we expect the gap to stay the same, we will add experiments with more layers.
+\newline
+\newline
+
+Q: Do you expect it to be possible to replace the soft thresholding with some other nonlinearity and to produce a similar algorithms? This isn't something I expect to be done easily, but do you expect it to be feasible, or is the combination of soft threshold with the spike/slab distribution critical?
+
+A: In sparse coding the soft-thresholding nonlinearity is the most popular as it is used in the optimal solution of the lasso method [1]. There are several other nonlinearities that are used in sparse coding, for example some of them are described in sec. IV-B of [2]. We can approximate other nonlinearities with the spike and slab distribution to see if these approximations are different in quality. This is an interesting future direction.
+
+The main motivation of using the spike and slab distribution is to obtain approximations of the sparse unknown vector $\beta$, that is critical for sparse coding. There is no intuition or motivation to use these distributions for networks with dense output.
+
+[1] Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society.
+
+[2] Borgerding, M., Schniter, P., Rangan, S. (2017). AMP-Inspired Deep Networks for Sparse Linear Inverse Problems. IEEE Transactions on Signal Processing.
 
 \section*{Reviewer 2}
-\begin{quote}
-\textit{It's not clear that a machine learning venue is appropriate.}
-\end{quote}
-We understand that the topic of deep sparse coding may indeed lay on the border between signal processing and machine learning. But there were recent papers in the area of deep sparse coding published in machine learning community, we'll list some of them below. And we believe that as our method allows to estimate the uncertainty of the deep sparse coding algorithms, it suits the UAI conference.
+Thank you for the helpful suggestions.
 
-In [1] the original LISTA paper is used as an example of unsupervised learning in deep learning. In [2] it is used for image super-resolution. In [3] general improvements to original paper are proposed. Other deep sparse coding and sparse models in general are of recent interest in ML community [4], [5].
+Q: It's not clear that a machine learning venue is appropriate. ... I found the writing unclear and confusing, as the authors switch back and forth between a neural network interpretation of LISTA, and the standard sparse coding interpretation. I imagine both interpretations would be standard for e.g. a signal processing audience?
 
-[1] LeCun, Y., Bengio, Y., Hinton, G. (2015). Deep learning. Nature.
-[2] Wang, Z., Liu, D., Yang, J., Han, W., Huang, T. (2015). Deep networks for image super-resolution with sparse prior. ICCV.
-[3] Sprechmann, P., Bronstein, A. M., Sapiro, G. (2015). Learning efficient sparse and low rank models. TPAMI.
+A: We thank the reviewer for raising this important question. Indeed, the field of sparse coding is on the border between signal processing and machine learning. Recently different works on deep sparse coding have been of interest in the machine learning community [1] -- [5].
+
+We believe since our method allows to estimate the uncertainty of the deep sparse coding algorithms, it suits the UAI conference.
+
+[1] Wang, Z., Liu, D., Yang, J., Han, W., Huang, T. (2015). Deep networks for image super-resolution with sparse prior. ICCV.
+
+[2] Sprechmann, P., Bronstein, A. M., Sapiro, G. (2015). Learning efficient sparse and low rank models. TPAMI.
+
+[3] Moreau, T., Bruna, J. (2017). Understanding Trainable Sparse Coding via Matrix Factorization. ICLR.
+
 [4] Papyan, V., Romano, Y., Elad, M. (2017). Convolutional neural networks analyzed via convolutional sparse coding. JMLR.
+
 [5] He, H., Xin, B., Ikehata, S., Wipf, D. (2017). From Bayesian Sparsity to Gated Recurrent Nets. NIPS.
+\newline
+\newline
 
-\begin{quote}
-\textit{I found the writing unclear and confusing, as the authors switch back and forth between a neural network interpretation of LISTA, and the standard sparse coding interpretation. I imagine both interpretations would be standard for e.g. a signal processing audience?}
-\end{quote}
-\textcolor{blue}{I don't fully understand. I don't think we can do anything with this point in the reply.}
+Q: I am unclear on how one can compute NMSE/F-measure for MNIST in figure 5/8, unless the ground truth sparsity is known i.e. if this is not real data. Is the experiment composed of real data and synthetic weights? While the focus is on estimation, for real data, would be useful to see prediction results (again, I am assuming ground truth is not known).
 
-\begin{quote}
-\textit{I am unclear on how one can compute NMSE/F-measure for MNIST in figure 5/8, unless the ground truth sparsity is known i.e. if this is not real data. Is the experiment composed of real data and synthetic weights? While the focus is on estimation, for real data, would be useful to see prediction results (again, I am assuming ground truth is not known).}
-\end{quote}
-\textcolor{blue}{We need to explain again the setup of the experiments, that we know ground truth. Predictive performance is evaluated.}
+A: For MNIST we simulate sparse measurements $y$, therefore we know the ground truth for sparse $\beta$. Sections 6.1 and 6.2 are devoted to experiments on predictive performance.
+\newline
+\newline
 
-\begin{quote}
-\textit{There are some unnecessary propositions e.g. Proposition 1/4, which refer to textbook results. Perhaps a simple citation is enough to save some space?}
-\end{quote}
-\textcolor{blue}{I don't think we can do anything with this point in the reply.} We'll move proofs to appendix.
+Q: There are some unnecessary propositions e.g. Proposition 1/4, which refer to textbook results. Perhaps a simple citation is enough to save some space?
+
+A: We will move proofs to the appendix.
 
 \section*{Reviewer 3}
-\begin{quote}
-\textit{What qualifies equation (11) to be a likelihood distribution?}
-\end{quote}
-\textcolor{blue}{This is an awkwardly formulated question. Maybe the question is why do we have this Gaussian noise model. We can say something that this is now normally people are introducing the Bayesian models. Give example of Probabilistic Backpropagation.}
+Thank you for the helpful suggestions.
 
-\begin{quote}
-\textit{The uncertainty propagation in section 4 refers to a distribution over $\beta$. Which distribution are the authors referring to? Conditioned upon $Y,W,S,\gamma,\lambda$ as in (13)? Related: perhaps the method is better explained as a variational approximation on $p(B,W,S,\gamma,\lambda|Y)$?}
-\end{quote}
-Section 4 refers to distribution over $\widehat{\beta}$, which is the output of each layer of the neural network and ultimately the output of the whole network, which is denoted as $f(y; W, S, \lambda)$ in eq. (11). This $\widehat{\beta}$ is an approximation of the true $\beta$.
+Q: What qualifies equation (11) to be a likelihood distribution?
 
-Yes, the distribution over $\widehat{\beta}$ is conditioned on $Y, W, S, \lambda$, but it is not conditioned on $\gamma$ as this is the noise variable that relates $\beta$, which we have during the training as a target and $\widehat{\beta}$, which is the output of the neural network.
+A: We assume that $\beta$, which are available for the training dataset, are outputs of the neural net corrupted by the additive Gaussian-distributed noise. Therefore, (11) is the Gaussian likelihood.
+\newline
+\newline
 
-The proposed inference is a variational approximation of the true posterior in the context of expectation propagation and ADF frameworks.
+Q: The uncertainty propagation in section 4 refers to a distribution over $\beta$. Which distribution are the authors referring to? Conditioned upon $Y,W,S,\gamma,\lambda$ as in (13)? Related: perhaps the method is better explained as a variational approximation on $p(B,W,S,\gamma,\lambda|Y)$?
 
-\begin{quote}
-\textit{The exact meaning of “Then we generate observations as $y = X \beta$, where $\beta$ are images converted to vectors.”(Section 6.2) is not quite clear. Are the $\beta$ now flattened images, or the same sparse representations? Which dimensionality do they have?}
-\end{quote}
-Each beta is a flattened image of size $(784 \times 1)$
+A: Section 4 refers to distribution over $\widehat{\beta}$, which is the output of each layer of the neural network and ultimately the output of the whole network, which is denoted as $f(y; W, S, \lambda)$ in eq. (11). This $\widehat{\beta}$ is an approximation of the true $\beta$.
 
-\begin{quote}
-\textit{Why do the authors restrict themselves to so few training and validation images (100 each)?}
-\end{quote}
-Bayesian models in general show themselves espesially useful when dealing with limited data, when the frequentist counterparts may suffer from inadequate maximum likelihood estimates. Therefore, we were particurlarly interested in study on limited data, where the frequentist LISTA might have lower accuracy, to better show how Bayesian LISTA may provide benefits over the frequentist LISTA. We expected the frequentist LISTA to have very good results when there is a lot of data, which has been shown in the original paper and extensions.
+Yes, the distribution over $\widehat{\beta}$ is conditioned on $Y, W, S, \lambda$, but it is not conditioned on $\gamma$ as this is the precision of the noise that relates $\beta$, which we have during training as a target, and $\widehat{\beta}$, which is the output of the neural network.
 
-We appreciate that it would be useful to have also confirmation that on larger datasets both LISTAs show competitive results. We will add the experiments on larger datasets in the revised version of the paper if it is accepted.
+The proposed inference is a variational approximation of the true posterior in the context of EP and ADF frameworks.
+\newline
+\newline
 
-\begin{quote}
-\textit{Why is $\lambda$ fixed to 0.1?}
-\end{quote}
-\textcolor{blue}{We are running experiments with this}
-It was epmirically set. This value looks reasonable, since we use normalised data. As we mention in the paper the type II maximum likelihood can be used to find this value.
+Q: The exact meaning of “Then we generate observations as $y = X \beta$, where $\beta$ are images converted to vectors.”(Section 6.2) is not quite clear. Are the $\beta$ now flattened images, or the same sparse representations? Which dimensionality do they have?
 
-\begin{quote}
-\textit{In the Discussion, the use with overcomplete dictionaries is mentioned as possible but no reasoning is given as to why undercomplete dictionaries were used and why they deviated from the method of the original paper.}
-\end{quote}
-Both overcomplete and undercomplete cases represent very important problems that conveniently can be solved with the same methods. In our previous work we dealt with undercomplete dictionaries and therefore we had the experiments with undercomplete dictionaries. Due to the space limit we couldn't include experiments for both cases.
+A: Yes, each beta is a flattened image of size $(784 \times 1)$
+\newline
+\newline
 
-\begin{quote}
-\textit{Furthermore, the Figures are very small to a point where they are illegible on a DIN A4 printout.
-If some of the proofs and calculations were moved to an Appendix, there would be room for readable Figures and more explanations in Sections 3 and 6.}
-\end{quote}
-We'll move some proofs to the appendix and enlarge the figures.
+Q: Why do the authors restrict themselves to so few training and validation images (100 each)?
 
-% \section*{ToDo List}
-% \begin{enumerate}
-%   \item Enlarge the figures.
-%   \item Check motivation of LISTA in ML.
-%   \item Check reviwer 3 without lambda
-%   \item Check the clock time.
-%   \item Explain why baseline ISTA/FISTA is better in the synthetic data case.
-%   \item Think about the gap in performance when number of layers increases.
-%   \item Think if the method is expandable for different nonlinearities and distributions.
-%   \item Think about prediction results on real data as in review 2.
-%   \item Check reviewer 3 lambda.
-%   \item Consider heavier experiments.
-%   \item Think about different interpretations of lista as it waas uncelar in review 2.
-% \end{enumerate}
+A: Bayesian models in general show themselves especially useful dealing with limited data, when the frequentist counterparts may suffer from inadequate maximum likelihood estimates. Therefore, we were particularly interested in study on limited data, where the frequentist LISTA might have lower accuracy, to better show how Bayesian LISTA may provide benefits over the frequentist LISTA. We expect the frequentist LISTA to have very good results when there is a lot of data, which has been shown in the original paper and extensions.
+
+We appreciate that it would be useful to have also confirmation that on larger datasets the frequentist and Bayesian LISTA show competitive results. We will add the experiments on larger datasets.
+\newline
+\newline
+
+Q: Why is $\lambda$ fixed to 0.1?
+
+A: It was empirically set based on grid search. This value looks reasonable, since we use normalised data. As we mention in the paper the type II maximum likelihood can be used to find this value.
+\newline
+\newline
+
+Q: In the Discussion, the use with overcomplete dictionaries is mentioned as possible but no reasoning is given as to why undercomplete dictionaries were used and why they deviated from the method of the original paper.
+
+A: Both overcomplete and undercomplete cases represent very important problems that conveniently can be solved with the same methods. In our previous work we dealt with undercomplete dictionaries and therefore we had the experiments with undercomplete dictionaries. Due to the space limit we could not include experiments for both cases.
+\newline
+\newline
+
+Q: The paper contains a number of grammatical errors and typos
+
+A: Thank you for pointing this. We will check and correct them.
+\newline
+\newline
+
+Q: Furthermore, the Figures are very small to a point where they are illegible on a DIN A4 printout.
+If some of the proofs and calculations were moved to an Appendix, there would be room for readable Figures and more explanations in Sections 3 and 6.
+
+A: We will move some proofs to the appendix and enlarge the figures.
+
 
 \end{document}
