@@ -17,10 +17,6 @@ def random_spike_and_slab(mean, std, omega_prob):
     return beta
 
 
-def soft_threshold(v, thr_lambda):
-    return np.sign(v) * np.maximum(abs(v) - thr_lambda, np.zeros_like(v))
-
-
 class TestNetwork_layer(TestCase):
     def setUp(self):
 
