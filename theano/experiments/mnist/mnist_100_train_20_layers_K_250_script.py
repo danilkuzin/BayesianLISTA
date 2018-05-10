@@ -2,7 +2,7 @@ import numpy as np
 import six.moves.cPickle as pickle
 from tqdm import tqdm
 
-from compare_freq_bayes.compare_sequential import SequentialComparator
+from comparator.compare_sequential import SequentialComparator
 from compare_mnist.mnist_data import MnistData
 
 
@@ -11,7 +11,7 @@ class MnistSequentialComparator_DFGHJDF(SequentialComparator):
                  train_freq=True, train_bayes=True, train_shared_bayes=True, save_history=False):
 
         self.data = MnistData(K=K)
-        self.data.check_download()
+        self.data.check_download(normalise=False)
         self.data.learn_dictionary()
         self.D = self.data.train_data.shape[1]
 
@@ -50,6 +50,17 @@ if __name__ == '__main__':
 
     for _ in tqdm(range(n_iter)):
        comparator.train_iteration()
+
+
+    lista_time = comparator.recorders['lista'].time
+    sh_bayes_time = comparator.recorders['shared_bayes'].time
+    lista_nmse = comparator.recorders['lista'].validation_loss
+    lista_f_meas = comparator.recorders['lista'].validation_f_meas
+    sh_bayes_nmse = comparator.recorders['shared_bayes'].validation_loss
+    sh_bayes_f_meas = comparator.recorders['shared_bayes'].validation_f_meas
+
+    np.savez('time_100_train_20_layers_K_250', lista_time=lista_time, sh_bayes_time=sh_bayes_time, lista_nmse=lista_nmse, lista_f_meas=lista_f_meas, sh_bayes_nmse=sh_bayes_nmse, sh_bayes_f_meas=sh_bayes_f_meas)
+
 
     comparator.plot_quality_history()
 

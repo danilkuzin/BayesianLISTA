@@ -9,38 +9,39 @@ import os
 from comparator.compare_sequential import SequentialComparator
 from experiments.synthetic.experiments_parameters import load_long_experiment
 
-rseed, D, _, L, batch_size, validation_size, n_iter = load_long_experiment()
+rseed, D, K, L, batch_size, validation_size, n_iter = load_long_experiment()
 np.random.seed(rseed)
-K_array = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+lambda_array = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
 
-freq_train_loss = np.zeros((len(K_array), n_iter))
-freq_validation_loss = np.zeros((len(K_array), n_iter))
-freq_train_f_measure = np.zeros((len(K_array), n_iter))
-freq_validation_f_measure = np.zeros((len(K_array), n_iter))
-freq_time = np.zeros((len(K_array), n_iter))
+freq_train_loss = np.zeros((len(lambda_array), n_iter))
+freq_validation_loss = np.zeros((len(lambda_array), n_iter))
+freq_train_f_measure = np.zeros((len(lambda_array), n_iter))
+freq_validation_f_measure = np.zeros((len(lambda_array), n_iter))
+freq_time = np.zeros((len(lambda_array), n_iter))
 
-sh_bayes_train_loss = np.zeros((len(K_array), n_iter))
-sh_bayes_validation_loss = np.zeros((len(K_array), n_iter))
-sh_bayes_train_f_measure = np.zeros((len(K_array), n_iter))
-sh_bayes_validation_f_measure = np.zeros((len(K_array), n_iter))
-sh_bayes_time = np.zeros((len(K_array), n_iter))
+sh_bayes_train_loss = np.zeros((len(lambda_array), n_iter))
+sh_bayes_validation_loss = np.zeros((len(lambda_array), n_iter))
+sh_bayes_train_f_measure = np.zeros((len(lambda_array), n_iter))
+sh_bayes_validation_f_measure = np.zeros((len(lambda_array), n_iter))
+sh_bayes_time = np.zeros((len(lambda_array), n_iter))
 
-ista_train_loss = np.zeros((len(K_array), n_iter))
-ista_validation_loss = np.zeros((len(K_array), n_iter))
-ista_train_f_measure = np.zeros((len(K_array), n_iter))
-ista_validation_f_measure = np.zeros((len(K_array), n_iter))
+ista_train_loss = np.zeros((len(lambda_array), n_iter))
+ista_validation_loss = np.zeros((len(lambda_array), n_iter))
+ista_train_f_measure = np.zeros((len(lambda_array), n_iter))
+ista_validation_f_measure = np.zeros((len(lambda_array), n_iter))
 
-fista_train_loss = np.zeros((len(K_array), n_iter))
-fista_validation_loss = np.zeros((len(K_array), n_iter))
-fista_train_f_measure = np.zeros((len(K_array), n_iter))
-fista_validation_f_measure = np.zeros((len(K_array), n_iter))
+fista_train_loss = np.zeros((len(lambda_array), n_iter))
+fista_validation_loss = np.zeros((len(lambda_array), n_iter))
+fista_train_f_measure = np.zeros((len(lambda_array), n_iter))
+fista_validation_f_measure = np.zeros((len(lambda_array), n_iter))
 
 for rseed in range(10):
     np.random.seed(rseed)
-    for i, K in enumerate(tqdm(K_array)):
+    for i, lam in enumerate(tqdm(lambda_array)):
         comparator = SequentialComparator(D, K, L, learning_rate=0.0001, n_train_sample=batch_size,
                                           n_validation_sample=validation_size, train_freq=True, train_bayes=False,
-                                          train_shared_bayes=True, use_ista=True, use_fista=True, save_history=False)
+                                          train_shared_bayes=True, use_ista=True, use_fista=True, save_history=False,
+                                          initial_lambda=lam)
         for _ in trange(n_iter):
             comparator.train_iteration()
 
@@ -71,7 +72,7 @@ for rseed in range(10):
     path_name = '{}/'.format(rseed)
     if not os.path.exists(path_name):
         os.makedirs(path_name)
-    file_name = path_name + 'undersampling_measures'
+    file_name = path_name + 'lambda_measures'
     np.savez(file_name, freq_train_loss=freq_train_loss, freq_validation_loss=freq_validation_loss,
              freq_train_f_measure=freq_train_f_measure, freq_validation_f_measure=freq_validation_f_measure, freq_time=freq_time,
              sh_bayes_train_loss=sh_bayes_train_loss, sh_bayes_validation_loss=sh_bayes_validation_loss,
