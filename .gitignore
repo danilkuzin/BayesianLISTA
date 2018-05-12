@@ -39,3 +39,9 @@ theano/compare_mnist/mnist_100_train_20_layers_K_250_quality.npz
 theano/compare_mnist/mnist_results.zip
 
 theano/compare_mnist/mnist_data_imac_work.py
+theano/compare_mnist/mnist_norm_K_250_results.zip
+theano/experiments/active_learning/active_mnist_16_20.zip
+theano/experiments/active_learning/active_mnist_results_2_5.zip
+theano/experiments/synthetic/number_of_layers/2compare_f_measure_vs_number_of_layers.eps
+theano/experiments/synthetic/number_of_layers/2compare_nmse_vs_number_of_layers.eps
+theano/experiments/synthetic/undersampling/9/compare_nmse_vs_undersampling.eps
