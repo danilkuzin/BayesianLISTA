@@ -9,11 +9,13 @@ import tensorflow as tf
 
 import matplotlib.pyplot as plt
 
+import six.moves.cPickle as pickle
+
 class ActiveLearningExperiments(object):
     def __init__(self, update_size):
-        self.L = 4
+        self.L = 20
         self.learning_rate = 0.0001
-        self.n_train_iter = 200
+        self.n_train_iter = 50
         self.update_size = update_size
 
         self.freq_validation_loss = []
@@ -27,7 +29,7 @@ class ActiveLearningExperiments(object):
 
     def get_mnist_data_active_learning(self):
         self.K=100
-        n_train, n_pool, n_test = 10, 1000, 100
+        n_train, n_pool, n_test = 50, 100, 100
         data = MnistData(K=self.K, train_size=n_train + n_pool, valid_size=n_test)
         data.check_download()
         data.learn_dictionary()
@@ -121,22 +123,56 @@ class ActiveLearningExperiments(object):
 
 if __name__=='__main__':
 
-    #for rseed in trange(10):
+    # #for rseed in trange(10):
+    # rseed = 1
+    # np.random.seed(rseed)
+    # tf.set_random_seed(rseed)
+    #
+    # n_upd_iter = 5
+    # active_learning_experiments = ActiveLearningExperiments(update_size=10)
+    # #active_learning_experiments.get_synthetic_data_active_learning()
+    # active_learning_experiments.get_mnist_data_active_learning()
+    # active_learning_experiments.init_and_pretrain_lista()
+    #
+    # for i in trange(n_upd_iter):
+    #     active_learning_experiments.choose_next_random_from_pool()
+    #     active_learning_experiments.choose_next_train_active_from_pool()
+    #     for j in range(100):
+    #         active_learning_experiments.learning_iter()
+    #     active_learning_experiments.update_quality()
+    #
+    # active_learning_experiments.plot()
+
     rseed = 1
     np.random.seed(rseed)
     tf.set_random_seed(rseed)
 
-    n_upd_iter = 5
-    active_learning_experiments = ActiveLearningExperiments(update_size=50)
-    active_learning_experiments.get_synthetic_data_active_learning()
-    active_learning_experiments.init_and_pretrain_lista()
+    saved_file_name = []#'synthetic_D_100_K_50_L_8_200_iter_train_900_train_size.pkl'
 
-    for i in trange(n_upd_iter):
-        active_learning_experiments.choose_next_random_from_pool()
-        active_learning_experiments.choose_next_train_active_from_pool()
-        for j in range(50):
-            active_learning_experiments.learning_iter()
-        active_learning_experiments.update_quality()
+    n_upd_iter = 10
+    update_size = 1
 
-    active_learning_experiments.plot()
+    if not saved_file_name:
+        active_learning_experiments = ActiveLearningExperiments(update_size=update_size)
+        active_learning_experiments.get_mnist_data_active_learning()
+        active_learning_experiments.init_and_pretrain_lista()
+    else:
+        active_learning_experiments = pickle.load(open(saved_file_name, 'rb'))
 
+    #    with open('synthetic_D_100_K_50_L_8_200_iter_train_900_train_size.pkl', 'wb') as f:
+    #        pickle.dump(active_learning_experiments, f)
+
+    print('freq loss {}'.format(active_learning_experiments.freq_validation_loss))
+    print('bayes loss {}'.format(active_learning_experiments.non_active_shared_bayesian_validation_loss))
+    print('active bayes loss {}'.format(active_learning_experiments.active_bayesian_validation_loss))
+
+    active_learning_experiments.update_size = update_size
+
+    # for i in trange(n_upd_iter):
+    #     active_learning_experiments.choose_next_random_from_pool()
+    #     active_learning_experiments.choose_next_train_active_from_pool()
+    #     for j in range(200):
+    #         active_learning_experiments.learning_iter()
+    #     active_learning_experiments.update_quality()
+    #
+    # active_learning_experiments.plot()

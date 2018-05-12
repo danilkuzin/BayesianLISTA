@@ -6,7 +6,7 @@ from sklearn.decomposition import MiniBatchDictionaryLearning
 import matplotlib.pyplot as plt
 
 class MnistData(object):
-    def __init__(self, K=100, train_size=100, valid_size=100):
+    def __init__(self, K, train_size, valid_size):
         self.train_data = None
         self.train_labels = None
         self.dictionary_learn_data = None
@@ -24,7 +24,7 @@ class MnistData(object):
         self.training_size = train_size
         self.validation_size = valid_size
 
-    def check_download(self):
+    def check_download(self, normalise):
         mnist = tf.contrib.learn.datasets.load_dataset("mnist")
         random_train_ind = np.random.choice(mnist.train.images.shape[0], self.training_size, replace=False)
         self.train_data = mnist.train.images[random_train_ind]
@@ -35,7 +35,8 @@ class MnistData(object):
         self.validation_data = mnist.validation.images[random_validation_ind]
         #self.validation_labels = np.asarray(mnist.validation.labels, dtype=np.int32)
 
-        self.normalize()
+        if normalise:
+            self.normalize()
 
     def normalize(self):
         self.train_mean = np.mean(np.append(self.train_data, self.validation_data, axis=0), axis=0)

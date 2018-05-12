@@ -178,7 +178,11 @@ if __name__=='__main__':
     freq_validation_f_measure = active_learning_experiments.freq_validation_f_meas
     non_active_bayes_validation_f_measure = active_learning_experiments.non_active_shared_bayesian_validation_f_meas
     active_bayes_validation_f_measure = active_learning_experiments.active_bayesian_validation_f_meas
+<<<<<<< HEAD
     np.savez('mnist_active_rseed_{}'.format(rseed), freq_validation_loss=freq_validation_loss,
+=======
+    np.savez('mnist_active_test_2', freq_validation_loss=freq_validation_loss,
+>>>>>>> df5d1a81be9464e35d98b7f61f94fab64a50884e
              non_active_bayes_validation_loss=non_active_bayes_validation_loss,
              active_bayes_validation_loss=active_bayes_validation_loss,
              freq_validation_f_measure=freq_validation_f_measure,
