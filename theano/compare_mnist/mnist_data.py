@@ -6,7 +6,7 @@ from sklearn.decomposition import MiniBatchDictionaryLearning
 import matplotlib.pyplot as plt
 
 class MnistData(object):
-    def __init__(self, K=100, train_size=100, valid_size=100):
+    def __init__(self, K, train_size, valid_size):
         self.train_data = None
         self.train_labels = None
         self.dictionary_learn_data = None

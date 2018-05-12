@@ -17,9 +17,9 @@ from algorithms.ista.IstaHandler import IstaHandler
 
 
 class SequentialComparator(object):
-    def __init__(self, D, K, L, learning_rate=0.0001, n_train_sample=1, n_validation_sample=1,
-                 train_freq=True, train_bayes=True, train_shared_bayes=True, use_ista=True, use_fista=True,
-                 save_history=False, initial_lambda=0.1):
+    def __init__(self, D, K, L, learning_rate, n_train_sample, n_validation_sample,
+                 train_freq, train_bayes, train_shared_bayes, use_ista, use_fista,
+                 save_history, initial_lambda):
 
         self.D = D
         self.K = K
