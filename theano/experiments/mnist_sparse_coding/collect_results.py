@@ -99,5 +99,5 @@ class MnistExperimentResultsCollector(object):
 
 if __name__=='__main__':
     collector = MnistExperimentResultsCollector()
-    collector.collect_main('time_1000_train_20_layers_K_100')
+    collector.collect_main('time_100_train_20_layers')
     collector.plot_all()

@@ -48,7 +48,7 @@ class ActiveExperimentMnistResultsCollector(object):
 
         non_active_bayes_marker = 'v'
         non_active_bayes_color = 'red'
-        non_active_bayes_label = 'non active bayes'
+        non_active_bayes_label = 'non-active Bayes'
 
         freq_marker = 's'
         freq_color = 'black'
@@ -56,7 +56,7 @@ class ActiveExperimentMnistResultsCollector(object):
 
         active_bayes_marker = 'd'
         active_bayes_color = 'green'
-        active_bayes_label = 'active bayes'
+        active_bayes_label = 'active Bayes'
 
         # plt.plot(np.arange(0, self.n_upd_iter+1), np.mean(self.freq_validation_loss, axis=0),
         #          label=freq_label, color=freq_color, marker=freq_marker, linewidth=linewidth, markersize=markersize)
@@ -73,7 +73,7 @@ class ActiveExperimentMnistResultsCollector(object):
                      yerr=std_multiplier * np.std(self.non_active_bayes_validation_loss, axis=0), color=non_active_bayes_color)
 
         plt.legend(fontsize=legend_fontsize)
-        plt.xlabel(r'K', fontsize=label_fontsize)
+        plt.xlabel(r'Number of pool additions', fontsize=label_fontsize)
         plt.ylabel(r'NMSE', fontsize=label_fontsize)
         plt.savefig('mnist_results_plots/nmse_validation.eps', format='eps')
         plt.show()
@@ -93,7 +93,7 @@ class ActiveExperimentMnistResultsCollector(object):
                      yerr=std_multiplier * np.std(self.non_active_bayes_validation_f_measure, axis=0), color=non_active_bayes_color)
 
         plt.legend(fontsize=legend_fontsize)
-        plt.xlabel(r'K', fontsize=label_fontsize)
+        plt.xlabel(r'Number of pool additions', fontsize=label_fontsize)
         plt.ylabel(r'F measure', fontsize=label_fontsize)
         plt.savefig('mnist_results_plots/f_measure_validation.eps', format='eps')
         plt.show()

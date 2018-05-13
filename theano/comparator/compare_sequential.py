@@ -17,15 +17,15 @@ from algorithms.ista.IstaHandler import IstaHandler
 
 
 class SequentialComparator(object):
-    def __init__(self, D, K, L, learning_rate, n_train_sample, n_validation_sample,
-                 train_freq, train_bayes, train_shared_bayes, use_ista, use_fista,
+    def __init__(self, D, K, L, data, learning_rate, train_freq, train_bayes, train_shared_bayes, use_ista, use_fista,
                  save_history, initial_lambda):
 
         self.D = D
         self.K = K
         self.L = L
 
-        self.data_generator = DataGenerator(D, K)
+        # self.data_generator = DataGenerator(D, K)
+        self.data = data
 
         self.train_freq = train_freq
         self.train_bayes = train_bayes
@@ -38,39 +38,39 @@ class SequentialComparator(object):
         self.recorders = {}
 
         if self.train_freq:
-            freq_lista = FrequentistListaHandler(D=D, K=K, L=L, X=self.data_generator.X, learning_rate=learning_rate,
+            freq_lista = FrequentistListaHandler(D=D, K=K, L=L, X=self.data.X, learning_rate=learning_rate,
                                                  initial_lambda=initial_lambda)
             self.recorders['lista'] = FrequentistListaRecorder(handler=freq_lista, save_history=save_history,
                                                            name='freq lista')
 
         if self.train_bayes:
-            separate_bayesian_lista = BayesianListaHandler(D=D, K=K, L=L, X=self.data_generator.X,
+            separate_bayesian_lista = BayesianListaHandler(D=D, K=K, L=L, X=self.data.X,
                                                            initial_lambda=initial_lambda)
             self.recorders['separate_bayes'] = SeparateBayesianRecorder(handler=separate_bayesian_lista,
                                                                         name='separate bayes lista')
 
         if self.train_shared_bayes:
-            shared_bayesian_lista = SingleBayesianListaHandler(D=D, K=K, L=L, X=self.data_generator.X,
+            shared_bayesian_lista = SingleBayesianListaHandler(D=D, K=K, L=L, X=self.data.X,
                                                                initial_lambda=initial_lambda)
             self.recorders['shared_bayes'] = SharedBayesianRecorder(handler=shared_bayesian_lista,
                                                                     save_history=save_history,
                                                                     name='shared bayes lista')
 
         if self.use_ista:
-            ista = IstaHandler(D=D, K=K, L=L, X=self.data_generator.X, initial_lambda=initial_lambda)
+            ista = IstaHandler(D=D, K=K, L=L, X=self.data.X, initial_lambda=initial_lambda)
             self.recorders['ista'] = IstaRecorder(handler=ista, name='ista')
 
         if self.use_fista:
-            fista = FistaHandler(D=D, K=K, L=L, X=self.data_generator.X, initial_lambda=initial_lambda)
+            fista = FistaHandler(D=D, K=K, L=L, X=self.data.X, initial_lambda=initial_lambda)
             self.recorders['fista'] = FistaRecorder(handler=fista, name='fista')
 
-        self.beta_train, self.y_train, _ = self.data_generator.new_sample(n_train_sample)
-        self.beta_validation, self.y_validation, _ = self.data_generator.new_sample(n_validation_sample)
+        # self.beta_train, self.y_train, _ = self.data_generator.new_sample(n_train_sample)
+        # self.beta_validation, self.y_validation, _ = self.data_generator.new_sample(n_validation_sample)
 
     def train_iteration(self):
         for recorder_key in self.recorders.keys():
-            self.recorders[recorder_key].train_and_record(beta_train=self.beta_train, y_train=self.y_train,
-                                      beta_validation=self.beta_validation, y_validation=self.y_validation)
+            self.recorders[recorder_key].train_and_record(beta_train=self.data.beta_train, y_train=self.data.y_train,
+                                      beta_validation=self.data.beta_validation, y_validation=self.data.y_validation)
 
     # def get_final_statistics(self):
     #     res = {}
@@ -113,29 +113,29 @@ class SequentialComparator(object):
         for recorder in self.recorders:
             recorder.save_numpy(filename=filename)
 
-        np.savez('{}_data'.format(filename), true_beta_train=self.beta_train,
-                 true_beta_validation=self.beta_validation, y_train=self.y_train, y_validation=self.y_validation)
+        np.savez('{}_data'.format(filename), true_beta_train=self.data.beta_train,
+                 true_beta_validation=self.data.beta_validation, y_train=self.data.y_train, y_validation=self.data.y_validation)
 
 
-if __name__ == '__main__':
-
-    rseed, D, K, L, batch_size, validation_size, n_iter = load_quick_experiment()
-    np.random.seed(rseed)
-
-    saved_comparator_file_name = []  # 'best_model_bayes_lista_single_matrices.pkl'
-
-    if not saved_comparator_file_name:
-        comparator = SequentialComparatorIstaFista(D, K, L, learning_rate=0.0001, n_train_sample=batch_size,
-                                                   n_validation_sample=validation_size)
-    else:
-        comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
-
-    for _ in range(n_iter):
-        comparator.train_iteration()
-
-    comparator.plot_quality_history()
-
-    with open('cur.pkl', 'wb') as f:
-        pickle.dump(comparator, f)
+# if __name__ == '__main__':
+#
+#     rseed, D, K, L, batch_size, validation_size, n_iter = load_quick_experiment()
+#     np.random.seed(rseed)
+#
+#     saved_comparator_file_name = []  # 'best_model_bayes_lista_single_matrices.pkl'
+#
+#     if not saved_comparator_file_name:
+#         comparator = SequentialComparatorIstaFista(D, K, L, learning_rate=0.0001, n_train_sample=batch_size,
+#                                                    n_validation_sample=validation_size)
+#     else:
+#         comparator = pickle.load(open(saved_comparator_file_name, 'rb'))
+#
+#     for _ in range(n_iter):
+#         comparator.train_iteration()
+#
+#     comparator.plot_quality_history()
+#
+#     with open('cur.pkl', 'wb') as f:
+#         pickle.dump(comparator, f)
 
 # D = 784, K = 100, L = 4, batch_size = 1000, validation_size = 100 - at the beginning bayes loss less than freg

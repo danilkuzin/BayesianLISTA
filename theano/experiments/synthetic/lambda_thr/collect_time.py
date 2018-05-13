@@ -2,19 +2,17 @@ import errno
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from experiments.synthetic.lambda_thr.collect_results import LambdaExperimentResultsCollector
 
-class LambdaExperimentResultsCollector(object):
-    def __init__(self):
-        self.lambda_array = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
-        self.random_range = 10 # TODO update when experiments finished
-        self.n_iter = 1000
+
+class LambdaExperimentTimeCollector(LambdaExperimentResultsCollector):
 
     def collect_all(self):
         self.ista_f_meas_train, self.ista_f_meas_validation, self.ista_loss_train, self.ista_loss_validation, \
         self.ista_f_meas_train_std, self.ista_f_meas_validation_std, self.ista_loss_train_std, self.ista_loss_validation_std = \
             self.collect_main('ista')
         self.fista_f_meas_train, self.fista_f_meas_validation, self.fista_loss_train, self.fista_loss_validation, \
-        self.fista_f_meas_train_std, self.fista_f_meas_validation_std, self.fista_loss_train_std, self.fista_loss_validation_std, = \
+        self.fista_f_meas_train_std, self.fista_f_meas_validation_std, self.fista_loss_train_std, self.fista_loss_validation_std = \
             self.collect_main('fista')
         self.freq_f_meas_train, self.freq_f_meas_validation, self.freq_loss_train, self.freq_loss_validation, \
         self.freq_f_meas_train_std, self.freq_f_meas_validation_std, self.freq_loss_train_std, self.freq_loss_validation_std = \
@@ -23,6 +21,9 @@ class LambdaExperimentResultsCollector(object):
         self.sh_bayes_f_meas_train_std, self.sh_bayes_f_meas_validation_std, self.sh_bayes_loss_train_std, self.sh_bayes_loss_validation_std = \
             self.collect_main('sh_bayes')
 
+        self.freq_loss_hist, self.freq_f_hist, self.freq_time_hist = self.collect_time_performance('freq', lambda_thr_ind=2)
+        self.sh_bayes_loss_hist, self.sh_bayes_f_hist, self.sh_bayes_time_hist = self.collect_time_performance('sh_bayes', lambda_thr_ind=2)
+
     def collect_main(self, alg_name):
         f_meas_train = np.zeros((self.random_range, len(self.lambda_array), self.n_iter))
         f_meas_validation = np.zeros((self.random_range, len(self.lambda_array), self.n_iter))
@@ -30,7 +31,7 @@ class LambdaExperimentResultsCollector(object):
         loss_validation = np.zeros((self.random_range, len(self.lambda_array), self.n_iter))
 
         for i in range(self.random_range):
-            saved_res = np.load('{}/lambda_measures.npz'.format(i, i))
+            saved_res = np.load('{}/lambda_measures.npz'.format(i))
             loss_train[i] = saved_res['{}_train_loss'.format(alg_name)]
             loss_validation[i] = saved_res['{}_validation_loss'.format(alg_name)]
             f_meas_train[i] = saved_res['{}_train_f_measure'.format(alg_name)]
@@ -58,6 +59,28 @@ class LambdaExperimentResultsCollector(object):
 
         return f_meas_train, f_meas_validation, loss_train, loss_validation, \
                f_meas_train_std, f_meas_validation_std, loss_train_std, loss_validation_std
+
+    def collect_time_performance(self, alg_name, lambda_thr_ind):
+        f_meas = np.zeros((self.random_range, len(self.lambda_array), self.n_iter))
+        loss = np.zeros((self.random_range, len(self.lambda_array), self.n_iter))
+        time = np.zeros((self.random_range, len(self.lambda_array), self.n_iter))
+
+        for i in range(self.random_range):
+            saved_res = np.load('{}/lambda_measures.npz'.format(i))
+            loss[i] = saved_res['{}_validation_loss'.format(alg_name)]
+            f_meas[i] = saved_res['{}_validation_f_measure'.format(alg_name)]
+            time[i] = saved_res['{}_time'.format(alg_name)]
+
+        f_meas = f_meas[:, lambda_thr_ind, :]
+        loss = loss[:, lambda_thr_ind, :]
+        time = time[:, lambda_thr_ind, :]
+
+        f_meas = np.mean(f_meas, axis=0)
+        loss = np.mean(loss, axis=0)
+        time = np.mean(time, axis=0)
+
+        return loss, f_meas, time
+
 
     def plot_all(self):
 
@@ -145,9 +168,57 @@ class LambdaExperimentResultsCollector(object):
         plt.savefig('results/nmse_validation.eps', format='eps')
         plt.show()
 
+    def plot_time_performance(self):
+
+        try:
+            os.makedirs('results')
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+        linewidth = .25
+        markersize = 5.
+        std_multiplier = 2
+        label_fontsize = 18
+        legend_fontsize = 14
+
+        ista_marker= 'o'
+        ista_color='blue'
+        ista_label=r'\textsc{ista}'
+
+        fista_marker= 'v'
+        fista_color='red'
+        fista_label=r'\textsc{fista}'
+
+        freq_marker= 's'
+        freq_color='black'
+        freq_label=r'\textsc{lista}'
+
+        sh_bayes_marker='d'
+        sh_bayes_color='green'
+        sh_bayes_label=r'Bayesian \textsc{lista}'
+
+        plt.plot(self.freq_time_hist, self.freq_f_hist, label=freq_label, color=freq_color, marker=freq_marker, linewidth=linewidth, markersize=markersize)
+        plt.plot(self.sh_bayes_time_hist, self.sh_bayes_f_hist, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'L', fontsize=label_fontsize)
+        plt.ylabel(r'F measure', fontsize=label_fontsize)
+        plt.savefig('results/f_measure_time.eps', format='eps')
+        plt.show()
+
+
+        plt.semilogy(self.freq_time_hist, self.freq_loss_hist, label=freq_label, color=freq_color, marker=freq_marker, linewidth=linewidth, markersize=markersize)
+        plt.semilogy(self.sh_bayes_time_hist, self.sh_bayes_loss_hist, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
+        plt.legend(fontsize=legend_fontsize)
+        plt.xlabel(r'L', fontsize=label_fontsize)
+        plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
+        plt.savefig('results/nmse_time.eps', format='eps')
+        plt.show()
+
 
 if __name__=='__main__':
     plt.rc('text', usetex=True)
-    collector = LambdaExperimentResultsCollector()
+    collector = LambdaExperimentTimeCollector()
     collector.collect_all()
     collector.plot_all()
+    collector.plot_time_performance()
