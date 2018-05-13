@@ -1,0 +1,135 @@
+\documentclass[twoside,11pt]{article} 
+\usepackage{jmlr2e}
+\usepackage{amsmath}
+\usepackage{bbm} % for indicator function
+\usepackage{cancel} % for cancelto
+\usepackage{graphicx}
+\graphicspath{{./graphics/}}
+\usepackage{subfig}
+
+
+\firstpageno{1}
+
+\begin{document}
+
+\title{Supplementary materials for the paper ``Uncertainty propagation in neural networks for sparse coding''}
+
+%\author{ Olga Isupova \AND Danil Kuzin }
+
+\maketitle
+
+\section{Proofs}
+
+\begin{lemma}[Propagation of a Gaussian distribution through soft thresholding]
+\label{thm:soft_thresholding}
+The distribution of $x^*$ can be parametrised by the probability of being zero, $\omega^*$, the mean $m^*$ and the variance $v^*$ of the truncated Gaussian distribution.
+\end{lemma}
+\begin{proof}
+
+The probability of a zero $\omega^*$ equals to the probability mass of the original distribution from the interval $[-\lambda, \lambda]$
+\begin{align}
+\begin{split}
+\omega^* &=\operatorname{P}(x^*=0) = \operatorname{P}(x \in [-\lambda, \lambda]) \\
+&= \Phi\left(\frac{\lambda-m}{\sqrt{v}}\right) - \Phi\left(\frac{-\lambda-m}{\sqrt{v}}\right).
+\end{split}
+\end{align}
+where $\Phi(\cdot)$ is the standard Gaussian cumulative distribution function.
+
+The soft thresholding function shifts elements that are greater than $\lambda$  or less than $-\lambda$ towards~$0$. Let $\psi(\cdot)$ denote the density of the soft-thresholded distribution on $x^* \neq 0$, $\phi(\cdot)$ denote the density of the original Gaussian distribution on $x$. Then the first moment of $x^* \neq 0$ is:
+
+\begin{align}
+\label{eq:thr_first_moment}
+\begin{split}
+m^* &= \int_{-\infty}^{+\infty}x\psi(x)dx= \int_{-\infty}^{0}x\phi(x-\lambda)dx \\
+&{} + \int_{0}^{+\infty}x\phi(x+\lambda)dx,
+\end{split}
+\end{align}
+where
+\begin{align}
+&\int_{-\infty}^{0}x\phi(x-\lambda)dx = -\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} \nonumber\\
+&{} + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)\\
+&\int_{0}^{+\infty}x\phi(x+\lambda)dx = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\nonumber\\
+& + (m - \lambda)\left(1 - \Phi\left(-\frac{\lambda-m}{\sqrt{v}}\right)\right)
+\end{align}
+
+The second moment of $x^* \neq 0$ is given as
+\begin{align}
+\label{eq:thr_second_moment}
+\begin{split}
+s &= \int_{-\infty}^{+\infty}x^2\psi(x)dx = \int_{-\infty}^{0}x^2\phi(x-\lambda)dx \\
+&{}+ \int_{0}^{+\infty}x^2\phi(x+\lambda)dx,
+\end{split}
+\end{align}
+where
+\begin{align}
+\begin{split}
+&\int_{-\infty}^{0}x^2\phi(x-\lambda)dx = \\
+&-\frac{\sqrt{v}}{\sqrt{2\pi}} (\lambda+m)\exp\left\{\frac{-(\lambda+m)^2}{2v}\right\}\\
+& + (\sigma^2 + (\lambda+m)^2)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
+\end{split}\\
+\begin{split}
+&\int_{0}^{+\infty}x^2\phi(x+\lambda)dx = \\
+&\frac{\sqrt{v}}{\sqrt{2\pi}} (m - \lambda)\exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\\
+& + (\sigma^2 + (m - \lambda)^2)\left(1 - \Phi\left(\frac{\lambda -m}{\sqrt{v}}\right)\right)
+\end{split}
+\end{align}
+
+The resulting variance is then
+\begin{equation}
+v^* = s- (m^*)^2
+\end{equation}
+\end{proof}
+
+\begin{lemma}[Moments of a spike and slab distribution]
+\label{thm:moments_spsl}
+Let a random variable $\xi$ have a spike and slab distribution with probability of spike $\omega$, slab mean $m$ and slab variance $v$. Then its moments are
+\begin{subequations}
+\begin{align}
+\mathbb{E}\xi &= (1-\omega)m \\
+\operatorname{Var}\xi & = (1-\omega)(v + \omega m^2)
+\end{align}
+\end{subequations}
+\end{lemma}
+
+\begin{proof}
+\begin{align*}
+\begin{split}
+\mathbb{E}\xi &= \int x \big(\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v)\big)dx \\
+& = \omega \int x \delta_0(x)dx + (1 - \omega)\int x \mathcal{N}(x; m, v)dx \\
+& = (1-\omega)m \\
+\mathbb{E}\xi^2 &= \int x^2 \big(\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v)\big)dx \\
+& = \omega \int x^2 \delta_0(x)dx + (1 - \omega)\int x^2 \mathcal{N}(x; m, v)dx \\
+& = (1-\omega)(v + m^2) \\
+\operatorname{Var}\xi &= \mathbb{E}\xi^2 - \left(\mathbb{E}\xi\right)^2 = (1-\omega)(v + \omega m^2)
+\end{split}
+\end{align*}
+\end{proof}
+
+
+\begin{lemma}[Product of a Gaussian matrix and a spike and slab vector]
+  \label{thm:matrix_vector}
+Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\widehat{\boldsymbol\beta }\in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\widehat{\beta}_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. The components of the matrix $\mathbf{S}$ and the vector $\widehat{\boldsymbol\beta}$ are mutual independent. Let $\mathbf{e} \in \mathbb{R}^{D}$ denote the product $\mathbf{S} \widehat{\boldsymbol\beta}$. Then the marginal mean and variance of elements $e_d$ of the vector $\mathbf{e}$ are:
+\begin{subequations}
+\begin{align}
+ \mathbb{E}e_d &= \sum_{d'=1}^D m^s_{dd'}(1-\omega_{d'})m_{d'}, \\
+ \begin{split}
+ \operatorname{Var}e_d &= \sum_{d'=1}^D [(m^s_{dd'})^2(1-\omega_{d'})^2v_{d'} \\
+ & {}+ (1-\omega_{d'})^2(m_{d'})^2v^s_{dd'} + v^s_{dd'}(1-\omega_{d'})^2v_{d'}].
+ \end{split}
+ \end{align}
+\end{subequations}
+ \end{lemma}
+ \begin{proof}
+\begin{flalign*}
+	\mathbb{E}e_d &= \sum_{d'=1}^D \mathbb{E}[s_{dd'}\widehat{\beta}_{d'}]  = \sum_{d'=1}^D m^s_{dd'}\mathbb{E}\widehat{\beta}_{d'}\\
+	\operatorname{Var}e_d &= \sum_{d'=1}^D \operatorname{Var}[s_{dd'}\widehat{\beta}_{d'}] = \sum_{d'=1}^D [(\mathbb{E}s_{dd'})^2 \operatorname{Var}\widehat{\beta}_{d'} \\
+	&{}+ (\mathbb{E}\widehat{\beta}_{d'})^2 \operatorname{Var}s_{dd'} + \operatorname{Var}\widehat{\beta}_{d'} \operatorname{Var}s_{dd'}]
+\end{flalign*}
+where $\mathbb{E}\widehat{\beta}_{d'}$ and $\operatorname{Var}\widehat{\beta}_{d'}$ are computed according to Lemma~\ref{thm:moments_spsl}.
+ \end{proof}
+
+
+%\bibliography{bibliography}
+%\bibliographystyle{icml2018}
+
+\end{document}

@@ -2,6 +2,7 @@
 \usepackage{proceed2e}
 \usepackage[margin=1in]{geometry}
 \usepackage{mathtools}
+\usepackage{xfrac}
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage{subfig}
@@ -163,24 +164,12 @@ where $\omega_d$, $m_d$, and $v_d$ are the components of vectors $\boldsymbol\om
 Later in this section, we show that the output $\widehat{\boldsymbol\beta}_l$ of the next layer can be approximated with a spike and slab distribution and, therefore, it maintains the same family of distributions. This leads to the proposed probabilistic backpropagation algorithm that is presented in Section~\ref{sec:backpropagation}. We now describe how to propagate uncertainty through the layers of the Bayesian \textsc{lista} step by step stating meanwhile theoretical facts required for the method.
 
 \subsection{\uppercase{Initialisation dense layer}}
-The first step in the Bayesian \textsc{lista} is (\ref{eq:first_layer}). The matrix $\mathbf{W}$ consists of Gaussian-distributed components and $y$ is a deterministic vector.
-
- \begin{lemma}[Product of Gaussian matrix and deterministic vector]
- \label{thm:matrix_const}
-Let $\mathbf{W} \in \mathbb{R}^{D \times K}$ be a matrix of independent Gaussian-distributed random variables: $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $\mathbf{y} \in \mathbb{R}^K$ be a deterministic vector. Then their product $\mathbf{W} \mathbf{y}$ is a vector $\mathbf{b} \in \mathbb{R}^{D}$ of random variables $b_d \sim \mathcal{N}(m^b_d, w^b_d)$, where
-\begin{subequations}
-\begin{align}
-m^b_d &= \sum_{k=1}^Ky_k m^w_{dk}, \\
-w^b_d &= \sum_{k=1}^Ky_k^2v^w_{dk}.
- \end{align}
-\end{subequations}
-
- \end{lemma}
- \begin{proof}
- 	The statement follows from the property that the family of normal distributions is closed under linear transformations.
- \end{proof}
-
-According to Lemma~\ref{thm:matrix_const}, $\mathbf{b}$ in~(\ref{eq:first_layer}) is a vector of Gaussian-distributed components.
+The first step in the Bayesian \textsc{lista} is (\ref{eq:first_layer}). The matrix $\mathbf{W}$ consists of Gaussian-distributed components: $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $y$ is a deterministic vector. Since the sum of independent Gaussian-distributed variables is a Gaussian variable~\citep{eisenberg2008sum}, $\mathbf{b}$ is a vector of Gaussian-distributed components $b_d \sim \mathcal{N}(m^b_d, v^b_d)$
+\begin{equation}
+\label{eq:matrix_vector_product}
+m^b_d = \sum_{k=1}^Ky_k m^w_{dk}, \qquad
+v^b_d = \sum_{k=1}^Ky_k^2v^w_{dk}.
+\end{equation}
 
 
 \subsection{\uppercase{Soft thresholding nonlinearity}}
@@ -190,65 +179,10 @@ When a Gaussian-distributed random variable $x \sim \mathcal{N}(x; m, v)$ is pro
 
 \begin{lemma}[Propagation of a Gaussian distribution through soft thresholding]
 \label{thm:soft_thresholding}
-The distribution of $x^*$ can be parametrised by the probability of being zero, $\omega^*$, the mean $m^*$ and the variance $v^*$ of the truncated Gaussian distribution.
+The distribution of $x^*$ can be parametrised by the probability of being zero, $\omega^*$, the mean $m^*$ and the variance $v^*$ of the truncated Gaussian distribution
 \end{lemma}
-\begin{proof}
 
-The probability of a zero $\omega^*$ equals to the probability mass of the original distribution from the interval $[-\lambda, \lambda]$
-\begin{align}
-\begin{split}
-\omega^* &=\operatorname{P}(x^*=0) = \operatorname{P}(x \in [-\lambda, \lambda]) \\
-&= \Phi\left(\frac{\lambda-m}{\sqrt{v}}\right) - \Phi\left(\frac{-\lambda-m}{\sqrt{v}}\right).
-\end{split}
-\end{align}
-where $\Phi(\cdot)$ is the standard Gaussian cumulative distribution function.
-
-The soft thresholding function shifts elements that are greater than $\lambda$  or less than $-\lambda$ towards~$0$. Let $\psi(\cdot)$ denote the density of the soft-thresholded distribution on $x^* \neq 0$, $\phi(\cdot)$ denote the density of the original Gaussian distribution on $x$. Then the first moment of $x^* \neq 0$ is:
-
-\begin{align}
-\label{eq:thr_first_moment}
-\begin{split}
-m^* &= \int_{-\infty}^{+\infty}x\psi(x)dx= \int_{-\infty}^{0}x\phi(x-\lambda)dx \\
-&{} + \int_{0}^{+\infty}x\phi(x+\lambda)dx,
-\end{split}
-\end{align}
-where
-\begin{align}
-&\int_{-\infty}^{0}x\phi(x-\lambda)dx = -\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} \nonumber\\
-&{} + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)\\
-&\int_{0}^{+\infty}x\phi(x+\lambda)dx = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\nonumber\\
-& + (m - \lambda)\left(1 - \Phi\left(-\frac{\lambda-m}{\sqrt{v}}\right)\right)
-\end{align}
-
-The second moment of $x^* \neq 0$ is given as
-\begin{align}
-\label{eq:thr_second_moment}
-\begin{split}
-s &= \int_{-\infty}^{+\infty}x^2\psi(x)dx = \int_{-\infty}^{0}x^2\phi(x-\lambda)dx \\
-&{}+ \int_{0}^{+\infty}x^2\phi(x+\lambda)dx,
-\end{split}
-\end{align}
-where
-\begin{align}
-\begin{split}
-&\int_{-\infty}^{0}x^2\phi(x-\lambda)dx = \\
-&-\frac{\sqrt{v}}{\sqrt{2\pi}} (\lambda+m)\exp\left\{\frac{-(\lambda+m)^2}{2v}\right\}\\
-& + (\sigma^2 + (\lambda+m)^2)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
-\end{split}\\
-\begin{split}
-&\int_{0}^{+\infty}x^2\phi(x+\lambda)dx = \\
-&\frac{\sqrt{v}}{\sqrt{2\pi}} (m - \lambda)\exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\\
-& + (\sigma^2 + (m - \lambda)^2)\left(1 - \Phi\left(\frac{\lambda -m}{\sqrt{v}}\right)\right)
-\end{split}
-\end{align}
-
-The resulting variance is then
-\begin{equation}
-v^* = s- (m^*)^2
-\end{equation}
-\end{proof}
-
-Based on the results of Lemma~\ref{thm:soft_thresholding} we approximate the distribution of $\widehat{\boldsymbol\beta}_0$ from (\ref{eq:thr_first}) with a spike and slab distribution with parameters derived in the lemma: the spike probability $\omega$ is equal to $\omega^*$, the slab mean $m$ and variance $v$ are set to the corresponding parameters of the truncated Gaussian $m^*$ and $v^*$.
+The proof of Lemma~\ref{thm:soft_thresholding} and expressions for $\omega^*$, $m^*$ and $v^*$ are given in the supplementary materials. Based on the results of Lemma~\ref{thm:soft_thresholding} we approximate the distribution of $\widehat{\boldsymbol\beta}_0$ from (\ref{eq:thr_first}) with a spike and slab distribution with parameters derived in the lemma: the spike probability $\omega$ is equal to $\omega^*$, the slab mean $m$ and variance $v$ are set to the corresponding parameters of the truncated Gaussian $m^*$ and $v^*$.
 
 \subsection{\uppercase{Main layers}}
 The distributions of the inputs at the step (\ref{eq:l_dense_layer}) of the Bayesian \textsc{lista} for each $l$ are: the vector $\mathbf{b}$ and matrix $\mathbf{S}$ that consist of Gaussian-distributed components and $\widehat{\boldsymbol\beta}_{l-1}$, which is a vector of the spike and slab random variables.
@@ -266,20 +200,6 @@ Let a random variable $\xi$ have a spike and slab distribution with probability 
 \end{subequations}
 \end{lemma}
 
-\begin{proof}
-\begin{align*}
-\begin{split}
-\mathbb{E}\xi &= \int x \big(\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v)\big)dx \\
-& = \omega \int x \delta_0(x)dx + (1 - \omega)\int x \mathcal{N}(x; m, v)dx \\
-& = (1-\omega)m \\
-\mathbb{E}\xi^2 &= \int x^2 \big(\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v)\big)dx \\
-& = \omega \int x^2 \delta_0(x)dx + (1 - \omega)\int x^2 \mathcal{N}(x; m, v)dx \\
-& = (1-\omega)(v + m^2) \\
-\operatorname{Var}\xi &= \mathbb{E}\xi^2 - \left(\mathbb{E}\xi\right)^2 = (1-\omega)(v + \omega m^2)
-\end{split}
-\end{align*}
-\end{proof}
-
 \begin{lemma}[Product of a Gaussian matrix and a spike and slab vector]
   \label{thm:matrix_vector}
 Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\widehat{\boldsymbol\beta }\in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\widehat{\beta}_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. The components of the matrix $\mathbf{S}$ and the vector $\widehat{\boldsymbol\beta}$ are mutual independent. Let $\mathbf{e} \in \mathbb{R}^{D}$ denote the product $\mathbf{S} \widehat{\boldsymbol\beta}$. Then the marginal mean and variance of elements $e_d$ of the vector $\mathbf{e}$ are:
@@ -293,35 +213,18 @@ Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian
  \end{align}
 \end{subequations}
  \end{lemma}
- \begin{proof}
-\begin{flalign*}
-	\mathbb{E}e_d &= \sum_{d'=1}^D \mathbb{E}[s_{dd'}\widehat{\beta}_{d'}]  = \sum_{d'=1}^D m^s_{dd'}\mathbb{E}\widehat{\beta}_{d'}\\
-	\operatorname{Var}e_d &= \sum_{d'=1}^D \operatorname{Var}[s_{dd'}\widehat{\beta}_{d'}] = \sum_{d'=1}^D [(\mathbb{E}s_{dd'})^2 \operatorname{Var}\widehat{\beta}_{d'} \\
-	&{}+ (\mathbb{E}\widehat{\beta}_{d'})^2 \operatorname{Var}s_{dd'} + \operatorname{Var}\widehat{\beta}_{d'} \operatorname{Var}s_{dd'}]
-\end{flalign*}
-where $\mathbb{E}\widehat{\beta}_{d'}$ and $\operatorname{Var}\widehat{\beta}_{d'}$ are computed according to Lemma~\ref{thm:moments_spsl}.
- \end{proof}
+ 
+The proofs of Lemmas~\ref{thm:moments_spsl} and~\ref{thm:matrix_vector} are given in the supplementary materials.
 
-{\color{red} Let $\mathbf{e}_l = \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ at the step (\ref{eq:l_dense_layer}) of the Bayesian \textsc{lista}}. We assume that $\mathbf{S}$ and $\widehat{\boldsymbol\beta}_{l-1}$ are mutually independent. Then according to the Central Limit Theorem $[ \mathbf{e}_l ]_d$ can be approximated as a Gaussian-distributed variable when $D$ is sufficiently large. The parameters of the of the approximating Gaussian distribution are set to the marginal mean and variance given in Lemma~\ref{thm:matrix_vector}. The quality of this approximation is discussed in section \ref{sec:approx_quality}.
+Let $\mathbf{e}_l$ denote the product $\mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ at the step (\ref{eq:l_dense_layer}) of the Bayesian \textsc{lista}. We assume that $\mathbf{S}$ and $\widehat{\boldsymbol\beta}_{l-1}$ are mutually independent. Then according to the Central Limit Theorem $[ \mathbf{e}_l ]_d$ can be approximated as a Gaussian-distributed variable when $D$ is sufficiently large. The parameters of the of the approximating Gaussian distribution are set to the marginal mean and variance given in Lemma~\ref{thm:matrix_vector}. The quality of this approximation is discussed in section \ref{sec:approx_quality}.
 
-The output $\mathbf{c}_l$ at the step (\ref{eq:l_dense_layer}) is then represented as a sum of two Gaussian-distributed vectors: $\mathbf{b}$ and $\mathbf{e}_l$
+The output $\mathbf{c}_l$ at the step (\ref{eq:l_dense_layer}) is then represented as a sum of two Gaussian-distributed vectors: $\mathbf{b}$ and $\mathbf{e}_l$, i.e. it is a Gaussian-distributed vector with components $c_{d} \sim \mathcal{N}(m^c_{d}, v^c_{d})$
+\begin{equation}
+\label{eq:sum_vectors}
+m^c_{d} = m^b_{d} + m^e_{d}, \qquad
+v^c_{d} = v^b_{d} + v^e_{d}.
+\end{equation}
 
-
-\begin{lemma}[Sum of Gaussian vectors]
-\label{thm:sum_vectors}
-If $\mathbf{b} \in \mathbb{R}^{D}$ and $\mathbf{e} \in \mathbb{R}^{D}$ are both vectors of independent Gaussian-distributed random variables: $b_{d} \sim \mathcal{N}(m^b_{d}, v^b_{d})$, $e_{d} \sim \mathcal{N}(m^e_{d}, v^e_{d})$ then their sum $\mathbf{c} = \mathbf{b} + \mathbf{e}$ is a vector of independent Gaussian-distributed random variables $c_{d} \sim \mathcal{N}(m^c_{d}, v^c_{d})$ with
-\begin{subequations}
-\begin{align}
-m^c_{d} &= m^b_{d} + m^e_{d}, \\
-v^c_{d} &= v^b_{d} + v^e_{d}.
- \end{align}
-\end{subequations}
-\end{lemma}
-\begin{proof}
-Based on properties of Gaussian distributions.
-\end{proof}
-
-Therefore, $\mathbf{c}_l$ is a vector of Gaussian-distributed components, which parameters can be found according to Lemma~\ref{thm:sum_vectors}.
 
 Then $\widehat{\boldsymbol\beta}_{l}$ at the step (\ref{eq:l_thr}) of the Bayesian \textsc{lista} is the result of soft thresholding of a Gaussian distribution, which is approximated with the spike and slab distribution,  similar to the step (\ref{eq:thr_first}).
 
@@ -337,21 +240,21 @@ Then $\widehat{\boldsymbol\beta}_{l}$ at the step (\ref{eq:l_thr}) of the Bayesi
 We have covered all steps of the Bayesian \textsc{lista} and derived distributions for outputs of these steps. Now we can formulate the main result of this section that describes how the proposed uncertainty propagation works.
 
 \begin{enumerate}
-	\item $\mathbf{b} = \mathbf{W}\mathbf{y}$ is the Gaussian distribution with parameters computed according to Lemma \ref{thm:matrix_const};
+	\item $\mathbf{b} = \mathbf{W}\mathbf{y}$ is the Gaussian distribution with parameters computed according to (\ref{eq:matrix_vector_product});
 	\item $\widehat{\boldsymbol\beta}_{0} = h_\lambda(\mathbf{b})$ is approximated with the spike and slab distribution, which parameters are computed according to Lemma \ref{thm:soft_thresholding}.
 	\item $\mathbf{e}_l = \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ is approximated with the Gaussian distribution, which parameters are computed according to Lemma \ref{thm:matrix_vector};
-	\item $\mathbf{c}_l = \mathbf{b} + \mathbf{e}_l$ is the Gaussian distribution with parameters computed according to Lemma \ref{thm:sum_vectors};
+	\item $\mathbf{c}_l = \mathbf{b} + \mathbf{e}_l$ is the Gaussian distribution with parameters computed according to (\ref{eq:sum_vectors});
 	\item $\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)$ is approximated with the spike and slab distribution, which parameters are computed according to Lemma \ref{thm:soft_thresholding}.
 \end{enumerate}
 
 
 \subsection{\uppercase{Approximation quality}}
 \label{sec:approx_quality}
-We have used two approximations in forward propagation of uncertainty. First, {\color{red} in Lemma \ref{thm:matrix_vector}} a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, {\color{red} in Lemma \ref{thm:soft_thresholding}} the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
+We have used two approximations in forward propagation of uncertainty. First, at the step (\ref{eq:l_dense_layer}) during the computation of $\mathbf{e}_l$, a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, at the steps (\ref{eq:thr_first}) and (\ref{eq:l_thr}) the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
-Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for Lemma \ref{thm:matrix_vector}. For the sampled distribution, $10000$ values are sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The approximated distribution is computed according to Lemma \ref{thm:matrix_vector}.
+Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for Lemma \ref{thm:matrix_vector}. For the sampled distribution, $10000$ values are sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:matrix_vector}.
 
-Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for Lemma \ref{thm:soft_thresholding}. For the sampled distribution, $10000$ values are sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities is plotted. The approximated distribution is computed according to Lemma \ref{thm:soft_thresholding}.
+Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for Lemma \ref{thm:soft_thresholding}. For the sampled distribution, $10000$ values are sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:soft_thresholding}.
 
 %\subfloat[\textsc{nmse} on validation]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_non_normalised_nmse_valid}}
 
@@ -407,24 +310,19 @@ Z = \int \prod_{d=1}^{D} \big[&\mathcal{N}(\beta_d | f(\mathbf{y} ; \mathbf{S}, 
  &q(\mathbf{W}, \mathbf{S}, \gamma, \eta)\big] \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
  \end{split}
 \end{align}
-We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta}_L = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$, that is the output from the network and approximated with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}_L}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}_L}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}_L}$
+We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_L = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$, that is the output from the network and approximate with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}_L}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}_L}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}_L}$
 \begin{align}
-&Z \approx \int \prod_{d=1}^{D} \big[\mathcal{N}(\beta_d | [\widehat{\boldsymbol\beta}_L]_d, \gamma^{-1}) \nonumber \\
-&\times (\omega^{\widehat{\boldsymbol\beta}_L}_d \delta_0([\widehat{\boldsymbol\beta}_L]_d) + (1 - \omega^{\widehat{\boldsymbol\beta}_L}_d)\mathcal{N}([\widehat{\boldsymbol\beta}_L]_d | m^{\widehat{\boldsymbol\beta}_L}_d, v^{\widehat{\boldsymbol\beta}_L}_d)) \nonumber\\
-&\times \text{Gam} (\gamma_d; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}\widehat{\boldsymbol\beta}_L \mathrm{d}\gamma  \nonumber\\
-&= \prod_{d=1}^{D} \Big[\omega^{\widehat{\boldsymbol\beta}_L}_d \int \big[\mathcal{N}(\beta_d | [\widehat{\boldsymbol\beta}_L]_d, \gamma^{-1})  \delta_0([\widehat{\boldsymbol\beta}_L]_d) \nonumber \\
-&\times \text{Gam} (\gamma; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}[\widehat{\boldsymbol\beta}_L]_d \mathrm{d}\gamma  \nonumber\\
-& + (1 - \omega^{\widehat{\boldsymbol\beta}_L}_d)\int \big[\mathcal{N}(\beta_d | [\widehat{\boldsymbol\beta}_L]_d, \gamma^{-1})\nonumber\\
-&\times \mathcal{N}([\widehat{\boldsymbol\beta}_L]_d | m^{\widehat{\boldsymbol\beta}_L}_d, v^{\widehat{\boldsymbol\beta}_L}_d)) \text{Gam} (\gamma; \alpha^\gamma, \beta^\gamma)\big]\mathrm{d}[\widehat{\boldsymbol\beta}_L]_d \mathrm{d}\gamma\Big]  \nonumber\\
-& = \prod_{d=1}^{D} \Big[\omega^{\widehat{\boldsymbol\beta}_L}_d \int \mathcal{N}(\beta_d | 0, \gamma^{-1})  \text{Gam} (\gamma; \alpha^\gamma, \beta^\gamma) d\gamma  \nonumber\\
-& + (1 - \omega^{\widehat{\boldsymbol\beta}_L}_d)\int \big[\mathcal{T}(\beta_d | [\widehat{\boldsymbol\beta}_L]_d, \frac{\beta^\gamma}{\alpha^\gamma}, 2\alpha^\gamma)  \nonumber\\
-&\times \mathcal{N}([\mathbf{\widehat{\boldsymbol\beta}_L}]_d| m^{\widehat{\boldsymbol\beta}_L}_d, v^{\widehat{\boldsymbol\beta}_L}_d))\big] \mathrm{d}[\widehat{\boldsymbol\beta}_L]_d\Big]  \nonumber\\
-& \approx \prod_{d=1}^D \Big[\omega^{\widehat{\boldsymbol\beta}_L}_d  \mathcal{T}(\beta_d | 0, \frac{\beta^\gamma}{\alpha^\gamma}, 2\alpha^\gamma) \nonumber \\
+&Z \approx \int \prod_{d=1}^{D} \left[\mathcal{N}\left(\beta_d | \widehat{\beta}_d, \gamma^{-1}\right) \nonumber \right.\\
+&\times \left(\omega^{\widehat{\boldsymbol\beta}}_d \delta_0\left(\widehat{\beta}_d\right) + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\widehat{\beta}_d | m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right)\right) \nonumber\\
+&\times \left.\vphantom{\mathcal{N}(\beta_d | \widehat{\beta}_d} \text{Gam} \left(\gamma_d; \alpha^\gamma, \beta^\gamma\right)\right]\mathrm{d}\widehat{\boldsymbol\beta} \mathrm{d}\gamma  \nonumber\\
+& = \prod_{d=1}^{D} \left[\omega^{\widehat{\boldsymbol\beta}}_d \int \mathcal{N}\left(\beta_d | 0, \gamma^{-1}\right)  \text{Gam} \left(\gamma; \alpha^\gamma, \beta^\gamma\right) d\gamma  \nonumber \right.\\
+& + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\int \left[\mathcal{T}\left(\beta_d | \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right)  \nonumber \right.\\
+&\times \left.\left. \vphantom{\int}  \mathcal{N}\left(\widehat{\beta}_d | m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right)\right] \mathrm{d}\widehat{\boldsymbol\beta}_d\right]  \nonumber\\
+& \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d | 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) \nonumber \right.\\
 \label{eq:Z_approx}
-&+ (1 - \omega^{\widehat{\boldsymbol\beta}_L}_d)\mathcal{N}(\beta_d | m^{\widehat{\boldsymbol\beta}_L}_d, \frac{\beta^\gamma}{\alpha^\gamma - 1} + v^{\widehat{\boldsymbol\beta}_L})\Big]
+& + \left. \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d | m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}\right)\right],
 \end{align}
-
-The Student t density can be parametrised in different ways. In this paper the following parametrisation is used
+where we have approximated the Student's t density $\mathcal{T}\left(\beta_d | \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right)$ with a Gaussian density with the same mean and variance. The Student's t density can be parametrised in different ways. In this paper the following parametrisation is used
 \begin{equation}
 \mathcal{T}(x; \mu, \beta, \nu) = \frac{\Gamma\left(\frac{\nu + 1}{2}\right)}{\Gamma\left(\frac{\nu}{2}\right)\sqrt{\pi \nu \beta}} \left(1 + \frac{(x - \mu)^2}{\nu\beta}\right)^{-\frac{\nu + 1}{2}}
 \end{equation}
@@ -440,7 +338,7 @@ The only hyperparameter in the proposed Bayesian \textsc{lista} is the shrinkage
 
 \section{\uppercase{Experiments}}
 \label{sec:experiments}
-The proposed Bayesian \textsc{lista} is evaluated in the context of the sparse coding problem with an undercomplete dictionary, where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
+The proposed Bayesian \textsc{lista} is evaluated in the context of the sparse coding problem with an overcomplete dictionary, where the number of measurements $K$ is much smaller than the dimensionality of the vector $\boldsymbol\beta$.
 
 We compare the proposed Bayesian \textsc{lista} with the classical \textsc{lista}~\citep{gregor2010learning} in terms of the predictive accuracy. As baselines we also use \textsc{ista} \citep{daubechies2004iterative} and Fast \textsc{ista} (\textsc{fista}) \citep{beck2009fast}. \textsc{fista} adds the momentum to \textsc{ista} and improves its convergence speed. We set the number of iterations in these algorithms and the number of layers in the Bayesian and classical \textsc{lista} networks to $L$. To measure the performance of the algorithms the normalised mean square error (\textsc{nmse}) and F measure are used. \textsc{nmse} for a batch of data $\{\boldsymbol\beta^{(n)}\}_{n=1}^{N}$ and estimates $\{\widehat{\boldsymbol\beta}^{(n)}\}_{n=1}^{N}$ is computed as
 \begin{equation}
@@ -570,7 +468,7 @@ To the best of our knowledge, this is the first implementation of a Bayesian dee
 
 %The inference is based on the expectation propagation algorithm and though it is not suited for distributed inference, stochastic variant of assumed density filtering can potentially be used \citep{li2015stochastic}. This would allow the proposed approach to scale.
 
-The \textsc{lista}-based algorithms can be applied for the sparse coding problem with both overcomplete dictionaries as in the original paper \citep{gregor2010learning}, and undercomplete dictionaries \citep{borgerding2017amp}. Though this paper presents only results with undercomplete dictionaries, this is not the limitation of the proposed method and it can be used for overcomplete dictionaries in a similar manner.
+The \textsc{lista}-based algorithms can be applied for the sparse coding problem with both overcomplete dictionaries (i.e., $D > K$) as in the original paper \citep{gregor2010learning}, and undercomplete dictionaries (i.e., $D < K$). Section~\ref{sec:experiments} provides experiments for the overcomplete case, we give experiments for the undercomplete case in the supplementary material.
 
 \section{\uppercase{Conclusions and future work}}
 \label{sec:conclusions}
