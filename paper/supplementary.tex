@@ -8,8 +8,6 @@
 \usepackage{subfig}
 
 
-\firstpageno{1}
-
 \begin{document}
 
 \title{Supplementary materials for the paper ``Uncertainty propagation in neural networks for sparse coding''}
@@ -158,7 +156,7 @@ Z &\approx \int \prod_{d=1}^{D} \mathcal{N}\left(\beta_d | \widehat{\beta}_d, \g
 &\quad + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\int \mathcal{T}\left(\beta_d | \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) 
 \left. \vphantom{\int}  \mathcal{N}\left(\widehat{\beta}_d | m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right) \mathrm{d}\widehat{\boldsymbol\beta}_d\right]  \nonumber\\
 \label{eq:Z_approx}
-& \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d | 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d | m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}\right)\right],
+& \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d | 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d | m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}_d\right)\right],
 \end{align}
 where we have approximated the Student's t density $\mathcal{T}\left(\beta_d | \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right)$ with a Gaussian density with the same mean and variance. The Student's t density can be parametrised in different ways. In this work the following parametrisation is used
 \begin{equation}
