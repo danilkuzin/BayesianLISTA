@@ -61,20 +61,20 @@ In the Bayesian neural network framework prior distributions are imposed on weig
 \section{\uppercase{Introduction}}
 Though the idea of Bayesian learning in neural networks is not new \citep{neal2012bayesian}, it has regained its attention recently with the development of distributed approximate inference techniques \citep{li2015stochastic, hoffman2013stochastic}  and general boost in popularity of deep learning. In some spheres, such as self-driving cars or healthcare, uncertainty estimates are very important and Bayesian learning allows to obtain them.
 
-In general, when distributions are included in a network, Bayesian inference complexity scales exponentially with the number of layers. Thus, it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques have been proposed to handle specific types of neural networks. For example, feed-forward networks with rectified linear units nonlinearity~\citep{hernandez2015probabilistic}, networks with discrete distributions~\citep{soudry2014expectation}, recurrent networks~\citep{mcdermott2017bayesian}.
+In general, when distributions are included in a network, the complexity of Bayesian inference scales exponentially with the number of layers. Thus, it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques have been proposed to handle specific types of neural networks. For example, feed-forward networks with the rectified linear unit nonlinearity~\citep{hernandez2015probabilistic}, networks with discrete distributions~\citep{soudry2014expectation}, recurrent networks~\citep{mcdermott2017bayesian}.
 
 There are currently two approaches in Bayesian neural networks: explicit distributions of weights can be included in a network \citep{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing uncertainty \citep{gal2016dropout}. In this paper we use the first way and impose distributions on weights to obtain posterior estimates of weights and predictions with uncertainty estimated.
 
 Sparse coding can be viewed as a linear regression problem with the additional assumption that many of the basis representation coefficients should be zeros. They arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse}, neuroscience~\citep{baillet1997bayesian, jas2017learning}.
 
-Neural networks address the sparse coding problem with the soft thresholding nonlinearity, that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike and slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and soft thresholding nonlinearity can then be closely approximated with a distribution from the same family.
+Neural networks address the sparse coding problem with the soft thresholding nonlinearity that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike and slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and the soft thresholding nonlinearity can then be closely approximated with a distribution from the same family.
 
-The proposed method of uncertainty propagation for the soft thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update weights distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
+The proposed method of uncertainty propagation for the soft thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update a weight distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
 
 The main contributions of this paper can be summarised~as:
 \begin{itemize}
 \item for the first time we propose a method for uncertainty propagation through the soft thresholding nonlinearity for a Bayesian neural network;
-\item we develop efficient posterior inference for weights and outputs of neural networks with the soft thresholding nonlinearity;
+\item we develop an efficient posterior inference algorithm for weights and outputs of neural networks with the soft thresholding nonlinearity;
 \item we design a novel Bayesian neural network for sparse coding.
 \end{itemize}
 
@@ -87,9 +87,9 @@ The sparse coding problem is the linear regression with the assumption of sparse
 \label{eq:regression_problem}
 \mathbf{y} = \mathbf{X}\boldsymbol\beta + \varepsilon
 \end{equation}
-where $\mathbf{y} \in \mathbb{R}^K$ is the observation, $\mathbf{X} \in \mathbb{R}^{K \times D}$ is the design matrix, $\boldsymbol\beta \in \mathbb{R}^D$ is the unknown vector of weight with many elements $\beta_d$ equal to zero. $\varepsilon \in \mathbb{R}^K$ is the independent Gaussian noise.
+where $\mathbf{y} \in \mathbb{R}^K$ is the observation, $\mathbf{X} \in \mathbb{R}^{K \times D}$ is the design matrix, $\boldsymbol\beta \in \mathbb{R}^D$ is the unknown vector of weights with many elements $\beta_d$ equal to zero, $\varepsilon \in \mathbb{R}^K$ is the independent Gaussian noise.
 
-One of the popular families of the sparse coding algorithms is the iterative shrinkage algorithms, and notably the Iterative Shrinkage and Thresholding Algorithm(\textsc{ista}) \citep{daubechies2004iterative}. It iteratively obtains the new approximation of the coefficient vector $\widehat{\boldsymbol\beta}_l$ at the iteration $l$ as the linear transformation of the input $\mathbf{y}$ with previous approximation $\widehat{\boldsymbol\beta}_{l-1}$ and then propagates the new approximation through the soft thresholding function $h_\lambda(\cdot)$
+One of the popular families of the sparse coding algorithms is the iterative shrinkage algorithms, and notably the Iterative Shrinkage and Thresholding Algorithm (\textsc{ista}) \citep{daubechies2004iterative}. It iteratively obtains the new approximation of the coefficient vector $\widehat{\boldsymbol\beta}_l$ at the iteration $l$ as the linear transformation of the input $\mathbf{y}$ with the previous approximation $\widehat{\boldsymbol\beta}_{l-1}$ and then propagates the new approximation through the soft thresholding function $h_\lambda(\cdot)$
 \begin{equation}
 h_\lambda(v) = \text{sgn}(v) \max(|v| - \lambda, 0)
 \end{equation}
@@ -98,9 +98,9 @@ The linear transformation is
 \begin{equation}
 \widehat{\boldsymbol\beta}_l = \mathbf{W}\mathbf{y} + \mathbf{S}_l\widehat{\boldsymbol\beta}_{l-1}
 \end{equation}
-with weights $\mathbf{W} = \mathbf{X}^\top / E$, $E$ - upper bound on the largest eigenvalue of $\mathbf{X}^\top\mathbf{X}$ and $\mathbf{S} = \mathbf{I}_{D \times D} - \mathbf{W}\mathbf{X}$ ($\mathbf{I}_{D \times D}$ is the identity matrix of size $D$).
+with weights $\mathbf{W} = \mathbf{X}^\top / E$, $E$ - upper bound of the largest eigenvalue of $\mathbf{X}^\top\mathbf{X}$ and $\mathbf{S} = \mathbf{I}_{D \times D} - \mathbf{W}\mathbf{X}$ ($\mathbf{I}_{D \times D}$ is the identity matrix of size $D$).
 
-The Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} algorithm allows to learn the values of matrices $\mathbf{W}$, $\mathbf{S}$ based on set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, \textsc{ista} algorithm is limited with the fixed amount of iterations, $L$ and interpreted as a recurrent neural network. Overall, it has the following scheme of predicting a coefficient vector $\boldsymbol\beta$ for an observation $\mathbf{y}$
+The Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} algorithm allows to learn the values of matrices $\mathbf{W}$, $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, the \textsc{ista} algorithm is limited with the fixed amount of iterations, $L$, and interpreted as a recurrent neural network. Overall, it has the following scheme of predicting a coefficient vector $\boldsymbol\beta$ for an observation $\mathbf{y}$
 \begin{align}
 \label{eq:first_layer}
 &\mathbf{b} = \mathbf{W}\mathbf{y}\\
@@ -114,12 +114,12 @@ The Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} algorithm 
 & \widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_{L}
 \end{align}
 
-Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$, $\mathbf{b}$ are intermediate vectors that describe forward propagation.
+Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in the \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$, $\mathbf{b}$ are intermediate vectors that describe forward propagation.
 
 \section{\uppercase{Bayesian neural network for sparse coding}}
 \label{sec:bayesian_lista}
 
-This section presents the proposed Bayesian neural network for sparse coding. To formulate the Bayesian version of \textsc{lista} we impose the prior distributions on the unknown weights
+This section presents the proposed Bayesian neural network for sparse coding. To formulate the Bayesian version of the \textsc{lista} we impose the prior distributions on the unknown weights
 \begin{subequations}
 \label{eq:ws}
 \begin{align}
@@ -135,7 +135,7 @@ p(&\mathbf{B}| \mathbf{Y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda) \nonumber \\
 = &\prod_{n=1}^N\prod_{d=1}^D\mathcal{N}(\beta_d^{(n)}; [f(\mathbf{y^{(n)}}; \mathbf{W}, \mathbf{S}, \lambda)]_d, \gamma^{-1}),
 \end{align}
 where $[\cdot]_d$ denotes the d-th component of a vector, $f(\mathbf{y}^{(n)}; \mathbf{W}, \mathbf{S}, \lambda)$ is the output of the Bayesian \textsc{lista} neural network, $\gamma$ is the precision of the Gaussian distribution.
-The prior of the introduced Gaussian precisions are set to the Gamma distribution with parameters $a^{\cdot}$ and $b^{\cdot}$:
+The prior of the introduced Gaussian precisions are set to the Gamma distribution with parameters~$a^{\cdot}$ and~$b^{\cdot}$:
 \begin{subequations}
 \label{eq:gamma_eta}
 \begin{align}
@@ -186,7 +186,7 @@ According to Lemma~\ref{thm:matrix_const}, $\mathbf{b}$ in~(\ref{eq:first_layer}
 \subsection{\uppercase{Soft thresholding nonlinearity}}
 At the second step (\ref{eq:thr_first}) of the Bayesian \textsc{lista} the Gaussian vector $\mathbf{b}$ is taken as an input of the soft thresholding function.
 
-When a Gaussian-distributed random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft thresholding function: $x^* = h_{\lambda}(x)$ the probability mass of a resulting random variable $x^*$ is split into two parts. The values of $x$ from the interval $[-\lambda, \lambda]$ are converted to $0$ by the soft thresholding operator. Therefore, the probability mass of the original distribution that lies in $[-\lambda, \lambda]$ is squeezed into the probability of $x^*$ being zero. The values of $x$ from outside of the $[-\lambda, \lambda]$ interval are shifted towards $0$. Therefore, the distribution of $x^* \neq 0$ represents the tails of the original Gaussian distribution.
+When a Gaussian-distributed random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft thresholding function: $x^* = h_{\lambda}(x)$ the probability mass of a resulting random variable $x^*$ is split into two parts. The values of $x$ from the interval $[-\lambda, \lambda]$ are converted to~$0$ by the soft thresholding operator. Therefore, the probability mass of the original distribution that lies in $[-\lambda, \lambda]$ is squeezed into the probability of $x^*$ being zero. The values of $x$ from outside of the $[-\lambda, \lambda]$ interval are shifted towards~$0$. Therefore, the distribution of $x^* \neq 0$ represents the tails of the original Gaussian distribution.
 
 \begin{lemma}[Propagation of a Gaussian distribution through soft thresholding]
 \label{thm:soft_thresholding}
@@ -203,7 +203,7 @@ The probability of a zero $\omega^*$ equals to the probability mass of the origi
 \end{align}
 where $\Phi(\cdot)$ is the standard Gaussian cumulative distribution function.
 
-The soft thresholding function shifts elements that are greater than $\lambda$  or less than $-\lambda$ towards $0$. Let $\psi(\cdot)$ denote the density of the soft-thresholded distribution on $x^* \neq 0$, $\phi(\cdot)$ denote the density of the original Gaussian distribution on $x$. Then the first moment of $x^* \neq 0$ is:
+The soft thresholding function shifts elements that are greater than $\lambda$  or less than $-\lambda$ towards~$0$. Let $\psi(\cdot)$ denote the density of the soft-thresholded distribution on $x^* \neq 0$, $\phi(\cdot)$ denote the density of the original Gaussian distribution on $x$. Then the first moment of $x^* \neq 0$ is:
 
 \begin{align}
 \label{eq:thr_first_moment}
@@ -458,7 +458,7 @@ First, the predictive performance of the proposed Bayesian \textsc{lista} is ana
 
 In Figure \ref{fig:number_of_layers_synthetic} predictive performance for different number of layers $L$ is presented. The observation size is set to $K=50$. The Bayesian \textsc{lista} outperforms \textsc{lista} in terms of both measures. Although the baselines \textsc{ista} and \textsc{fista} show better performance in terms of F measure, the Bayesian \textsc{lista} has the lowest \textsc{nmse}.
 
-Figure~\ref{fig:unsersampling_synthetic} gives the results of predictive performance for different observation sizes $K$. The number of layers is set as $L=4$. In the previous experiment Bayesian and classical \textsc{lista} show similar results with this number of layers. The results of Figure~\ref{fig:unsersampling_synthetic} confirms this competitive behaviour between two \textsc{lista} networks. Baselines show similar results in terms of F measure and underperform in terms of \textsc{nmse}.
+Figure~\ref{fig:unsersampling_synthetic} gives the results of predictive performance for different observation sizes $K$. The number of layers is set as $L=4$. In the previous experiment Bayesian and classical \textsc{lista} show similar results with this number of layers. The results of Figure~\ref{fig:unsersampling_synthetic} confirm this competitive behaviour between two \textsc{lista} networks. Baselines show similar results in terms of F measure and underperform in terms of \textsc{nmse}.
 
 Overall, the experiments on the synthetic data demonstrate that the Bayesian \textsc{lista} provides competitive results in terms of predictive accuracy.
 

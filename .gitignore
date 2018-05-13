@@ -155,3 +155,7 @@ theano/experiments/mnist/posterior_std.pdf
 *.fls
 
 review_uai_2018/response_to_reviews.pdf
+
+review_uai_2018/response_to_reviews.bbl
+
+review_uai_2018/response_to_reviews.blg
