@@ -14,6 +14,7 @@
 \usepackage{nips_2018}
 
 \usepackage{bbm}
+\usepackage{algorithm, algorithmic}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -59,15 +60,15 @@ In the Bayesian neural network framework prior distributions are imposed on weig
 \end{abstract}
 
 \section{Introduction}
-Though the idea of Bayesian learning in neural networks is not new \citep{neal2012bayesian}, it has regained its attention recently with the development of distributed approximate inference techniques \citep{li2015stochastic, hoffman2013stochastic}  and general boost in popularity of deep learning. In some spheres, such as self-driving cars or healthcare, uncertainty estimates are very important and Bayesian learning allows to obtain them.
+The idea of Bayesian learning in neural networks \citep{neal2012bayesian} has recently regained its attention with the development of distributed approximate inference techniques \citep{li2015stochastic, hoffman2013stochastic} and general boost in popularity of deep learning. In addition to algorithms' predictions themselves, Bayesian learning naturally provides the uncertainty estimates of these predictions. These uncertainty estimates are vital in spheres that affect people's health, such as self-driving cars or medicine.
 
-In general, when distributions are included in a network, the complexity of Bayesian inference scales exponentially with the number of layers. Thus, it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques have been proposed to handle specific types of neural networks. For example, feed-forward networks with the rectified linear unit nonlinearity~\citep{hernandez2015probabilistic}, networks with discrete distributions~\citep{soudry2014expectation}, recurrent networks~\citep{mcdermott2017bayesian}.
+In general, when distributions are included in the network, the complexity of Bayesian inference scales exponentially with the number of layers. Thus, it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques have been proposed to handle specific types of neural networks. For example, feed-forward networks with the rectified linear unit nonlinearity~\citep{hernandez2015probabilistic}, networks with discrete distributions~\citep{soudry2014expectation}, recurrent networks~\citep{mcdermott2017bayesian}.
 
-There are currently two approaches in Bayesian neural networks: explicit distributions of weights can be included in a network \citep{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing uncertainty \citep{gal2016dropout}. In this paper we use the former and impose distributions on weights to obtain the posterior of weights and predictions with uncertainty estimated.
+There are currently two approaches in Bayesian neural networks: explicit distributions of weights can be included in a network \citep{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing uncertainty \citep{gal2016dropout}. In this paper we use the former approach and impose prior distributions on the neural network's weights to obtain the posterior distributions of weights and posterior predictive distributions of target variables.
 
-Sparse coding can be viewed as a linear regression problem with the additional assumption that many of the basis representation coefficients should be zeros. They arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse}, neuroscience~\citep{baillet1997bayesian, jas2017learning}.
+In this paper, we consider the area of sparse coding. The sparse coding problem can be viewed as a linear regression problem with the additional assumption that the majority of the basis representation coefficients should be zeros. Such problems arise in different applications, such as compressive sensing~\citep{candes2008introduction}, image and video processing~\citep{mairal2014sparse, wang2015deep}, neuroscience~\citep{baillet1997bayesian, jas2017learning}.
 
-Neural networks address the sparse coding problem with the soft thresholding nonlinearity that shifts current estimates towards zero \citep{gregor2010learning}. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike and slab distribution \citep{mitchell1988bayesian}. We show that it can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and the soft thresholding nonlinearity can then be closely approximated with a distribution from the same family.
+One of the modern approaches for the sparse coding problem utilises neural networks with soft thresholding nonlinearity~\citep{gregor2010learning, sprechmann2015learning}. At every layer this nonlinearity shifts current estimates of the target vectors towards zero, which allows to achieve sparsity of the target vectors. In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike and slab distribution \citep{mitchell1988bayesian}, which represents the probabilities of each variable being zero, or Gaussian-distributed. We show that the spike and slab distribution of traget vectors can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and the soft thresholding nonlinearity can then be closely approximated with a distribution from the same family. Overall, this approach allows to make the Bayesian inference for the sparse coding neural network feasible.
 
 The proposed method of uncertainty propagation for the soft thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update a weight distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
 
@@ -96,18 +97,33 @@ The linear transformation is
 with weights $\mathbf{W} = \mathbf{X}^\top / E$, where $E$ is the upper bound of the largest eigenvalue of $\mathbf{X}^\top\mathbf{X}$, and $\mathbf{S} = \mathbf{I}_{D \times D} - \mathbf{W}\mathbf{X}$ ($\mathbf{I}_{D \times D}$ is the identity matrix of size $D$).
 
 The Learned \textsc{ista} (\textsc{lista}) \citep{gregor2010learning} allows to learn the values of matrices $\mathbf{W}$, $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, the \textsc{ista} is limited with the fixed amount of iterations, $L$, and interpreted as a recurrent neural network. It has the following scheme of predicting a coefficient vector $\boldsymbol\beta$ for an observation~$\mathbf{y}$
-\begin{align}
-\label{eq:first_layer}
-&\mathbf{b} = \mathbf{W}\mathbf{y}\\
-\label{eq:thr_first}
-&\widehat{\boldsymbol\beta}_0 = h_\lambda(\mathbf{b}) \\
-&\text{for } l=1:L\\
-\label{eq:l_dense_layer}
-	&\quad \mathbf{c}_l = \mathbf{b} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1} \\
-\label{eq:l_thr}
-	&\quad \widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l) \\
-& \widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_{L}
-\end{align}
+
+\begin{algorithm}
+  \caption{\textsc{lista}}
+  \label{alg:lista}
+  \begin{algorithmic}[1]
+    \STATE Initialisation dense layer $\mathbf{b} \gets \mathbf{W}\mathbf{y}$ \label{eq:first_layer}
+    \STATE Initialisation soft thresholding nonlinearity $\widehat{\boldsymbol\beta}_0 \gets h_\lambda(\mathbf{b})$ \label{eq:thr_first}
+		\FOR{$l=1$ \TO $L$}
+			\STATE Main dense layer $\mathbf{c}_l \gets \mathbf{b} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ \label{eq:l_dense_layer}
+			\STATE Main soft thresholding nonlinearity $\widehat{\boldsymbol\beta}_{l} \gets h_\lambda(\mathbf{c}_l)$ \label{eq:l_thr}
+		\ENDFOR
+		\STATE Output $\widehat{\boldsymbol\beta} \gets \widehat{\boldsymbol\beta}_{L}$
+  \end{algorithmic}
+\end{algorithm}
+
+% \begin{align}
+% \label{eq:first_layer}
+% &\mathbf{b} = \mathbf{W}\mathbf{y}\\
+% \label{eq:thr_first}
+% &\widehat{\boldsymbol\beta}_0 = h_\lambda(\mathbf{b}) \\
+% &\text{for } l=1:L\\
+% \label{eq:l_dense_layer}
+% 	&\quad \mathbf{c}_l = \mathbf{b} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1} \\
+% \label{eq:l_thr}
+% 	&\quad \widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l) \\
+% & \widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_{L}
+% \end{align}
 
 Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in the \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$ and $\mathbf{b}$ are auxiliary vectors that describe forward propagation.
 
@@ -195,7 +211,7 @@ Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian
  \end{align}
 \end{subequations}
  \end{lemma}
- 
+
 The proofs of Lemmas~\ref{thm:moments_spsl} and~\ref{thm:matrix_vector} are given in the supplementary materials.
 
 Let $\mathbf{e}_l$ denote the product $\mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ at the step (\ref{eq:l_dense_layer}) of the Bayesian \textsc{lista}. We assume that $\mathbf{S}$ and $\widehat{\boldsymbol\beta}_{l-1}$ are mutually independent. Then according to the Central Limit Theorem $[ \mathbf{e}_l ]_d$ can be approximated as a Gaussian-distributed variable when $D$ is sufficiently large. The parameters of the of the approximating Gaussian distribution are set to the marginal mean and variance given in Lemma~\ref{thm:matrix_vector}. The supplementary materials provide a discussion of the quality of this approximation.
