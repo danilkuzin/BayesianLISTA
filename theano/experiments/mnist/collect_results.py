@@ -50,6 +50,9 @@ class MnistExperimentResultsCollector(object):
         sh_bayes_color='green'
         sh_bayes_label='bayes LISTA'
 
+        label_fontsize = 24
+        legend_fontsize = 14
+
         plt.rc('text', usetex=True)
 
         plt.plot(self.ista_validation_f_measure, label=ista_label, color=ista_color, marker=ista_marker, linewidth=linewidth, markersize=markersize)
@@ -57,9 +60,9 @@ class MnistExperimentResultsCollector(object):
         plt.plot(self.freq_validation_f_measure, label=freq_label, color=freq_color, marker=freq_marker, linewidth=linewidth, markersize=markersize)
         plt.plot(self.shared_bayesian_validation_f_measure, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.plot()
-        plt.legend()
-        plt.ylabel(r'F measure')
-        plt.xlabel(r'Number of iterations')
+        plt.legend(fontsize=legend_fontsize)
+        plt.ylabel(r'F measure', fontsize=label_fontsize)
+        plt.xlabel(r'Number of iterations', fontsize=label_fontsize)
         plt.savefig('results/f_measure_valid.eps', format='eps')
         plt.show()
 
@@ -68,9 +71,9 @@ class MnistExperimentResultsCollector(object):
         plt.plot(self.freq_validation_loss, label=freq_label, color=freq_color, marker=freq_marker, linewidth=linewidth, markersize=markersize)
         plt.plot(self.shared_bayesian_validation_loss, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.plot()
-        plt.legend()
-        plt.ylabel(r'\textsc{nmse}')
-        plt.xlabel(r'Number of iterations')
+        plt.legend(fontsize=legend_fontsize)
+        plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
+        plt.xlabel(r'Number of iterations', fontsize=label_fontsize)
         plt.savefig('results/nmse_valid.eps', format='eps')
         plt.show()
 
@@ -79,9 +82,9 @@ class MnistExperimentResultsCollector(object):
         plt.plot(self.freq_time, self.freq_validation_f_measure, label=freq_label, color=freq_color, marker=freq_marker, linewidth=linewidth, markersize=markersize)
         plt.plot(self.shared_bayesian_time, self.shared_bayesian_validation_f_measure, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.plot()
-        plt.legend()
-        plt.ylabel(r'F measure')
-        plt.xlabel(r'Time, s')
+        plt.legend(fontsize=legend_fontsize)
+        plt.ylabel(r'F measure', fontsize=label_fontsize)
+        plt.xlabel(r'Time, s', fontsize=label_fontsize)
         plt.xlim([0, 2500])
         plt.savefig('results/f_measure_valid_time.eps', format='eps')
         plt.show()
@@ -91,9 +94,9 @@ class MnistExperimentResultsCollector(object):
         plt.plot(self.freq_time, self.freq_validation_loss, label=freq_label, color=freq_color, marker=freq_marker, linewidth=linewidth, markersize=markersize)
         plt.plot(self.shared_bayesian_time, self.shared_bayesian_validation_loss, label=sh_bayes_label, color=sh_bayes_color, marker=sh_bayes_marker, linewidth=linewidth, markersize=markersize)
         plt.plot()
-        plt.legend()
-        plt.ylabel(r'\textsc{nmse}')
-        plt.xlabel(r'Time, s')
+        plt.legend(fontsize=legend_fontsize)
+        plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
+        plt.xlabel(r'Time, s', fontsize=label_fontsize)
         plt.xlim([0, 2500])
         plt.savefig('results/nmse_valid_time.eps', format='eps')
         plt.show()
@@ -101,5 +104,5 @@ class MnistExperimentResultsCollector(object):
 
 if __name__=='__main__':
     collector = MnistExperimentResultsCollector()
-    collector.collect_main('time_100_train_20_layers_K_100')
+    collector.collect_main('time_100_train_20_layers_K_250')
     collector.plot_all()

@@ -142,7 +142,7 @@ class NumberOfLayersExperimentReultsCollector(object):
         linewidth = .25
         markersize = 5.
         std_multiplier = 2
-        label_fontsize = 18
+        label_fontsize = 24
         legend_fontsize = 14
 
         ista_marker= 'o'
