@@ -336,34 +336,34 @@ Figures~\ref{fig:nmse_undersampling_synthetic} and~\ref{fig:f_meas_undesampling_
 %\label{fig:validation_synthetic}
 %\end{figure}
 
-\begin{figure}[t!]
-\centering
-%\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_nmse_train}}
-%~
-\subfloat[\textsc{nmse} for $K = 100$]{\includegraphics[width=0.4\columnwidth]{graphics/mnist/100_non_normalised_nmse_valid}}
-%\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_f_measure_train}}
-%~
-\subfloat[F measure for $K = 100$]{\includegraphics[width=0.4\columnwidth]{graphics/mnist/100_non_normalised_f_measure_valid}}\\[-13pt]
-\subfloat[\textsc{nmse} for $K = 250$]{\includegraphics[width=0.4\columnwidth]{graphics/mnist/250_non_normalised_nmse_valid}}
-%\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_f_measure_train}}
-%~
-\subfloat[F measure for $K = 250$]{\includegraphics[width=0.4\columnwidth]{graphics/mnist/250_non_normalised_f_measure_valid}}
-\caption{Predictive performance for different numbers of iterations on the \textsc{mnist} data with the dictionary size $K = 100$ (the top row) and $K = 250$ (the bottom row)}
-\label{fig:mnist}
-\end{figure}
-
 \subsection{Predictive performance on \textsc{mnist} data}
 Here we evaluate the proposed Bayesian \textsc{lista} in terms of predictive performance on the \textsc{mnist} dataset \citep{lecun1998gradient}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is generated as standard random Gaussian. The resulting size of $\mathbf{X}$ is $K \times 784$. Then we generate observations as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta \in \mathbb{R}^{784}$ are flatten images. We use $100$ images for training and $100$ for test. The shrinkage parameter $\lambda$ is fixed as $0.1$.
 
-Figure \ref{fig:mnist} present quality on the validation set with dictionaries of size $100$ and $250$.  The experiment with $K=100$ presents severe conditions for the algorithms: the very limited size of the training dataset combined with the small dimensionality of observations. The Bayesian \textsc{lista} is able to learn under these conditions, outperforming the \textsc{lista} that demonstrates poor results. Under better conditions of the second experiment with $K=250$ both \textsc{lista} networks converge to the similar results. However, the Bayesian \textsc{lista} demonstrates remarkably better convergence rate. Both baselines are unable to perform well in these experiments. The proposed Bayesian \textsc{lista} network also estimates the posterior distribution for $\boldsymbol\beta$. The parameters of the posterior distribution and samples from it are given in the supplementary materials.
+Figure \ref{fig:mnist} present quality on the validation set with observation sizes $100$ and $250$.  The experiment with $K=100$ presents severe conditions for the algorithms: the very limited size of the training dataset combined with the small dimensionality of observations. The Bayesian \textsc{lista} is able to learn under these conditions, outperforming the \textsc{lista} that demonstrates poor results. Under better conditions of the second experiment with $K=250$ both \textsc{lista} networks converge to the similar results. However, the Bayesian \textsc{lista} demonstrates remarkably better convergence rate. Both baselines are unable to perform well in these experiments. Further results on investigation of the predicted posterior and clock time comparison are given in the supplementary materials. 
+
+\begin{figure}[h]
+\centering
+%\subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_nmse_train}}
+%~
+\subfloat[\textsc{nmse} for $K = 100$]{\includegraphics[width=0.4\columnwidth]{graphics/mnist/100_nmse_valid}}
+%\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/100_normalised_f_measure_train}}
+%~
+\subfloat[F measure for $K = 100$]{\includegraphics[width=0.4\columnwidth]{graphics/mnist/100_f_measure_valid}}\\[-13pt]
+\subfloat[\textsc{nmse} for $K = 250$]{\includegraphics[width=0.4\columnwidth]{graphics/mnist/250_nmse_valid}}
+%\subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/mnist/250_normalised_f_measure_train}}
+%~
+\subfloat[F measure for $K = 250$]{\includegraphics[width=0.4\columnwidth]{graphics/mnist/250_f_measure_valid}}
+\caption{Predictive performance for different numbers of iterations on the \textsc{mnist} data with the observation size $K = 100$ (the top row) and $K = 250$ (the bottom row)}
+\label{fig:mnist}
+\end{figure}
 
 \subsection{Active learning}
 To demonstrate a potential scenario that can benefit from uncertainty estimates of the Bayesian \textsc{lista} we consider the active learning example \citep{settles.tr09}. The active learning area researches ways to select new training subsets to reduce the total number of required supervision. One of the popular approaches in active learning is uncertainty sampling when the data with the least certain predictions is chosen to obtain a new label at. Uncertainty is usually measured with entropy. In our case of the spike and slab distributed data points there is no closed form for entropy. Therefore, we use a variance from Lemma~\ref{thm:moments_spsl} as a measure of uncertainty.
 
-The data in this example is the \textsc{mnist} dataset with the learnt dictionary of size $K=100$. We use the training data of size $50$, the pool data of size $500$,  and the test data of size $100$. The algorithm learns on the training data for $50$ iterations and it is evaluated on the test data. To actively collect a next data point from the pool, the algorithm is used to predict a point with the highest uncertainty. The selected point is moved from the pool to the training data and the algorithm performs additional $10$ iterations on the updated training data. Overall, $10$ pool additions are performed. After every addition the performance is measured on the test data. We compare the actively updated approach of adding new points from the pool with the random approach that picks a new data point from the pool at random. The procedure is repeated for $20$ times with new randomly selected initial datasets.
+The data in this example is the \textsc{mnist} dataset with the observation size $K=100$. We use the training data of size $50$, the pool data of size $500$,  and the test data of size $100$. The algorithm learns on the training data for $50$ iterations and it is evaluated on the test data. To actively collect a next data point from the pool, the algorithm is used to predict a point with the highest uncertainty. The selected point is moved from the pool to the training data and the algorithm performs additional $10$ iterations on the updated training data. Overall, $10$ pool additions are performed. After every addition the performance is measured on the test data. We compare the actively updated approach of adding new points from the pool with the random approach that picks a new data point from the pool at random. The procedure is repeated for $20$ times with new randomly selected initial datasets.
 
 Figure \ref{fig:active_learning_mnist} demonstrates performance of the active and non-active methods of updates with the Bayesian \textsc{lista}. The active approach with uncertainty sampling steadily demonstrates better results in terms of both quality measures. This means that the posterior distribution learnt by the Bayesian \textsc{lista} is an adequate estimate of the true posterior.
-\begin{figure}[t]
+\begin{figure}[h]
 \centering
 \subfloat[\textsc{nmse}]{\includegraphics[width=0.4\columnwidth]{graphics/active_mnist/nmse_validation}}%
 \subfloat[F measure]{\includegraphics[width=0.4\columnwidth]{graphics/active_mnist/f_measure_validation}}
@@ -374,10 +374,6 @@ Figure \ref{fig:active_learning_mnist} demonstrates performance of the active an
 \section{Discussion}
 \label{sec:discussion}
 To the best of our knowledge, this is the first implementation of a Bayesian deep sparse coding algorithm. Although there are works on Bayesian sparsity in context of neural networks \citep{he2017bayesian}, they are not the Bayesian neural networks in the same sense as the Bayesian \textsc{lista} but rather the interpretation of the sparse Bayesian  learning algorithm as the long short-term memory network. We find not only correct predictions but also useful posterior estimates for the predictions.
-
-%The inference is based on the expectation propagation algorithm and though it is not suited for distributed inference, stochastic variant of assumed density filtering can potentially be used \citep{li2015stochastic}. This would allow the proposed approach to scale.
-
-The \textsc{lista}-based algorithms can be applied for the sparse coding problem with both overcomplete (i.e., $D > K$) as in the original paper \citep{gregor2010learning}, and undercomplete (i.e., $D < K$) dictionaries. Section~\ref{sec:experiments} provides experiments for the overcomplete case, we give experiments for the undercomplete case in the supplementary material.
 
 \section{Conclusions and future work}
 \label{sec:conclusions}
