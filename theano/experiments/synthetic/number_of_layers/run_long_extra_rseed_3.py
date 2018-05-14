@@ -8,10 +8,10 @@ from tqdm import tqdm, trange
 
 from comparator.compare_sequential import SequentialComparator
 from experiments.synthetic.experiments_parameters import load_long_experiment
-
+from algorithms.PBP_net_lista_single_matrices.DataGenerator import DataGenerator
 rseed, D, K, _, batch_size, validation_size, n_iter = load_long_experiment()
 np.random.seed(rseed)
-L_array = [20, 30, 40, 50]
+L_array = [15, 20]
 
 freq_train_loss = np.zeros((len(L_array), n_iter))
 freq_validation_loss = np.zeros((len(L_array), n_iter))
@@ -38,8 +38,10 @@ fista_validation_f_measure = np.zeros((len(L_array), n_iter))
 rseed = 3
 np.random.seed(rseed)
 for i, L in enumerate(tqdm(L_array)):
-    comparator = SequentialComparator(D, K, L, learning_rate=0.0001, n_train_sample=batch_size,
-                                      n_validation_sample=validation_size, train_freq=True, train_bayes=False,
+    data_generator = DataGenerator(D, K, sparsity=0.8, beta_scale=1, noise_scale=0.5)
+    data_generator.beta_train, data_generator.y_train, _ = data_generator.new_sample(N=batch_size)
+    data_generator.beta_validation, data_generator.y_validation, _ = data_generator.new_sample(N=validation_size)
+    comparator = SequentialComparator(D, K, L, learning_rate=0.0001, data=data_generator, train_freq=True, train_bayes=False,
                                       train_shared_bayes=True, use_ista=True, use_fista=True, save_history=False, initial_lambda=0.1)
     for _ in trange(n_iter):
         comparator.train_iteration()
