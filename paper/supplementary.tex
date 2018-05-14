@@ -1,14 +1,21 @@
 \documentclass{article} 
-\usepackage[preprint]{nips_2018}
-\usepackage{amsmath}
-\usepackage{bbm} % for indicator function
-\usepackage{cancel} % for cancelto
-\usepackage{graphicx}
+\usepackage{nips_2018}
+\usepackage{mathtools}
+\usepackage{xfrac}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{subfig}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\usepackage{times}
+\usepackage{float}
+
 \graphicspath{{./graphics/}}
 \usepackage{subfig}
 
-
-\firstpageno{1}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
 
 \begin{document}
 
@@ -151,14 +158,14 @@ When the likelihood term for a single data point is incorporated into the approx
 \label{eq:Z}
 Z = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d | f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda), \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
 \end{equation}
-We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_L = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$, that is the output from the network and approximate with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}_L}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}_L}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}_L}$
+We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_L = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$, that is the output from the network and approximate with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}}$
 \begin{align}
 Z &\approx \int \prod_{d=1}^{D} \mathcal{N}\left(\beta_d | \widehat{\beta}_d, \gamma^{-1}\right) \left(\omega^{\widehat{\boldsymbol\beta}}_d \delta_0\left(\widehat{\beta}_d\right) + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\widehat{\beta}_d | m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right)\right) \text{Gam} \left(\gamma_d; \alpha^\gamma, \beta^\gamma\right)\mathrm{d}\widehat{\boldsymbol\beta} \mathrm{d}\gamma  \nonumber\\
 & = \prod_{d=1}^{D} \left[\omega^{\widehat{\boldsymbol\beta}}_d \int \mathcal{N}\left(\beta_d | 0, \gamma^{-1}\right)  \text{Gam} \left(\gamma; \alpha^\gamma, \beta^\gamma\right) d\gamma  \nonumber \right.\\
 &\quad + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\int \mathcal{T}\left(\beta_d | \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) 
 \left. \vphantom{\int}  \mathcal{N}\left(\widehat{\beta}_d | m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right) \mathrm{d}\widehat{\boldsymbol\beta}_d\right]  \nonumber\\
 \label{eq:Z_approx}
-& \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d | 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d | m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}\right)\right],
+& \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d | 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d | m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}_d\right)\right],
 \end{align}
 where we have approximated the Student's t density $\mathcal{T}\left(\beta_d | \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right)$ with a Gaussian density with the same mean and variance. The Student's t density can be parametrised in different ways. In this work the following parametrisation is used
 \begin{equation}
@@ -185,19 +192,20 @@ Figure~\ref{fig:posterior_samples} shows samples from the posterior for one of t
 
 \begin{figure}[t]
 \centering
-\subfloat[$\beta$ posterior mean]{\includegraphics[width=0.33\columnwidth]{posterior_mean}}~
-\subfloat[$\beta$ posterior std]{\includegraphics[width=0.33\columnwidth]{posterior_std}}~
-\subfloat[$\beta$ posterior spike indicator]{\includegraphics[width=0.33\columnwidth]{posterior_spike_indicator}}
-\caption{Posterior parameters for an image of the digit 7.}
-\label{fig:posterior_distribution}
-\end{figure}
-\begin{figure}[t]
-\centering
 \subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_0}}~
 \subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_1}}~
 \subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_2}}
 \caption{Samples from the posterior for an image of the digit 7.}
 \label{fig:posterior_samples}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\subfloat[$\beta$ posterior mean]{\includegraphics[width=0.33\columnwidth]{posterior_mean}}~
+\subfloat[$\beta$ posterior std]{\includegraphics[width=0.33\columnwidth]{posterior_std}}~
+\subfloat[$\beta$ posterior spike indicator]{\includegraphics[width=0.33\columnwidth]{posterior_spike_indicator}}
+\caption{Posterior parameters for an image of the digit 7.}
+\label{fig:posterior_distribution}
 \end{figure}
 
 
