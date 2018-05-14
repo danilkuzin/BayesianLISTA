@@ -178,3 +178,11 @@ paper/supplementary.out
 paper/graphics/synthetic_lambda/f_measure_validation-eps-converted-to.pdf
 
 paper/graphics/synthetic_lambda/nmse_validation-eps-converted-to.pdf
+
+paper/graphics/mnist/100_f_measure_valid-eps-converted-to.pdf
+
+paper/graphics/mnist/100_nmse_valid-eps-converted-to.pdf
+
+paper/graphics/mnist/250_f_measure_valid-eps-converted-to.pdf
+
+paper/graphics/mnist/250_nmse_valid-eps-converted-to.pdf
