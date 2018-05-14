@@ -34,50 +34,37 @@ The distribution of $x^*$ can be parametrised by the probability of being zero, 
 \begin{proof}
 
 The probability of a zero $\omega^*$ equals to the probability mass of the original distribution from the interval $[-\lambda, \lambda]$
-\begin{align}
-\begin{split}
-\omega^* &=\operatorname{P}(x^*=0) = \operatorname{P}(x \in [-\lambda, \lambda]) \\
-&= \Phi\left(\frac{\lambda-m}{\sqrt{v}}\right) - \Phi\left(\frac{-\lambda-m}{\sqrt{v}}\right).
-\end{split}
-\end{align}
+\begin{equation}
+\omega^* =\operatorname{P}(x^*=0) = \operatorname{P}(x \in [-\lambda, \lambda]) = \Phi\left(\frac{\lambda-m}{\sqrt{v}}\right) - \Phi\left(\frac{-\lambda-m}{\sqrt{v}}\right).
+\end{equation}
 where $\Phi(\cdot)$ is the standard Gaussian cumulative distribution function.
 
 The soft thresholding function shifts elements that are greater than $\lambda$  or less than $-\lambda$ towards~$0$. Let $\psi(\cdot)$ denote the density of the soft-thresholded distribution on $x^* \neq 0$, $\phi(\cdot)$ denote the density of the original Gaussian distribution on $x$. Then the first moment of $x^* \neq 0$ is:
 
-\begin{align}
+\begin{equation}
 \label{eq:thr_first_moment}
-\begin{split}
-m^* &= \int_{-\infty}^{+\infty}x\psi(x)dx= \int_{-\infty}^{0}x\phi(x-\lambda)dx \\
-&{} + \int_{0}^{+\infty}x\phi(x+\lambda)dx,
-\end{split}
-\end{align}
+m^* = \int_{-\infty}^{+\infty}x\psi(x)dx= \int_{-\infty}^{0}x\phi(x-\lambda)dx + \int_{0}^{+\infty}x\phi(x+\lambda)dx,
+\end{equation}
 where
 \begin{align}
-&\int_{-\infty}^{0}x\phi(x-\lambda)dx = -\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} \nonumber\\
-&{} + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)\\
-&\int_{0}^{+\infty}x\phi(x+\lambda)dx = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\nonumber\\
-& + (m - \lambda)\left(1 - \Phi\left(-\frac{\lambda-m}{\sqrt{v}}\right)\right)
+&\int_{-\infty}^{0}x\phi(x-\lambda)dx = -\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)\\
+&\int_{0}^{+\infty}x\phi(x+\lambda)dx = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\} + (m - \lambda)\left(1 - \Phi\left(-\frac{\lambda-m}{\sqrt{v}}\right)\right)
 \end{align}
 
 The second moment of $x^* \neq 0$ is given as
-\begin{align}
+\begin{equation}
 \label{eq:thr_second_moment}
-\begin{split}
-s &= \int_{-\infty}^{+\infty}x^2\psi(x)dx = \int_{-\infty}^{0}x^2\phi(x-\lambda)dx \\
-&{}+ \int_{0}^{+\infty}x^2\phi(x+\lambda)dx,
-\end{split}
-\end{align}
+s = \int_{-\infty}^{+\infty}x^2\psi(x)dx = \int_{-\infty}^{0}x^2\phi(x-\lambda)dx + \int_{0}^{+\infty}x^2\phi(x+\lambda)dx,
+\end{equation}
 where
 \begin{align}
 \begin{split}
 &\int_{-\infty}^{0}x^2\phi(x-\lambda)dx = \\
-&-\frac{\sqrt{v}}{\sqrt{2\pi}} (\lambda+m)\exp\left\{\frac{-(\lambda+m)^2}{2v}\right\}\\
-& + (\sigma^2 + (\lambda+m)^2)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
+&-\frac{\sqrt{v}}{\sqrt{2\pi}} (\lambda+m)\exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} + (\sigma^2 + (\lambda+m)^2)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
 \end{split}\\
 \begin{split}
 &\int_{0}^{+\infty}x^2\phi(x+\lambda)dx = \\
-&\frac{\sqrt{v}}{\sqrt{2\pi}} (m - \lambda)\exp\left\{\frac{-(m - \lambda)^2}{2v}\right\}\\
-& + (\sigma^2 + (m - \lambda)^2)\left(1 - \Phi\left(\frac{\lambda -m}{\sqrt{v}}\right)\right)
+&\frac{\sqrt{v}}{\sqrt{2\pi}} (m - \lambda)\exp\left\{\frac{-(m - \lambda)^2}{2v}\right\} + (\sigma^2 + (m - \lambda)^2)\left(1 - \Phi\left(\frac{\lambda -m}{\sqrt{v}}\right)\right)
 \end{split}
 \end{align}
 
@@ -120,8 +107,7 @@ Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian
 \begin{align}
  \mathbb{E}e_d &= \sum_{d'=1}^D m^s_{dd'}(1-\omega_{d'})m_{d'}, \\
  \begin{split}
- \operatorname{Var}e_d &= \sum_{d'=1}^D [(m^s_{dd'})^2(1-\omega_{d'})^2v_{d'} \\
- & {}+ (1-\omega_{d'})^2(m_{d'})^2v^s_{dd'} + v^s_{dd'}(1-\omega_{d'})^2v_{d'}].
+ \operatorname{Var}e_d &= \sum_{d'=1}^D [(m^s_{dd'})^2(1-\omega_{d'})^2v_{d'} + (1-\omega_{d'})^2(m_{d'})^2v^s_{dd'} + v^s_{dd'}(1-\omega_{d'})^2v_{d'}].
  \end{split}
  \end{align}
 \end{subequations}
@@ -129,8 +115,9 @@ Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian
  \begin{proof}
 \begin{flalign*}
 	\mathbb{E}e_d &= \sum_{d'=1}^D \mathbb{E}[s_{dd'}\widehat{\beta}_{d'}]  = \sum_{d'=1}^D m^s_{dd'}\mathbb{E}\widehat{\beta}_{d'}\\
-	\operatorname{Var}e_d &= \sum_{d'=1}^D \operatorname{Var}[s_{dd'}\widehat{\beta}_{d'}] = \sum_{d'=1}^D [(\mathbb{E}s_{dd'})^2 \operatorname{Var}\widehat{\beta}_{d'} \\
-	&{}+ (\mathbb{E}\widehat{\beta}_{d'})^2 \operatorname{Var}s_{dd'} + \operatorname{Var}\widehat{\beta}_{d'} \operatorname{Var}s_{dd'}]
+	\operatorname{Var}e_d &= \sum_{d'=1}^D \operatorname{Var}[s_{dd'}\widehat{\beta}_{d'}] \\
+	&= \sum_{d'=1}^D [(\mathbb{E}s_{dd'})^2 \operatorname{Var}\widehat{\beta}_{d'}
+	+ (\mathbb{E}\widehat{\beta}_{d'})^2 \operatorname{Var}s_{dd'} + \operatorname{Var}\widehat{\beta}_{d'} \operatorname{Var}s_{dd'}]
 \end{flalign*}
 where $\mathbb{E}\widehat{\beta}_{d'}$ and $\operatorname{Var}\widehat{\beta}_{d'}$ are computed according to Lemma~\ref{thm:moments_spsl}.
  \end{proof}
@@ -138,7 +125,7 @@ where $\mathbb{E}\widehat{\beta}_{d'}$ and $\operatorname{Var}\widehat{\beta}_{d
 \section{Approximation quality}
 \label{sec:approx_quality}
 
-\begin{figure}[!t]
+\begin{figure}[h]
 \subfloat[Approximation of the \newline product of Gaussians]{\includegraphics[width=0.5\columnwidth]{d_testing}\label{fig:d_testing}}
 %\label{fig:d_testing}
 \subfloat[Approximation of the propagation through soft thresholding]{\includegraphics[width=0.5\columnwidth]{z_new_testing}\label{fig:z_new_testing}}
@@ -146,7 +133,7 @@ where $\mathbb{E}\widehat{\beta}_{d'}$ and $\operatorname{Var}\widehat{\beta}_{d
 %\label{fig:z_new_testing}
 \end{figure}
 
-We have used two approximations in forward propagation of uncertainty. First, at the step (\ref{eq:l_dense_layer}) during the computation of $\mathbf{e}_l$, a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, at the steps (\ref{eq:thr_first}) and (\ref{eq:l_thr}) the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
+We have used two approximations in forward propagation of uncertainty. First, at the step 2 of Algorithm 1 during the computation of $\mathbf{e}_l$, a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, at the steps 2 and 5 of Algorithm 1 the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
 Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for Lemma \ref{thm:matrix_vector}. For the sampled distribution, $10000$ values are sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:matrix_vector}.
 
@@ -156,18 +143,18 @@ Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distri
 When the likelihood term for a single data point is incorporated into the approximating distribution $q$, the normalisation constant of $q$ is expressed as
 \begin{equation}
 \label{eq:Z}
-Z = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d | f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda), \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
+Z = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d ; f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda), \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
 \end{equation}
 We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_L = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$, that is the output from the network and approximate with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}}$
 \begin{align}
-Z &\approx \int \prod_{d=1}^{D} \mathcal{N}\left(\beta_d | \widehat{\beta}_d, \gamma^{-1}\right) \left(\omega^{\widehat{\boldsymbol\beta}}_d \delta_0\left(\widehat{\beta}_d\right) + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\widehat{\beta}_d | m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right)\right) \text{Gam} \left(\gamma_d; \alpha^\gamma, \beta^\gamma\right)\mathrm{d}\widehat{\boldsymbol\beta} \mathrm{d}\gamma  \nonumber\\
-& = \prod_{d=1}^{D} \left[\omega^{\widehat{\boldsymbol\beta}}_d \int \mathcal{N}\left(\beta_d | 0, \gamma^{-1}\right)  \text{Gam} \left(\gamma; \alpha^\gamma, \beta^\gamma\right) d\gamma  \nonumber \right.\\
-&\quad + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\int \mathcal{T}\left(\beta_d | \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) 
-\left. \vphantom{\int}  \mathcal{N}\left(\widehat{\beta}_d | m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right) \mathrm{d}\widehat{\boldsymbol\beta}_d\right]  \nonumber\\
+Z &\approx \int \prod_{d=1}^{D} \mathcal{N}\left(\beta_d ; \widehat{\beta}_d, \gamma^{-1}\right) \left(\omega^{\widehat{\boldsymbol\beta}}_d \delta_0\left(\widehat{\beta}_d\right) + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\widehat{\beta}_d ; m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right)\right) \text{Gam} \left(\gamma_d; \alpha^\gamma, \beta^\gamma\right)\mathrm{d}\widehat{\boldsymbol\beta} \mathrm{d}\gamma  \nonumber\\
+& = \prod_{d=1}^{D} \left[\omega^{\widehat{\boldsymbol\beta}}_d \int \mathcal{N}\left(\beta_d ; 0, \gamma^{-1}\right)  \text{Gam} \left(\gamma; \alpha^\gamma, \beta^\gamma\right) d\gamma  \nonumber \right.\\
+&\quad + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\int \mathcal{T}\left(\beta_d ; \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) 
+\left. \vphantom{\int}  \mathcal{N}\left(\widehat{\beta}_d ; m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right) \mathrm{d}\widehat{\boldsymbol\beta}_d\right]  \nonumber\\
 \label{eq:Z_approx}
-& \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d | 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d | m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}_d\right)\right],
+& \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d ; 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d ; m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}_d\right)\right],
 \end{align}
-where we have approximated the Student's t density $\mathcal{T}\left(\beta_d | \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right)$ with a Gaussian density with the same mean and variance. The Student's t density can be parametrised in different ways. In this work the following parametrisation is used
+where we have approximated the Student's t density $\mathcal{T}\left(\beta_d ; \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right)$ with a Gaussian density with the same mean and variance. The Student's t density can be parametrised in different ways. In this work the following parametrisation is used
 \begin{equation}
 \mathcal{T}(x; \mu, \beta, \nu) = \frac{\Gamma\left(\frac{\nu + 1}{2}\right)}{\Gamma\left(\frac{\nu}{2}\right)\sqrt{\pi \nu \beta}} \left(1 + \frac{(x - \mu)^2}{\nu\beta}\right)^{-\frac{\nu + 1}{2}}
 \end{equation}
@@ -175,6 +162,16 @@ where $\Gamma(\cdot)$ denotes the Gamma function.
 
 \section{Hyperparameter optimisation}
 The only hyperparameter in the proposed Bayesian \textsc{lista} is the shrinkage parameter $\lambda$. It can be optimised using the Type II maximum likelihood procedure. The Type II likelihood, i.e. the evidence $p(\boldsymbol\beta | \mathbf{y}, \lambda)$, of the Bayesian \textsc{lista} is equal to the normalisation constant $Z$ (\ref{eq:Z}) computed for the whole training dataset $\boldsymbol\beta$. Given the approximation~(\ref{eq:Z_approx}) the optimal hyperparameter $\lambda$ can be found by a gradient-based optimiser.
+
+In our experiments we use $\lambda = 0.1$, which is determined by grid optimisation (Figure~\ref{fig:lambda_opt}).
+
+\begin{figure}[h]
+\centering
+\subfloat[]{\includegraphics[width=0.4\columnwidth]{./synthetic_lambda/nmse_validation}}~
+\subfloat[]{\includegraphics[width=0.4\columnwidth]{./synthetic_lambda/f_measure_validation}}~
+\caption{Grid optimisation for the shrinkage parameter $\lambda$ on the synthetic data.}
+\label{fig:lambda_opt}
+\end{figure}
 
 \section{Performance measures}
 \textsc{nmse} for a batch of data $\{\boldsymbol\beta^{(n)}\}_{n=1}^{N}$ and estimates $\{\widehat{\boldsymbol\beta}^{(n)}\}_{n=1}^{N}$ is computed as
@@ -190,7 +187,7 @@ where precision is the fraction of estimated slab locations that are correct, re
 \section{Posterior estimation for the \textsc{mnist} data}
 Figure~\ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
 
-\begin{figure}[t]
+\begin{figure}[h]
 \centering
 \subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_0}}~
 \subfloat[]{\includegraphics[width=0.33\columnwidth]{posterior_sample_1}}~
@@ -199,7 +196,7 @@ Figure~\ref{fig:posterior_samples} shows samples from the posterior for one of t
 \label{fig:posterior_samples}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[h]
 \centering
 \subfloat[$\beta$ posterior mean]{\includegraphics[width=0.33\columnwidth]{posterior_mean}}~
 \subfloat[$\beta$ posterior std]{\includegraphics[width=0.33\columnwidth]{posterior_std}}~
