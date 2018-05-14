@@ -184,8 +184,8 @@ In sparse coding it is also important to obtain the correct locations of spikes 
 \end{equation}
 where precision is the fraction of estimated slab locations that are correct, recall is the fraction of true slab locations among all predicted slab locations.
 
-\section{Posterior estimation for the \textsc{mnist} data}
-Figure~\ref{fig:posterior_samples} shows samples from the posterior for one of the validation data points and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
+\section{Additional results on the \textsc{mnist} data}
+In contrast to \textsc{lista} and baselines, the Bayesian \textsc{lista} provides a posterior estimate. Figure~\ref{fig:posterior_samples} shows samples from the posterior for one of the test data points and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
 
 \begin{figure}[h]
 \centering
@@ -204,6 +204,8 @@ Figure~\ref{fig:posterior_samples} shows samples from the posterior for one of t
 \caption{Posterior parameters for an image of the digit 7.}
 \label{fig:posterior_distribution}
 \end{figure}
+
+Here we also provide the comparison of the Bayesian and non-Bayesian \textsc{lista} networks in terms of the clock time (Figure ).
 
 
 %\bibliography{bibliography}
