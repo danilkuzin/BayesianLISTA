@@ -126,9 +126,10 @@ where $\mathbb{E}\widehat{\beta}_{d'}$ and $\operatorname{Var}\widehat{\beta}_{d
 \label{sec:approx_quality}
 
 \begin{figure}[h]
-\subfloat[Approximation of the \newline product of Gaussians]{\includegraphics[width=0.5\columnwidth]{d_testing}\label{fig:d_testing}}
+\centering
+\subfloat[Approximation of the \newline product of Gaussians]{\includegraphics[width=0.4\columnwidth]{d_testing}\label{fig:d_testing}}
 %\label{fig:d_testing}
-\subfloat[Approximation of the propagation through soft thresholding]{\includegraphics[width=0.5\columnwidth]{z_new_testing}\label{fig:z_new_testing}}
+\subfloat[Approximation of the propagation through soft thresholding]{\includegraphics[width=0.4\columnwidth]{z_new_testing}\label{fig:z_new_testing}}
 \caption{Approximations of the Bayesian \textsc{lista}}
 %\label{fig:z_new_testing}
 \end{figure}
@@ -185,7 +186,7 @@ In sparse coding it is also important to obtain the correct locations of spikes 
 where precision is the fraction of estimated slab locations that are correct, recall is the fraction of true slab locations among all predicted slab locations.
 
 \section{Additional results on the \textsc{mnist} data}
-In contrast to \textsc{lista} and baselines, the Bayesian \textsc{lista} provides a posterior estimate. Figure~\ref{fig:posterior_samples} shows samples from the posterior for one of the test data points and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
+In contrast to \textsc{lista} and baselines, the Bayesian \textsc{lista} provides a posterior estimate for a test data point. Figure~\ref{fig:posterior_samples} shows samples from the posterior for the test image of the digit $7$ and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
 
 \begin{figure}[h]
 \centering
@@ -205,7 +206,15 @@ In contrast to \textsc{lista} and baselines, the Bayesian \textsc{lista} provide
 \label{fig:posterior_distribution}
 \end{figure}
 
-Here we also provide the comparison of the Bayesian and non-Bayesian \textsc{lista} networks in terms of the clock time (Figure ).
+Here we also provide the comparison of the Bayesian and non-Bayesian \textsc{lista} networks in terms of the clock time for the experiment with $K = 250$ on the \textsc{mnist} data (Figure~\ref{fig:mnist_time}).
+
+\begin{figure}[h]
+\centering
+\subfloat[]{\includegraphics[width=0.4\columnwidth]{./mnist/250_nmse_valid_time}}~
+\subfloat[]{\includegraphics[width=0.4\columnwidth]{./mnist/250_f_measure_valid_time}}~
+\caption{Predictive performance over clock time on the \textsc{mnist} data with the observation size $K = 250$.}
+\label{fig:mnist_time}
+\end{figure}
 
 
 %\bibliography{bibliography}
