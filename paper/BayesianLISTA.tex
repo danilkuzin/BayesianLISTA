@@ -21,6 +21,20 @@
 
 \allowdisplaybreaks
 
+\setlength{\belowcaptionskip}{-15pt}
+ \usepackage[small,compact]{titlesec}
+ \titlespacing{\section}{0pt}{1ex}{0.8ex}
+ \titlespacing{\subsection}{0pt}{0.5ex}{0ex}
+ \titlespacing{\subsubsection}{0pt}{0.2ex}{0ex}
+ \expandafter\def\expandafter\normalsize\expandafter{%
+     \normalsize
+     \setlength\abovedisplayskip{2pt}
+     \setlength\belowdisplayskip{2pt}
+     \setlength\abovedisplayshortskip{0pt}
+     \setlength\belowdisplayshortskip{0pt}
+ }
+ \renewcommand{\baselinestretch}{0.99}
+
 \title{Uncertainty propagation in neural networks for sparse coding}
 
 \author{} % LEAVE BLANK FOR ORIGINAL SUBMISSION.
@@ -60,7 +74,7 @@ The Bayesian learning allows to estimate the uncertainty of predictions in neura
 \end{abstract}
 
 \section{Introduction}
-The idea of Bayesian learning in neural networks \cite{neal2012bayesian} has recently regained its attention with the development of distributed approximate inference techniques \cite{li2015stochastic, hoffman2013stochastic} and general boost in popularity of deep learning. In addition to algorithms' predictions themselves, Bayesian learning naturally provides the uncertainty estimates of these predictions. These uncertainty estimates are vital in spheres that affect people's health, such as self-driving cars or medicine.
+The idea of Bayesian learning in neural networks \cite{neal2012bayesian} has recently regained its attention with the development of distributed approximate inference techniques \cite{li2015stochastic, hoffman2013stochastic} and general boost in popularity of deep learning. In addition to algorithms' predictions themselves, Bayesian learning naturally provides the uncertainty estimates of these predictions. These uncertainty estimates are vital, e.g., in spheres that affect people's health, such as self-driving cars or medicine.
 
 In general, when distributions are included in the network, the complexity of Bayesian inference scales exponentially with the number of layers. Thus, it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques have been proposed to handle specific types of neural networks. For example, feed-forward networks with the rectified linear unit nonlinearity~\cite{hernandez2015probabilistic}, networks with discrete distributions~\cite{soudry2014expectation}, recurrent networks~\cite{mcdermott2017bayesian}.
 
