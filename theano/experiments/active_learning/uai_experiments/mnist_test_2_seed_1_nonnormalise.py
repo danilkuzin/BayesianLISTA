@@ -31,11 +31,7 @@ class ActiveLearningExperiments(object):
         self.K=250
         n_train, n_pool, n_test = 50, 500, 100
         data = MnistData(K=self.K, train_size=n_train + n_pool, valid_size=n_test)
-<<<<<<< HEAD
-        data.check_download()
-=======
         data.check_download(normalise=False)
->>>>>>> df5d1a81be9464e35d98b7f61f94fab64a50884e
         data.learn_dictionary()
         self.D = data.train_data.shape[1]
 
