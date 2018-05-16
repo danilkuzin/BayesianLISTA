@@ -21,19 +21,22 @@
 
 \allowdisplaybreaks
 
-\setlength{\belowcaptionskip}{-15pt}
- \usepackage[small,compact]{titlesec}
- \titlespacing{\section}{0pt}{1ex}{0.8ex}
- \titlespacing{\subsection}{0pt}{0.5ex}{0ex}
- \titlespacing{\subsubsection}{0pt}{0.2ex}{0ex}
- \expandafter\def\expandafter\normalsize\expandafter{%
-     \normalsize
-     \setlength\abovedisplayskip{2pt}
-     \setlength\belowdisplayskip{2pt}
-     \setlength\abovedisplayshortskip{0pt}
-     \setlength\belowdisplayshortskip{0pt}
- }
- \renewcommand{\baselinestretch}{0.99}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicreturn}{\textbf{Output:}}
+
+% \setlength{\belowcaptionskip}{-15pt}
+%  \usepackage[small,compact]{titlesec}
+%  \titlespacing{\section}{0pt}{1ex}{0.8ex}
+%  \titlespacing{\subsection}{0pt}{0.5ex}{0ex}
+%  \titlespacing{\subsubsection}{0pt}{0.2ex}{0ex}
+%  \expandafter\def\expandafter\normalsize\expandafter{%
+%      \normalsize
+%      \setlength\abovedisplayskip{2pt}
+%      \setlength\belowdisplayskip{2pt}
+%      \setlength\abovedisplayshortskip{0pt}
+%      \setlength\belowdisplayshortskip{0pt}
+%  }
+%  \renewcommand{\baselinestretch}{0.99}
 
 \title{Uncertainty propagation in neural networks for sparse coding}
 
@@ -76,13 +79,13 @@ The Bayesian learning allows to estimate the uncertainty of predictions in neura
 \section{Introduction}
 The idea of Bayesian learning in neural networks \cite{neal2012bayesian} has recently regained its attention with the development of distributed approximate inference techniques \cite{li2015stochastic, hoffman2013stochastic} and general boost in popularity of deep learning. In addition to algorithms' predictions themselves, Bayesian learning naturally provides the uncertainty estimates of these predictions. These uncertainty estimates are vital, e.g., in spheres that affect people's health, such as self-driving cars or medicine.
 
-In general, when distributions are included in the network, the complexity of Bayesian inference scales exponentially with the number of layers. Thus, it is infeasible to apply conventional Bayesian inference algorithms for deep neural networks. Nevertheless, recently several techniques have been proposed to handle specific types of neural networks. For example, feed-forward networks with the rectified linear unit nonlinearity~\cite{hernandez2015probabilistic}, networks with discrete distributions~\cite{soudry2014expectation}, recurrent networks~\cite{mcdermott2017bayesian}.
+In general, when distributions are included in the network, the complexity of Bayesian inference scales exponentially with the number of layers. Nevertheless, recently several techniques have been proposed to handle specific types of neural networks without this exponential growth. For example, feed-forward networks with the rectified linear unit nonlinearity~\cite{hernandez2015probabilistic}, networks with discrete distributions~\cite{soudry2014expectation}, recurrent networks~\cite{mcdermott2017bayesian}.
 
 There are currently two approaches in Bayesian neural networks: explicit distributions of weights can be included in a network \cite{hernandez2015probabilistic, ranganath2015deep}, or dropout can be interpreted as an element introducing uncertainty \cite{gal2016dropout}. In this paper we use the former approach and impose prior distributions on the neural network's weights to obtain the posterior distributions of weights and posterior predictive distributions of target variables.
 
-In this paper, we consider the area of sparse coding. The sparse coding problem can be viewed as a linear regression problem with the additional assumption that the majority of the basis representation coefficients should be zeros. This sparsity assumption may be represented as $l1$ penalty~\cite{tibshirani1996regression}, or, in Bayesian interpretation, as prior that has sharp peak at zero~\cite{tipping2001sparse}. One of the modern approaches for the sparse coding problem utilises neural networks with soft thresholding nonlinearity~\cite{gregor2010learning, sprechmann2015learning}. At every layer this nonlinearity shifts current estimates of the target vectors towards zero, which allows to achieve sparsity of the target vectors. Such problems arise in different applications, such as compressive sensing~\cite{candes2008introduction}, image and video processing~\cite{mairal2014sparse, wang2015deep}, neuroscience~\cite{baillet1997bayesian, jas2017learning}. 
+In this paper, we consider the area of sparse coding. The sparse coding problem can be viewed as a linear regression problem with the additional assumption that the majority of the basis representation coefficients should be zeros. This sparsity assumption may be represented as $l1$ penalty~\cite{tibshirani1996regression}, or, in Bayesian interpretation, as prior that has sharp peak at zero~\cite{tipping2001sparse}. One of the modern approaches for the sparse coding problem utilises neural networks with soft thresholding nonlinearity~\cite{gregor2010learning, sprechmann2015learning}. At every layer this nonlinearity shifts current estimates of the target vectors towards zero, which allows to achieve sparsity of the target vectors. Such problems arise in different applications, such as compressive sensing~\cite{candes2008introduction}, image and video processing~\cite{mairal2014sparse, wang2015deep}, neuroscience~\cite{baillet1997bayesian, jas2017learning}.
 
-In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike and slab distribution \cite{mitchell1988bayesian}, which represents the probabilities of each variable being zero, or Gaussian-distributed. We show that the spike and slab distribution of target vectors can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and the soft thresholding nonlinearity can then be closely approximated with a distribution from the same family. Overall, this approach allows to make the Bayesian inference for the sparse coding neural network feasible. The proposed method of uncertainty propagation for the soft thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update a weight distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
+In this paper we propose a method to propagate uncertainty through the soft thresholding nonlinearity. At every layer the current distribution of the target vector is represented as a spike and slab distribution \cite{mitchell1988bayesian}, which represents the probabilities of each variable being zero, or Gaussian-distributed. We show that the spike and slab distribution of target vectors can be effectively combined with Gaussian weights of dense layers. The distribution of the target vector propagated through a dense layer and the soft thresholding nonlinearity can then be closely approximated with a distribution from the same family. The proposed method of uncertainty propagation for the soft thresholding nonlinearity allows us to derive the gradients of the logarithms of normalisation constants, which can be used to update a weight distribution. We then develop a highly efficient Bayesian inference algorithm based on the probabilistic backpropagation paradigm while significantly expanding it.
 
 The main contributions of this paper are: (\textit{i}) for the first time we propose a method for uncertainty propagation through the soft thresholding nonlinearity for a Bayesian neural network; (\textit{ii}) we develop an efficient posterior inference algorithm for weights and outputs of neural networks with the soft thresholding nonlinearity; (\textit{iii}) we design a novel Bayesian neural network for sparse coding.
 
@@ -90,37 +93,34 @@ The paper is organised as following: first, we review neural networks for sparse
 
 \section{Neural networks for sparse coding}
 \label{sec:nn_sc}
-The sparse coding problem is the linear regression with the assumption of sparse weights
+The neural network approach to sparse coding is based on earlier Iterative Shrinkage and Thresholding Algorithm (\textsc{ista}) \cite{daubechies2004iterative}. It addresses the sparse coding problem as the linear regression problem with $l1$ penalty that promotes sparsity. For the linear regression model with observations $\mathbf{y} \in \mathbb{R}^K$, the design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$, and the sparse unknown vector of weights $\boldsymbol\beta \in \mathbb{R}^D$, \textsc{ista} minimises the energy function $E(\cdot)$ to find $\boldsymbol\beta$
 \begin{equation}
 \label{eq:regression_problem}
-\mathbf{y} = \mathbf{X}\boldsymbol\beta + \boldsymbol\varepsilon
+E(\mathbf{y}, \boldsymbol\beta) = ||\mathbf{X}\boldsymbol\beta - \mathbf{y}||_2^2 + \alpha ||\boldsymbol\beta||_1,
 \end{equation}
-where $\mathbf{y} \in \mathbb{R}^K$ is the observation, $\mathbf{X} \in \mathbb{R}^{K \times D}$ is the design matrix, $\boldsymbol\beta \in \mathbb{R}^D$ is the unknown vector of weights with many elements $\beta_d$ equal to zero, $\boldsymbol\varepsilon \in \mathbb{R}^K$ is the independent Gaussian noise.
+where $\alpha$ is the parameter that controls the influence of sparse penalty.
 
-One of the popular families of the sparse coding algorithms is the iterative shrinkage algorithms, and notably the Iterative Shrinkage and Thresholding Algorithm (\textsc{ista}) \cite{daubechies2004iterative}. It iteratively obtains the new approximation of the coefficient vector $\widehat{\boldsymbol\beta}_l$ at the iteration $l$ as the linear transformation of the input $\mathbf{y}$ with the previous approximation $\widehat{\boldsymbol\beta}_{l-1}$ and then propagates the new approximation through the soft thresholding function $h_\lambda(\cdot)$
+At every iteration $l$, \textsc{ista} obtains the new estimate $\widehat{\boldsymbol\beta}_l$ of the target vector $\boldsymbol\beta$ as the linear transformation $\mathbf{b} = \mathbf{W}\mathbf{y} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ of the input $\mathbf{y}$ with the previous estimate and then propagates the result of the linear transformation through the soft thresholding function $h_\lambda(\cdot)$
 \begin{equation}
-h_\lambda(v) = \text{sgn}(v) \max(|v| - \lambda, 0)
+h_\lambda(\mathbf{b}) = \text{sgn}(\mathbf{b}) \max(|\mathbf{b}| - \lambda, 0),
 \end{equation}
 where $\lambda$ is a shrinkage parameter.
-The linear transformation is
-\begin{equation}
-\widehat{\boldsymbol\beta}_l = \mathbf{W}\mathbf{y} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}
-\end{equation}
-with weights $\mathbf{W} = \mathbf{X}^\top / E$, where $E$ is the upper bound of the largest eigenvalue of $\mathbf{X}^\top\mathbf{X}$, and $\mathbf{S} = \mathbf{I}_{D \times D} - \mathbf{W}\mathbf{X}$ ($\mathbf{I}_{D \times D}$ is the identity matrix of size $D$).
+In \textsc{ista}, weights of the linear transformation are assumed fixed: $\mathbf{W} = \mathbf{X}^\top / E$, where $E$ is the upper bound of the largest eigenvalue of $\mathbf{X}^\top\mathbf{X}$, and $\mathbf{S} = \mathbf{I}_{D \times D} - \mathbf{W}\mathbf{X}$, where $\mathbf{I}_{D \times D}$ is the identity matrix of size $D$.
 
-The Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} allows to learn the values of matrices $\mathbf{W}$, $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, the \textsc{ista} is limited with the fixed amount of iterations, $L$, and interpreted as a recurrent neural network. A coefficient vector $\boldsymbol\beta$ for an observation~$\mathbf{y}$ is predicted according to Algorithm~\ref{alg:lista}.
+The Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} allows to learn the values of matrices $\mathbf{W}$, $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, the \textsc{ista} is limited with the fixed amount of iterations $L$, and interpreted as a recurrent neural network: every iteration of \textsc{ista} corresponds to the layer of \textsc{lista}. A coefficient vector $\boldsymbol\beta$ for an observation~$\mathbf{y}$ is predicted according to Algorithm~\ref{alg:lista}.
 
 \begin{algorithm}[h]
-  \caption{\textsc{lista}}
+  \caption{\textsc{lista} forward propagation}
   \label{alg:lista}
   \begin{algorithmic}[1]
-    \STATE Initialisation dense layer $\mathbf{b} \gets \mathbf{W}\mathbf{y}$ \label{eq:first_layer}
-    \STATE Initialisation soft thresholding nonlinearity $\widehat{\boldsymbol\beta}_0 \gets h_\lambda(\mathbf{b})$ \label{eq:thr_first}
+    \REQUIRE observations $\mathbf{y}$, weights $\mathbf{W}, \mathbf{S}$, number of layers $L$
+    \STATE \textit{Initialisation.} Dense layer $\mathbf{b} \gets \mathbf{W}\mathbf{y}$ \label{eq:first_layer}
+    \STATE \textit{Initialisation.} Soft thresholding nonlinearity $\widehat{\boldsymbol\beta}_0 \gets h_\lambda(\mathbf{b})$ \label{eq:thr_first}
 		\FOR{$l=1$ \TO $L$}
-			\STATE Main dense layer $\mathbf{c}_l \gets \mathbf{b} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ \label{eq:l_dense_layer}
-			\STATE Main soft thresholding nonlinearity $\widehat{\boldsymbol\beta}_{l} \gets h_\lambda(\mathbf{c}_l)$ \label{eq:l_thr}
+			\STATE Dense layer $\mathbf{c}_l \gets \mathbf{b} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ \label{eq:l_dense_layer}
+			\STATE Soft thresholding nonlinearity $\widehat{\boldsymbol\beta}_{l} \gets h_\lambda(\mathbf{c}_l)$ \label{eq:l_thr}
 		\ENDFOR
-		\STATE Output $\widehat{\boldsymbol\beta} \gets \widehat{\boldsymbol\beta}_{L}$
+		\RETURN $\widehat{\boldsymbol\beta} \gets \widehat{\boldsymbol\beta}_{L}$
   \end{algorithmic}
 \end{algorithm}
 
@@ -137,25 +137,30 @@ The Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} allows to l
 % & \widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_{L}
 % \end{align}
 
-Matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in the \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$ and $\mathbf{b}$ are auxiliary vectors that describe forward propagation.
+In \textsc{lista}, matrices $\mathbf{W}$, $\mathbf{S}$ are the parameters that are initialised as in the \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$ and $\mathbf{b}$ are auxiliary vectors that describe forward propagation.
 
 \section{Bayesian neural network for sparse coding}
 \label{sec:bayesian_lista}
-
-This section presents the proposed Bayesian neural network for sparse coding. To formulate the Bayesian version of the \textsc{lista} we impose the prior distributions on the unknown weights
+To formulate the Bayesian version of the \textsc{lista} we impose the prior distributions on the unknown weights
 \begin{equation}
 \label{eq:ws}
 p(\mathbf{W}) = \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{ij} ; 0, \eta^{-1}), \qquad
 p(\mathbf{S}) = \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd''} ; 0, \eta^{-1}),
 \end{equation}
 where $\eta$ is the precision of the Gaussian distribution.
-The likelihood of $\mathbf{B}$ is defined as
+
+For every layer of the Bayesian \textsc{lista} we assume that $\widehat{\boldsymbol\beta}_{l-1}$ has the spike and slab distribution with spike probability $\boldsymbol\omega$, slab mean $\mathbf{m}$, and slab variance $\mathbf{v}$
+\begin{equation}
+[\widehat{\boldsymbol\beta}_{l-1}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d),
+\end{equation}
+where $\delta_0$ is the delta-function that represents a spike, $[\cdot]_d$ denotes the $d$-th component of a vector. In Section \ref{sec:fprop}, we show that the output of the next layer $\widehat{\boldsymbol\beta}_l$ can be approximated with a spike and slab distribution and, therefore, the output of the \textsc{lista} network $\widehat{\boldsymbol\beta}_{L}$ has the spike and slab distribution.
+
+To introduce the uncertainty of predictions, we assume that the true $\boldsymbol\beta$ has a Gaussian distribution centered at the output of the \textsc{lista} network with precision $\gamma$. Then the likelihood of $\mathbf{B}$ is defined as
 \begin{equation}
 \label{eq:likelihood}
-p(\mathbf{B}| \mathbf{Y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda) = \prod_{n=1}^N\prod_{d=1}^D\mathcal{N}(\beta_d^{(n)}; [f(\mathbf{y^{(n)}}; \mathbf{W}, \mathbf{S}, \lambda)]_d, \gamma^{-1}),
+p(\mathbf{B}| \mathbf{Y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda) = \prod_{n=1}^N\prod_{d=1}^D\mathcal{N}\left(\beta_d^{(n)}; \left[\widehat{\boldsymbol\beta}_{L}^{(n)}\right]_d, \gamma^{-1}\right)
 \end{equation}
-where $[\cdot]_d$ denotes the d-th component of a vector, $f(\mathbf{y}^{(n)}; \mathbf{W}, \mathbf{S}, \lambda)$ is the output of the Bayesian \textsc{lista} neural network, $\gamma$ is the precision of the Gaussian distribution.
-The prior of the introduced Gaussian precisions are set to the Gamma distribution with parameters~$a^{\cdot}$ and~$b^{\cdot}$:
+The introduced Gaussian precisions have Gamma prior distributions with parameters~$a^{\cdot}$ and~$b^{\cdot}$
 \begin{equation}
 \label{eq:gamma_eta}
 p(\gamma) = \text{Gam}\left(\gamma; a^{\gamma}, b^{\gamma}\right), \qquad
@@ -171,37 +176,29 @@ The shrinkage parameter $\lambda$ is a hyperparameter of the model.
 
 \section{Uncertainty propagation through soft thresholding}
 \label{sec:fprop}
-For every layer of the Bayesian \textsc{lista} we assume that $\widehat{\boldsymbol\beta}_{l-1}$ has the spike and slab distribution with parameters: $\boldsymbol\omega$ is a probability of a spike, $\mathbf{m}$ is a mean of a slab Gaussian distribution, and $\mathbf{v}$ is a variance of the slab distribution:
-\begin{equation}
-[\widehat{\boldsymbol\beta}_{l-1}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d),
-\end{equation}
-where $\delta_0$ is the delta-function that represents a spike.
+We demonstrate that the output of every \textsc{lista} layer $\widehat{\boldsymbol\beta}_l$ can be approximated with a spike and slab distribution. This leads to the proposed probabilistic backpropagation algorithm that is presented in Section~\ref{sec:backpropagation}.
 
-Later in this section, we show that the output $\widehat{\boldsymbol\beta}_l$ of the next layer can be approximated with a spike and slab distribution and, therefore, it maintains the same family of distributions. This leads to the proposed probabilistic backpropagation algorithm that is presented in Section~\ref{sec:backpropagation}. We now describe how to propagate uncertainty through the layers of the Bayesian \textsc{lista} step by step.
-
-\subsection{Initialisation dense layer}
-At step \ref{eq:first_layer} in the Bayesian \textsc{lista} (Algorithm~\ref{alg:lista}) the matrix $\mathbf{W}$ consists of Gaussian-distributed components: $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $\mathbf{y}$ is a deterministic vector. Since the sum of independent Gaussian-distributed variables is a Gaussian variable~\cite{eisenberg2008sum}, $\mathbf{b}$ is a vector of Gaussian-distributed components $b_d \sim \mathcal{N}(m^b_d, v^b_d)$
+\subsection{Initialisation}
+At step \ref{eq:first_layer} of the \textsc{lista} (Algorithm~\ref{alg:lista}) the matrix $\mathbf{W}$ consists of Gaussian-distributed components $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $\mathbf{y}$ is a deterministic vector. Since the sum of independent Gaussian-distributed variables is a Gaussian variable~\cite{eisenberg2008sum}, $\mathbf{b}$ is a vector of Gaussian-distributed components $b_d \sim \mathcal{N}(m^b_d, v^b_d)$
 \begin{equation}
 \label{eq:matrix_vector_product}
 m^b_d = \sum_{k=1}^Ky_k m^w_{dk}, \qquad
 v^b_d = \sum_{k=1}^Ky_k^2v^w_{dk}.
 \end{equation}
 
+At step~\ref{eq:thr_first} of the \textsc{lista} (Algorithm~\ref{alg:lista}) the Gaussian vector $\mathbf{b}$ is taken as an input of the soft thresholding function.
 
-\subsection{Soft thresholding nonlinearity}
-At step~\ref{eq:thr_first} of the Bayesian \textsc{lista} (Algorithm~\ref{alg:lista}) the Gaussian vector $\mathbf{b}$ is taken as an input of the soft thresholding function.
-
-When a Gaussian random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft thresholding function: $x^* = h_{\lambda}(x)$, the probability mass of the resulting random variable $x^*$ is split into two parts. The values of $x$ from the interval $[-\lambda, \lambda]$ are converted to~$0$ by the soft thresholding operator. Therefore, the probability mass of the original distribution that lies in $[-\lambda, \lambda]$ is squeezed into the probability of $x^*$ being zero. The values of $x$ from outside of the $[-\lambda, \lambda]$ interval are shifted towards~$0$. The distribution of $x^* \neq 0$ then represents the tails of the original Gaussian distribution.
+When a Gaussian random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft thresholding function $x^* = h_{\lambda}(x)$, the probability mass of the resulting random variable $x^*$ is split into two parts. The values of $x$ from the interval $[-\lambda, \lambda]$ are converted to~$0$ by the soft thresholding operator. Therefore, the probability mass of the original distribution that lies in $[-\lambda, \lambda]$ is squeezed into the probability of $x^*$ being zero. The values of $x$ from outside of the $[-\lambda, \lambda]$ interval are shifted towards~$0$. The distribution of $x^* \neq 0$ then represents the tails of the original Gaussian distribution.
 
 \begin{lemma}[Propagation of a Gaussian variable through soft thresholding]
 \label{thm:soft_thresholding}
 The distribution of $x^*$ can be parametrised by the probability of being zero, $\omega^*$, the mean $m^*$ and the variance $v^*$ of the truncated Gaussian distribution.
 \end{lemma}
 
-The proof of Lemma~\ref{thm:soft_thresholding} and expressions for $\omega^*$, $m^*$ and $v^*$ are given in the supplementary materials. Based on the results of Lemma~\ref{thm:soft_thresholding} we approximate the distribution of $\widehat{\boldsymbol\beta}_0$ at step~\ref{eq:thr_first} with a spike and slab distribution with parameters derived in the lemma: the spike probability $\omega$ is equal to $\omega^*$, the slab mean $m$ and variance $v$ are set to the corresponding parameters of the truncated Gaussian $m^*$ and $v^*$. The quality of this approximation is discussed in the supplementary materials.
+The proof of Lemma~\ref{thm:soft_thresholding} and expressions for $\omega^*$, $m^*$ and $v^*$ are given in the supplementary materials. Based on the results of Lemma~\ref{thm:soft_thresholding}, we approximate the distribution of $\widehat{\boldsymbol\beta}_0$ at step~\ref{eq:thr_first} with a spike and slab distribution with parameters derived in the lemma: the spike probability $\omega$ is equal to $\omega^*$, the slab mean $m$ and variance $v$ are set to the corresponding parameters of the truncated Gaussian $m^*$ and $v^*$. The quality of this approximation is discussed in the supplementary materials.
 
 \subsection{Main layers}
-The distributions of the inputs at step \ref{eq:l_dense_layer} of the Bayesian \textsc{lista} (Algorithm~\ref{alg:lista}) for each $l$ are: the vector $\mathbf{b}$ and matrix $\mathbf{S}$ consist of Gaussian components and $\widehat{\boldsymbol\beta}_{l-1}$ is a vector of the spike and slab random variables. In order to determine the distribution of the output $\mathbf{c}_l$ we first formulate two lemmas.
+At step \ref{eq:l_dense_layer} of the \textsc{lista} (Algorithm~\ref{alg:lista}) the vector $\mathbf{b}$ and matrix $\mathbf{S}$ consist of Gaussian components and $\widehat{\boldsymbol\beta}_{l-1}$ is a vector of the spike and slab random variables. In order to determine the distribution of the output $\mathbf{c}_l$ we first formulate two lemmas.
 
 \begin{lemma}[Moments of a spike and slab distribution]
 \label{thm:moments_spsl}
@@ -213,7 +210,7 @@ Let a random variable $\xi$ have a spike and slab distribution with the probabil
 
 \begin{lemma}[Product of a Gaussian matrix and a spike and slab vector]
   \label{thm:matrix_vector}
-Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\widehat{\boldsymbol\beta }\in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\widehat{\beta}_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. The components of the matrix $\mathbf{S}$ and the vector $\widehat{\boldsymbol\beta}$ are mutual independent. Let $\mathbf{e} \in \mathbb{R}^{D}$ denote the product $\mathbf{S} \widehat{\boldsymbol\beta}$. Then the marginal mean and variance of the elements $e_d$ of the vector $\mathbf{e}$ are:
+Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\widehat{\boldsymbol\beta }\in \mathbb{R}^D$ be a vector with spike-and-slab-distributed variables: $\widehat{\beta}_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. The components of the matrix $\mathbf{S}$ and the vector $\widehat{\boldsymbol\beta}$ are mutually independent. Let $\mathbf{e} \in \mathbb{R}^{D}$ denote the product $\mathbf{S} \widehat{\boldsymbol\beta}$. Then the marginal mean and variance of the elements $e_d$ of the vector $\mathbf{e}$ are:
 \begin{subequations}
 \begin{align}
  \mathbb{E}e_d &= \sum_{d'=1}^D m^s_{dd'}(1-\omega_{d'})m_{d'}, \\
