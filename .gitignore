@@ -186,3 +186,5 @@ paper/graphics/mnist/100_nmse_valid-eps-converted-to.pdf
 paper/graphics/mnist/250_f_measure_valid-eps-converted-to.pdf
 
 paper/graphics/mnist/250_nmse_valid-eps-converted-to.pdf
+paper/graphics/mnist/250_f_measure_valid_time-eps-converted-to.pdf
+paper/graphics/mnist/250_nmse_valid_time-eps-converted-to.pdf
