@@ -6,15 +6,12 @@ class MnistSequentialComparator(SequentialComparator):
     def __init__(self, K, L, learning_rate, n_train_sample, n_validation_sample,
                  train_freq, train_bayes, train_shared_bayes, use_ista, use_fista, save_history, initial_lambda):
 
-        self.data = MnistData(K=K, train_size=n_train_sample, valid_size=n_validation_sample)
-        self.data.check_download(normalise=False)
-        self.data.learn_dictionary()
-        self.D = self.data.train_data.shape[1]
+        data = MnistData(K=K, train_size=n_train_sample, valid_size=n_validation_sample)
+        data.check_download(normalise=False)
+        data.learn_dictionary()
+        D = data.beta_train.shape[1]
 
-        super().__init__(self.D, K, L, learning_rate, n_train_sample, n_validation_sample,
-                 train_freq, train_bayes, train_shared_bayes, use_ista, use_fista, save_history, initial_lambda)
+        super().__init__(D=D, K=K, L=L, data=data, learning_rate=learning_rate, train_freq=train_freq,
+                         train_bayes=train_bayes, train_shared_bayes=train_shared_bayes, use_ista=use_ista,
+                         use_fista=use_fista, save_history=save_history, initial_lambda=initial_lambda)
 
-        self.beta_train = self.data.train_data
-        self.y_train = self.data.y_train
-        self.beta_validation = self.data.validation_data
-        self.y_validation = self.data.y_validation

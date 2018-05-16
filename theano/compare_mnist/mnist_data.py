@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 
 class MnistData(object):
     def __init__(self, K, train_size, valid_size):
-        self.train_data = None
+        self.beta_train = None
         self.train_labels = None
         self.dictionary_learn_data = None
         self.dictionary_learn_labels = None
-        self.validation_data = None
+        self.beta_validation = None
         self.validation_labels = None
 
         self.K = K
@@ -27,25 +27,25 @@ class MnistData(object):
     def check_download(self, normalise):
         mnist = tf.contrib.learn.datasets.load_dataset("mnist")
         random_train_ind = np.random.choice(mnist.train.images.shape[0], self.training_size, replace=False)
-        self.train_data = mnist.train.images[random_train_ind]
+        self.beta_train = mnist.train.images[random_train_ind]
         #self.train_labels = np.asarray(mnist.train.labels, dtype=np.int32)
         self.dictionary_learn_data = mnist.test.images
         #self.dictionary_learn_labels = np.asarray(mnist.test.labels, dtype=np.int32)
         random_validation_ind = np.random.choice(mnist.validation.images.shape[0], self.validation_size, replace=False)
-        self.validation_data = mnist.validation.images[random_validation_ind]
+        self.beta_validation = mnist.validation.images[random_validation_ind]
         #self.validation_labels = np.asarray(mnist.validation.labels, dtype=np.int32)
 
         if normalise:
             self.normalize()
 
     def normalize(self):
-        self.train_mean = np.mean(np.append(self.train_data, self.validation_data, axis=0), axis=0)
-        self.train_std = np.std(np.append(self.train_data, self.validation_data, axis=0), axis=0)
-        self.train_data = self.train_data - self.train_mean
-        self.train_data[:, self.train_std != 0] = self.train_data[:, self.train_std != 0] / \
+        self.train_mean = np.mean(np.append(self.beta_train, self.beta_validation, axis=0), axis=0)
+        self.train_std = np.std(np.append(self.beta_train, self.beta_validation, axis=0), axis=0)
+        self.beta_train = self.beta_train - self.train_mean
+        self.beta_train[:, self.train_std != 0] = self.beta_train[:, self.train_std != 0] / \
                                                   self.train_std[self.train_std != 0]
-        self.validation_data = self.validation_data - self.train_mean
-        self.validation_data[:, self.train_std != 0] = self.validation_data[:, self.train_std != 0] / \
+        self.beta_validation = self.beta_validation - self.train_mean
+        self.beta_validation[:, self.train_std != 0] = self.beta_validation[:, self.train_std != 0] / \
                                                        self.train_std[self.train_std != 0]
 
     def learn_dictionary(self):
@@ -56,14 +56,14 @@ class MnistData(object):
         dt = time() - t0
         print('done in %.2fs.' % dt)
 
-        self.y_train = np.dot(self.train_data, self.X.T)
-        self.y_validation = np.dot(self.validation_data, self.X.T)
+        self.y_train = np.dot(self.beta_train, self.X.T)
+        self.y_validation = np.dot(self.beta_validation, self.X.T)
 
     def generate_random_design_matrix(self):
-        self.X = np.random.randn(self.K, self.train_data.shape[1])
+        self.X = np.random.randn(self.K, self.beta_train.shape[1])
 
-        self.y_train = np.dot(self.train_data, self.X.T)
-        self.y_validation = np.dot(self.validation_data, self.X.T)
+        self.y_train = np.dot(self.beta_train, self.X.T)
+        self.y_validation = np.dot(self.beta_validation, self.X.T)
 
     def plot_learnt_dictionary(self):
         for i, comp in enumerate(self.X[:10]):

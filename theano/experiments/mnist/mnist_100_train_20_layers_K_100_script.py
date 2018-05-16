@@ -10,11 +10,11 @@ if __name__ == '__main__':
     K = 100
     L = 20
 
-    comparator = MnistSequentialComparator(K, L, learning_rate=0.0001, n_train_sample=1000, n_validation_sample=1000,
+    comparator = MnistSequentialComparator(K, L, learning_rate=0.0001, n_train_sample=100, n_validation_sample=100,
                                            train_freq=True, train_bayes=False, train_shared_bayes=True, use_ista=True,
                                            use_fista=True, save_history=False, initial_lambda=0.1)
 
-    n_iter = 100
+    n_iter = 500
 
     for _ in tqdm(range(n_iter)):
         comparator.train_iteration()
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     ista_f_meas = comparator.recorders['ista'].validation_f_meas
     fista_f_meas = comparator.recorders['fista'].validation_f_meas
 
-    np.savez('time_1000_train_20_layers_K_100',
+    np.savez('time_100_train_20_layers_K_100',
              lista_time=lista_time,
              sh_bayes_time=sh_bayes_time,
              lista_nmse=lista_nmse,

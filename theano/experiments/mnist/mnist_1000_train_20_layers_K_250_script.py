@@ -18,7 +18,7 @@ if __name__ == '__main__':
                                            train_freq=True, train_bayes=False, train_shared_bayes=True, use_ista=True,
                                            use_fista=True, save_history=False, initial_lambda=0.1)
 
-    n_iter = 500
+    n_iter = 100
 
     for _ in tqdm(range(n_iter)):
         comparator.train_iteration()
