@@ -26,7 +26,7 @@ class ActiveLearningExperiments(object):
 
     def get_mnist_data_active_learning(self):
         self.K=100
-        n_train, n_pool, n_test = 50, 500, 100
+        n_train, n_pool, n_test = 10, 500, 100
         data = MnistData(K=self.K, train_size=n_train + n_pool, valid_size=n_test)
         data.check_download(normalise=False)
         data.learn_dictionary()
@@ -149,7 +149,7 @@ if __name__=='__main__':
     active_bayes_validation_loss = active_learning_experiments.active_bayesian_validation_loss
     non_active_bayes_validation_f_measure = active_learning_experiments.non_active_shared_bayesian_validation_f_meas
     active_bayes_validation_f_measure = active_learning_experiments.active_bayesian_validation_f_meas
-    np.savez('test_3_mnist_active_rseed_{}'.format(rseed),
+    np.savez('test_5_mnist_active_rseed_{}'.format(rseed),
              non_active_bayes_validation_loss=non_active_bayes_validation_loss,
              active_bayes_validation_loss=active_bayes_validation_loss,
              non_active_bayes_validation_f_measure=non_active_bayes_validation_f_measure,

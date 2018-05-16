@@ -36,22 +36,23 @@ class MnistExperimentResultsCollector(object):
 
         ista_marker= None
         ista_color='blue'
-        ista_label='ISTA'
+        ista_label=r'\textsc{ista}'
 
         fista_marker= None
         fista_color='red'
-        fista_label='FISTA'
+        fista_label=r'\textsc{fista}'
 
         freq_marker= None
         freq_color='black'
-        freq_label='freq LISTA'
+        freq_label=r'\textsc{lista}'
 
         sh_bayes_marker=None
         sh_bayes_color='green'
-        sh_bayes_label='bayes LISTA'
+        sh_bayes_label=r'Bayesian \textsc{lista}'
 
         label_fontsize = 24
         legend_fontsize = 14
+        ticklabel_fontsize = 15
 
         plt.rc('text', usetex=True)
 
@@ -63,6 +64,7 @@ class MnistExperimentResultsCollector(object):
         plt.legend(fontsize=legend_fontsize)
         plt.ylabel(r'F measure', fontsize=label_fontsize)
         plt.xlabel(r'Number of iterations', fontsize=label_fontsize)
+        plt.tick_params(labelsize=ticklabel_fontsize)
         plt.savefig('results/f_measure_valid.eps', format='eps')
         plt.show()
 
@@ -74,6 +76,7 @@ class MnistExperimentResultsCollector(object):
         plt.legend(fontsize=legend_fontsize)
         plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
         plt.xlabel(r'Number of iterations', fontsize=label_fontsize)
+        plt.tick_params(labelsize=ticklabel_fontsize)
         plt.savefig('results/nmse_valid.eps', format='eps')
         plt.show()
 
@@ -85,6 +88,7 @@ class MnistExperimentResultsCollector(object):
         plt.legend(fontsize=legend_fontsize)
         plt.ylabel(r'F measure', fontsize=label_fontsize)
         plt.xlabel(r'Time, s', fontsize=label_fontsize)
+        plt.tick_params(labelsize=ticklabel_fontsize)
         plt.xlim([0, 2500])
         plt.savefig('results/f_measure_valid_time.eps', format='eps')
         plt.show()
@@ -97,6 +101,7 @@ class MnistExperimentResultsCollector(object):
         plt.legend(fontsize=legend_fontsize)
         plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
         plt.xlabel(r'Time, s', fontsize=label_fontsize)
+        plt.tick_params(labelsize=ticklabel_fontsize)
         plt.xlim([0, 2500])
         plt.savefig('results/nmse_valid_time.eps', format='eps')
         plt.show()
@@ -104,5 +109,5 @@ class MnistExperimentResultsCollector(object):
 
 if __name__=='__main__':
     collector = MnistExperimentResultsCollector()
-    collector.collect_main('time_100_train_20_layers_K_250')
+    collector.collect_main('time_100_train_20_layers_K_100')
     collector.plot_all()
