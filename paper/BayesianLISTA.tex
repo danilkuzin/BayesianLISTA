@@ -158,7 +158,7 @@ where $\delta_0$ is the delta-function that represents a spike, $[\cdot]_d$ deno
 To introduce the uncertainty of predictions, we assume that the true $\boldsymbol\beta$ has a Gaussian distribution centered at the output of the \textsc{lista} network with precision $\gamma$. Then the likelihood of $\mathbf{B}$ is defined as
 \begin{equation}
 \label{eq:likelihood}
-p(\mathbf{B}| \mathbf{Y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda) = \prod_{n=1}^N\prod_{d=1}^D\mathcal{N}\left(\beta_d^{(n)}; \left[\widehat{\boldsymbol\beta}_{L}^{(n)}\right]_d, \gamma^{-1}\right)
+p(\mathbf{B}| \mathbf{Y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda) = \prod_{n=1}^N\prod_{d=1}^D\mathcal{N}\left(\beta_d^{(n)}; \left[\widehat{\boldsymbol\beta}^{(n)}\right]_d, \gamma^{-1}\right)
 \end{equation}
 The introduced Gaussian precisions have Gamma prior distributions with parameters~$a^{\cdot}$ and~$b^{\cdot}$
 \begin{equation}
@@ -295,14 +295,14 @@ Then to find new values of $\mathbf{W}$ and $\mathbf{S}$ we need to compute deri
 
 With the likelihood factors~(\ref{eq:likelihood}) of the true posterior we employ the ADF approach and iteratively incorporate them into the approximating distribution $q$. The normalisation constant of the approximating distribution $q$ with the likelihood term for the data point $n$ incorporated can be computed as follows (to simplify notation the superscript $(n)$ is omitted)
 \begin{equation}
-Z  = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d ; \widehat{\boldsymbol\beta}_{L}, \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
+Z  = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d ; \widehat{\boldsymbol\beta}, \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
 \end{equation}
 Assuming the spike and slab distribution for $\widehat{\boldsymbol\beta}$, the normalisation constant can be approximated as \footnote{full derivation of the normalisation constant is given in supplementary materials}
 \begin{equation}
 \label{eq:Z}
-Z \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d ; 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d ; m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}_d\right)\right].
+Z \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d ; 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d ; m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}_d\right)\right],
 \end{equation}
-Parameters of the approximating posterior distribution are then updated with the derivatives of this normalisation constant according to (\ref{eq:param_update}).
+where $\{\omega^{\widehat{\boldsymbol\beta}}_d, m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\}$ are the parameters of the spike and slab distribution for $\widehat{\boldsymbol\beta}_d$. Parameters of the approximating posterior distribution $q$ are then updated with the derivatives of this normalisation constant according to (\ref{eq:param_update}).
 
 Prior factors from $p$ (\ref{eq:ws}), (\ref{eq:gamma_eta}) are incorporated into $q$ with the EP algorithm~\cite{hernandez2015probabilistic}, i.e. they replace the corresponding approximating factors from $q$ and then $q$ is updated to minimise the KL divergence.
 
