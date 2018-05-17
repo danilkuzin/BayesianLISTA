@@ -52,7 +52,7 @@ class MnistExperimentResultsCollector(object):
 
         label_fontsize = 24
         legend_fontsize = 14
-        ticklabel_fontsize = 15
+        ticklabel_fontsize = 10
 
         plt.rc('text', usetex=True)
 
@@ -109,5 +109,5 @@ class MnistExperimentResultsCollector(object):
 
 if __name__=='__main__':
     collector = MnistExperimentResultsCollector()
-    collector.collect_main('time_100_train_20_layers_K_100')
+    collector.collect_main('./random_not_normalised_dict/time_100_train_20_layers_K_100_rand_dict')
     collector.plot_all()

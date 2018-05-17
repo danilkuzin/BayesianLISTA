@@ -72,7 +72,7 @@ class LambdaExperimentResultsCollector(object):
         std_multiplier = 2
         label_fontsize = 24
         legend_fontsize = 14
-        ticklabel_fontsize = 15
+        ticklabel_fontsize = 10
 
         ista_marker= 'o'
         ista_color='blue'
