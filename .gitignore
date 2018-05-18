@@ -196,3 +196,6 @@ theano/experiments/mnist/random_normalised_dict/*
 theano/experiments/mnist/random_not_normalised_dict/*
 
 theano/experiments/active_learning/mnist_test_3_plots/*
+
+paper/supplementary_uncertainty_propagation_sparse_coding.pdf
+paper/uncertainty_propagation_sparse_coding.pdf

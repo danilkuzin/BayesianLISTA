@@ -14,6 +14,8 @@
 \graphicspath{{./graphics/}}
 \usepackage{subfig}
 
+\allowdisplaybreaks
+
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 
@@ -134,24 +136,25 @@ where $\mathbb{E}\widehat{\beta}_{d'}$ and $\operatorname{Var}\widehat{\beta}_{d
 %\label{fig:z_new_testing}
 \end{figure}
 
-We have used two approximations in forward propagation of uncertainty. First, at the step 2 of Algorithm 1 during the computation of $\mathbf{e}_l$, a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, at the steps 2 and 5 of Algorithm 1 the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
+We have used two approximations in forward propagation of uncertainty (section 4.3 of the main paper). First, at step 3 during the computation of $\mathbf{e}_l$, a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, at steps 2 and 5 the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
-Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for Lemma \ref{thm:matrix_vector}. For the sampled distribution, $10000$ values are sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:matrix_vector}.
+Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for the first approximation at step 3. For the sampled distribution, $10000$ values are sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:matrix_vector}.
 
-Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for Lemma \ref{thm:soft_thresholding}. For the sampled distribution, $10000$ values are sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:soft_thresholding}.
+Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for the second approximation at steps 2 and 5. For the sampled distribution, $10000$ values are sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:soft_thresholding}.
 
 \section{Derivation for the normalisation constant}
 When the likelihood term for a single data point is incorporated into the approximating distribution $q$, the normalisation constant of $q$ is expressed as
 \begin{equation}
 \label{eq:Z}
-Z = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d ; f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda), \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
+Z = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d ; [f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)]_d, \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
 \end{equation}
-We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta} = \widehat{\boldsymbol\beta}_L = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$, that is the output from the network and approximate with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}}$
+We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta} = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$ that is the output from the network. According to the proposed uncertainty propagation scheme $\widehat{\boldsymbol\beta}$ is approximated with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}}$
 \begin{align}
-Z &\approx \int \prod_{d=1}^{D} \mathcal{N}\left(\beta_d ; \widehat{\beta}_d, \gamma^{-1}\right) \left(\omega^{\widehat{\boldsymbol\beta}}_d \delta_0\left(\widehat{\beta}_d\right) + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\widehat{\beta}_d ; m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right)\right) \text{Gam} \left(\gamma_d; \alpha^\gamma, \beta^\gamma\right)\mathrm{d}\widehat{\boldsymbol\beta} \mathrm{d}\gamma  \nonumber\\
+Z &\approx \int \text{Gam} \left(\gamma; \alpha^\gamma, \beta^\gamma\right) \prod_{d=1}^{D} \left[ \mathcal{N}\left(\beta_d ; [\widehat{\boldsymbol\beta}]_d, \gamma^{-1}\right) \right.\\
+&\quad \left. \times  \left(\omega^{\widehat{\boldsymbol\beta}}_d \delta_0\left([\widehat{\boldsymbol\beta}]_d\right) + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left([\widehat{\boldsymbol\beta}]_d ; m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right)\right) \right] \mathrm{d}\widehat{\boldsymbol\beta} \mathrm{d}\gamma  \nonumber\\
 & = \prod_{d=1}^{D} \left[\omega^{\widehat{\boldsymbol\beta}}_d \int \mathcal{N}\left(\beta_d ; 0, \gamma^{-1}\right)  \text{Gam} \left(\gamma; \alpha^\gamma, \beta^\gamma\right) d\gamma  \nonumber \right.\\
-&\quad + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\int \mathcal{T}\left(\beta_d ; \widehat{\beta}_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) 
-\left. \vphantom{\int}  \mathcal{N}\left(\widehat{\beta}_d ; m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right) \mathrm{d}\widehat{\boldsymbol\beta}_d\right]  \nonumber\\
+&\quad + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\int \mathcal{T}\left(\beta_d ; [\widehat{\boldsymbol\beta}]_d, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) 
+\left. \vphantom{\int}  \mathcal{N}\left([\widehat{\boldsymbol\beta}]_d ; m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right) \mathrm{d}[\widehat{\boldsymbol\beta}]_d\right]  \nonumber\\
 \label{eq:Z_approx}
 & \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d ; 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d ; m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}_d\right)\right],
 \end{align}
@@ -177,7 +180,7 @@ In our experiments we use $\lambda = 0.1$, which is determined by grid optimisat
 \section{Performance measures}
 \textsc{nmse} for a batch of data $\{\boldsymbol\beta^{(n)}\}_{n=1}^{N}$ and estimates $\{\widehat{\boldsymbol\beta}^{(n)}\}_{n=1}^{N}$ is computed as
 \begin{equation}
-\text{\textsc{nmse}} = \frac{1}{N}\sum\limits_{n=1}^N\sqrt{\frac{\sum\limits_{d=1}^D\left(\widehat{\beta}_{d}^{(n)} - \beta_d^{(n)}\right)^2}{\sum\limits_{d=1}^D\left(\beta_{d}^{(n)}\right)^2}}
+\text{\textsc{nmse}} = \frac{1}{N}\sum\limits_{n=1}^N\sqrt{\frac{\sum\limits_{d=1}^D\left([\widehat{\boldsymbol\beta}^{(n)}]_{d} - \beta_d^{(n)}\right)^2}{\sum\limits_{d=1}^D\left(\beta_{d}^{(n)}\right)^2}}
 \end{equation}
 In sparse coding it is also important to obtain the correct locations of spikes (i.e zeros) and slabs (i.e. non-zeros) in the estimates. The problem is therefore viewed as a skewed two-class classification problem where the number of spikes is higher than the number of slabs. F measure is used to evaluate the accuracy of such problems. It is defined as the harmonic mean of precision and recall
 \begin{equation}
