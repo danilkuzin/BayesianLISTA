@@ -59,6 +59,15 @@ class MnistData(object):
         self.y_train = np.dot(self.beta_train, self.X.T)
         self.y_validation = np.dot(self.beta_validation, self.X.T)
 
+    def random_dictionary(self, normalise):
+        self.X = np.random.randn(self.K, self.beta_train.shape[1])
+        if normalise:
+            self.X = np.dot(self.X, np.diag(1 / np.linalg.norm(self.X, axis=0)))
+
+        self.y_train = np.dot(self.beta_train, self.X.T)
+        self.y_validation = np.dot(self.beta_validation, self.X.T)
+
+
     def generate_random_design_matrix(self):
         self.X = np.random.randn(self.K, self.beta_train.shape[1])
 
