@@ -190,3 +190,9 @@ paper/graphics/mnist/250_f_measure_valid_time-eps-converted-to.pdf
 paper/graphics/mnist/250_nmse_valid_time-eps-converted-to.pdf
 theano/experiments/active_learning/uai_experiments/active_mnist_16_20.zip
 theano/experiments/active_learning/uai_experiments/active_mnist_results_2_5.zip
+
+theano/experiments/mnist/learnt_dict/*
+theano/experiments/mnist/random_normalised_dict/*
+theano/experiments/mnist/random_not_normalised_dict/*
+
+theano/experiments/active_learning/mnist_test_3_plots/*

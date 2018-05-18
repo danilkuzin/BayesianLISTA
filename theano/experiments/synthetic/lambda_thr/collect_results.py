@@ -72,6 +72,7 @@ class LambdaExperimentResultsCollector(object):
         std_multiplier = 2
         label_fontsize = 24
         legend_fontsize = 14
+        ticklabel_fontsize = 10
 
         ista_marker= 'o'
         ista_color='blue'
@@ -100,6 +101,7 @@ class LambdaExperimentResultsCollector(object):
         plt.legend(fontsize=legend_fontsize)
         plt.xlabel(r'L', fontsize=label_fontsize)
         plt.ylabel(r'F measure', fontsize=label_fontsize)
+        plt.tick_params(labelsize=ticklabel_fontsize)
         plt.savefig('results/f_measure_train.eps', format='eps')
         plt.show()
 
@@ -114,6 +116,7 @@ class LambdaExperimentResultsCollector(object):
         plt.legend(fontsize=legend_fontsize)
         plt.xlabel(r'L', fontsize=label_fontsize)
         plt.ylabel(r'F measure', fontsize=label_fontsize)
+        plt.tick_params(labelsize=ticklabel_fontsize)
         plt.savefig('results/f_measure_validation.eps', format='eps')
         plt.show()
 
@@ -128,6 +131,7 @@ class LambdaExperimentResultsCollector(object):
         plt.legend(fontsize=legend_fontsize)
         plt.xlabel(r'L', fontsize=label_fontsize)
         plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
+        plt.tick_params(labelsize=ticklabel_fontsize)
         plt.savefig('results/nmse_train.eps', format='eps')
         plt.show()
 
@@ -142,6 +146,7 @@ class LambdaExperimentResultsCollector(object):
         plt.legend(fontsize=legend_fontsize)
         plt.xlabel(r'L', fontsize=label_fontsize)
         plt.ylabel(r'\textsc{nmse}', fontsize=label_fontsize)
+        plt.tick_params(labelsize=ticklabel_fontsize)
         plt.savefig('results/nmse_validation.eps', format='eps')
         plt.show()
 

@@ -114,7 +114,7 @@ class ActiveLearningExperiments(object):
 
 if __name__=='__main__':
 
-    rseed = 1
+    rseed = 4
     np.random.seed(rseed)
     tf.set_random_seed(rseed)
 
