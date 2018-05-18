@@ -35,37 +35,37 @@ The distribution of $x^*$ can be parametrised by the probability of being zero, 
 \end{lemma}
 \begin{proof}
 
-The probability of a zero $\omega^*$ equals to the probability mass of the original distribution from the interval $[-\lambda, \lambda]$
+The probability $\omega^*$ of zero equals to the probability mass of the original distribution from the interval $[-\lambda, \lambda]$
 \begin{equation}
 \omega^* =\operatorname{P}(x^*=0) = \operatorname{P}(x \in [-\lambda, \lambda]) = \Phi\left(\frac{\lambda-m}{\sqrt{v}}\right) - \Phi\left(\frac{-\lambda-m}{\sqrt{v}}\right).
 \end{equation}
 where $\Phi(\cdot)$ is the standard Gaussian cumulative distribution function.
 
-The soft thresholding function shifts elements that are greater than $\lambda$  or less than $-\lambda$ towards~$0$. Let $\psi(\cdot)$ denote the density of the soft-thresholded distribution on $x^* \neq 0$, $\phi(\cdot)$ denote the density of the original Gaussian distribution on $x$. Then the first moment of $x^* \neq 0$ is:
+The soft thresholding function shifts elements that are greater than $\lambda$  or less than $-\lambda$ towards~$0$. Let $\psi(\cdot)$ denote the density of the soft-thresholded distribution on $x^* \neq 0$, $\phi(\cdot)$ denote the density of the original Gaussian distribution on $x$. Then the first moment of $x^* \neq 0$ is
 
 \begin{equation}
 \label{eq:thr_first_moment}
-m^* = \int_{-\infty}^{+\infty}x\psi(x)dx= \int_{-\infty}^{0}x\phi(x-\lambda)dx + \int_{0}^{+\infty}x\phi(x+\lambda)dx,
+m^* = \int_{-\infty}^{+\infty}t\psi(t)\mathrm{d}t= \int_{-\infty}^{0}t\phi(t-\lambda)\mathrm{d}t + \int_{0}^{+\infty}t\phi(t+\lambda)\mathrm{d}t,
 \end{equation}
 where
 \begin{align}
-&\int_{-\infty}^{0}x\phi(x-\lambda)dx = -\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)\\
-&\int_{0}^{+\infty}x\phi(x+\lambda)dx = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\} + (m - \lambda)\left(1 - \Phi\left(-\frac{\lambda-m}{\sqrt{v}}\right)\right)
+&\int_{-\infty}^{0}t\phi(t-\lambda)\mathrm{d}t = -\frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} + (\lambda+m)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)\\
+&\int_{0}^{+\infty}t\phi(t+\lambda)\mathrm{d}t = \frac{\sqrt{v}}{\sqrt{2\pi}} \exp\left\{\frac{-(m - \lambda)^2}{2v}\right\} + (m - \lambda)\left(1 - \Phi\left(-\frac{\lambda-m}{\sqrt{v}}\right)\right)
 \end{align}
 
 The second moment of $x^* \neq 0$ is given as
 \begin{equation}
 \label{eq:thr_second_moment}
-s = \int_{-\infty}^{+\infty}x^2\psi(x)dx = \int_{-\infty}^{0}x^2\phi(x-\lambda)dx + \int_{0}^{+\infty}x^2\phi(x+\lambda)dx,
+s = \int_{-\infty}^{+\infty}t^2\psi(t)\mathrm{d}t = \int_{-\infty}^{0}t^2\phi(t-\lambda)\mathrm{d}t + \int_{0}^{+\infty}t^2\phi(t+\lambda)\mathrm{d}t,
 \end{equation}
 where
 \begin{align}
 \begin{split}
-&\int_{-\infty}^{0}x^2\phi(x-\lambda)dx = \\
+&\int_{-\infty}^{0}t^2\phi(t-\lambda)\mathrm{d}t = \\
 &-\frac{\sqrt{v}}{\sqrt{2\pi}} (\lambda+m)\exp\left\{\frac{-(\lambda+m)^2}{2v}\right\} + (\sigma^2 + (\lambda+m)^2)\Phi\left(-\frac{\lambda+m}{\sqrt{v}}\right)
 \end{split}\\
 \begin{split}
-&\int_{0}^{+\infty}x^2\phi(x+\lambda)dx = \\
+&\int_{0}^{+\infty}t^2\phi(t+\lambda)\mathrm{d}t = \\
 &\frac{\sqrt{v}}{\sqrt{2\pi}} (m - \lambda)\exp\left\{\frac{-(m - \lambda)^2}{2v}\right\} + (\sigma^2 + (m - \lambda)^2)\left(1 - \Phi\left(\frac{\lambda -m}{\sqrt{v}}\right)\right)
 \end{split}
 \end{align}
@@ -78,7 +78,7 @@ v^* = s- (m^*)^2
 
 \begin{lemma}[Moments of a spike and slab distribution]
 \label{thm:moments_spsl}
-Let a random variable $\xi$ have a spike and slab distribution with probability of spike $\omega$, slab mean $m$ and slab variance $v$. Then its moments are
+Let a random variable $\xi$ have a spike and slab distribution with the probability of spike $\omega$, the slab mean $m$ and slab variance $v$. Then its moments are
 \begin{subequations}
 \begin{align}
 \mathbb{E}\xi &= (1-\omega)m \\
@@ -90,11 +90,11 @@ Let a random variable $\xi$ have a spike and slab distribution with probability 
 \begin{proof}
 \begin{align*}
 \begin{split}
-\mathbb{E}\xi &= \int x \big(\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v)\big)dx \\
-& = \omega \int x \delta_0(x)dx + (1 - \omega)\int x \mathcal{N}(x; m, v)dx \\
+\mathbb{E}\xi &= \int t \big(\omega \delta_0(t) + (1 - \omega)\mathcal{N}(t; m, v)\big)\mathrm{d}t \\
+& = \omega \int t \delta_0(t)\mathrm{d}t + (1 - \omega)\int t \mathcal{N}(t; m, v)\mathrm{d}t \\
 & = (1-\omega)m \\
-\mathbb{E}\xi^2 &= \int x^2 \big(\omega \delta_0(x) + (1 - \omega)\mathcal{N}(x; m, v)\big)dx \\
-& = \omega \int x^2 \delta_0(x)dx + (1 - \omega)\int x^2 \mathcal{N}(x; m, v)dx \\
+\mathbb{E}\xi^2 &= \int t^2 \big(\omega \delta_0(t) + (1 - \omega)\mathcal{N}(t; m, v)\big)\mathrm{d}t \\
+& = \omega \int t^2 \delta_0(t)\mathrm{d}t + (1 - \omega)\int t^2 \mathcal{N}(t; m, v)\mathrm{d}t \\
 & = (1-\omega)(v + m^2) \\
 \operatorname{Var}\xi &= \mathbb{E}\xi^2 - \left(\mathbb{E}\xi\right)^2 = (1-\omega)(v + \omega m^2)
 \end{split}
@@ -104,7 +104,7 @@ Let a random variable $\xi$ have a spike and slab distribution with probability 
 
 \begin{lemma}[Product of a Gaussian matrix and a spike and slab vector]
   \label{thm:matrix_vector}
-Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\widehat{\boldsymbol\beta }\in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\widehat{\beta}_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. The components of the matrix $\mathbf{S}$ and the vector $\widehat{\boldsymbol\beta}$ are mutual independent. Let $\mathbf{e} \in \mathbb{R}^{D}$ denote the product $\mathbf{S} \widehat{\boldsymbol\beta}$. Then the marginal mean and variance of elements $e_d$ of the vector $\mathbf{e}$ are:
+Let $\mathbf{S} \in \mathbb{R}^{D \times D}$ be a matrix of independent Gaussian-distributed random variables: $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\widehat{\boldsymbol\beta }\in \mathbb{R}^D$ be a vector with spike-and-slab distributed variables: $\widehat{\beta}_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. The components of the matrix $\mathbf{S}$ and the vector $\widehat{\boldsymbol\beta}$ are mutually independent. Let $\mathbf{e} \in \mathbb{R}^{D}$ denote the product $\mathbf{S} \widehat{\boldsymbol\beta}$. Then the marginal mean and variance of elements $e_d$ of the vector $\mathbf{e}$ are
 \begin{subequations}
 \begin{align}
  \mathbb{E}e_d &= \sum_{d'=1}^D m^s_{dd'}(1-\omega_{d'})m_{d'}, \\
@@ -132,23 +132,23 @@ where $\mathbb{E}\widehat{\beta}_{d'}$ and $\operatorname{Var}\widehat{\beta}_{d
 \subfloat[Approximation of the \newline product of Gaussians]{\includegraphics[width=0.4\columnwidth]{d_testing}\label{fig:d_testing}}
 %\label{fig:d_testing}
 \subfloat[Approximation of the propagation through soft thresholding]{\includegraphics[width=0.4\columnwidth]{z_new_testing}\label{fig:z_new_testing}}
-\caption{Approximations of the Bayesian \textsc{lista}}
+\caption{Approximation quality in Bayesian \textsc{lista}}
 %\label{fig:z_new_testing}
 \end{figure}
 
 We have used two approximations in forward propagation of uncertainty (section 4.3 of the main paper). First, at step 3 during the computation of $\mathbf{e}_l$, a Gaussian matrix is multiplied by a spike and slab vector and their product is approximated with the Gaussian distribution. Second, at steps 2 and 5 the result of soft thresholding of a Gaussian vector is approximated with the spike and slab distribution. In this section we demonstrate that these approximations are close to the real distributions.
 
-Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for the first approximation at step 3. For the sampled distribution, $10000$ values are sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:matrix_vector}.
+Figure \ref{fig:d_testing} demonstrates the comparison of the sampled distribution and approximated distribution for the first approximation at step 3. For the sampled distribution, $10000$ values are sampled from the Gaussian matrix and the spike and slab vector and their product is computed, then one of the dimensionalities is plotted. The parameters of the approximated distribution are computed according to Lemma \ref{thm:matrix_vector}.
 
-Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for the second approximation at steps 2 and 5. For the sampled distribution, $10000$ values are sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities is plotted. The parameters of the approximated distribution is computed according to Lemma \ref{thm:soft_thresholding}.
+Figure \ref{fig:z_new_testing} demonstrates the comparison of the sampled distribution and approximated distribution for the second approximation at steps 2 and 5. For the sampled distribution, $10000$ values are sampled from the Gaussian vector and propagated through soft thresholding, then one of the dimensionalities is plotted. The parameters of the approximated distribution are computed according to Lemma \ref{thm:soft_thresholding}.
 
 \section{Derivation for the normalisation constant}
-When the likelihood term for a single data point is incorporated into the approximating distribution $q$, the normalisation constant of $q$ is expressed as
+When the likelihood term for a single data point is incorporated into the approximating distribution~$q$, the normalisation constant of $q$ is expressed as
 \begin{equation}
 \label{eq:Z}
 Z = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d ; [f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)]_d, \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
 \end{equation}
-We sample $\mathbf{W}$, $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta} = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$ that is the output from the network. According to the proposed uncertainty propagation scheme $\widehat{\boldsymbol\beta}$ is approximated with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}}$
+We sample weights $\mathbf{W}$ and $\mathbf{S}$ from $q$ and get $\widehat{\boldsymbol\beta} = f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$ that is the output from the network. According to the proposed uncertainty propagation scheme $\widehat{\boldsymbol\beta}$ is approximated with the spike and slab distribution with the parameters $\boldsymbol\omega^{\widehat{\boldsymbol\beta}}$, $\mathbf{m}^{\widehat{\boldsymbol\beta}}$, and $\mathbf{v}^{\widehat{\boldsymbol\beta}}$. Then we approximate the normalisation constant
 \begin{align}
 Z &\approx \int \text{Gam} \left(\gamma; \alpha^\gamma, \beta^\gamma\right) \prod_{d=1}^{D} \left[ \mathcal{N}\left(\beta_d ; [\widehat{\boldsymbol\beta}]_d, \gamma^{-1}\right) \right.\\
 &\quad \left. \times  \left(\omega^{\widehat{\boldsymbol\beta}}_d \delta_0\left([\widehat{\boldsymbol\beta}]_d\right) + \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left([\widehat{\boldsymbol\beta}]_d ; m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\right)\right) \right] \mathrm{d}\widehat{\boldsymbol\beta} \mathrm{d}\gamma  \nonumber\\
@@ -165,7 +165,7 @@ where we have approximated the Student's t density $\mathcal{T}\left(\beta_d ; \
 where $\Gamma(\cdot)$ denotes the Gamma function.
 
 \section{Hyperparameter optimisation}
-The only hyperparameter in the proposed Bayesian \textsc{lista} is the shrinkage parameter $\lambda$. It can be optimised using the Type II maximum likelihood procedure. The Type II likelihood, i.e. the evidence $p(\boldsymbol\beta | \mathbf{y}, \lambda)$, of the Bayesian \textsc{lista} is equal to the normalisation constant $Z$ (\ref{eq:Z}) computed for the whole training dataset $\boldsymbol\beta$. Given the approximation~(\ref{eq:Z_approx}) the optimal hyperparameter $\lambda$ can be found by a gradient-based optimiser.
+The only hyperparameter in the proposed Bayesian \textsc{lista} model is the shrinkage parameter $\lambda$. It can be optimised using the Type II maximum likelihood procedure. The Type II likelihood, i.e. the evidence $p(\mathbf{B} | \mathbf{Y}, \lambda)$, of the Bayesian \textsc{lista} is equal to the normalisation constant $Z$ (\ref{eq:Z}) computed for the whole training dataset $\{\mathbf{Y}, \mathbf{B}\}$. Given the approximation~(\ref{eq:Z_approx}) the optimal hyperparameter $\lambda$ can be found by a gradient-based optimiser.
 
 In our experiments we use $\lambda = 0.1$, which is determined by grid optimisation (Figure~\ref{fig:lambda_opt}).
 
@@ -182,14 +182,14 @@ In our experiments we use $\lambda = 0.1$, which is determined by grid optimisat
 \begin{equation}
 \text{\textsc{nmse}} = \frac{1}{N}\sum\limits_{n=1}^N\sqrt{\frac{\sum\limits_{d=1}^D\left([\widehat{\boldsymbol\beta}^{(n)}]_{d} - \beta_d^{(n)}\right)^2}{\sum\limits_{d=1}^D\left(\beta_{d}^{(n)}\right)^2}}
 \end{equation}
-In sparse coding it is also important to obtain the correct locations of spikes (i.e zeros) and slabs (i.e. non-zeros) in the estimates. The problem is therefore viewed as a skewed two-class classification problem where the number of spikes is higher than the number of slabs. F measure is used to evaluate the accuracy of such problems. It is defined as the harmonic mean of precision and recall
+In sparse coding it is also important to obtain the correct locations of spikes (i.e. zeros) and slabs (i.e. non-zeros) in the estimates. The problem is therefore viewed as a skewed two-class classification problem where the number of spikes is higher than the number of slabs. F measure is used to evaluate the accuracy of such problems. It is defined as the harmonic mean of precision and recall
 \begin{equation}
 \text{F measure} = 2\dfrac{\text{precision}\cdot\text{recall}}{\text{precision} + \text{recall}},
 \end{equation}
 where precision is the fraction of estimated slab locations that are correct, recall is the fraction of true slab locations among all predicted slab locations.
 
-\section{Additional results on the \textsc{mnist} data}
-In contrast to \textsc{lista} and baselines, the Bayesian \textsc{lista} provides a posterior estimate for a test data point. Figure~\ref{fig:posterior_samples} shows samples from the posterior for the test image of the digit $7$ and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
+\section{Additional results on \textsc{mnist} data}
+In contrast to \textsc{lista} and baselines, Bayesian \textsc{lista} provides a posterior estimate for a test data point. Figure~\ref{fig:posterior_samples} shows samples from the posterior for the test image of the digit $7$ and Figure \ref{fig:posterior_distribution} shows the parameters of this posterior.
 
 \begin{figure}[h]
 \centering
@@ -202,9 +202,9 @@ In contrast to \textsc{lista} and baselines, the Bayesian \textsc{lista} provide
 
 \begin{figure}[h]
 \centering
-\subfloat[$\beta$ posterior mean]{\includegraphics[width=0.33\columnwidth]{posterior_mean}}~
-\subfloat[$\beta$ posterior std]{\includegraphics[width=0.33\columnwidth]{posterior_std}}~
-\subfloat[$\beta$ posterior spike indicator]{\includegraphics[width=0.33\columnwidth]{posterior_spike_indicator}}
+\subfloat[$\boldsymbol\beta$ posterior mean]{\includegraphics[width=0.33\columnwidth]{posterior_mean}}~
+\subfloat[$\boldsymbol\beta$ posterior std]{\includegraphics[width=0.33\columnwidth]{posterior_std}}~
+\subfloat[$\boldsymbol\beta$ posterior spike indicator]{\includegraphics[width=0.33\columnwidth]{posterior_spike_indicator}}
 \caption{Posterior parameters for an image of the digit 7.}
 \label{fig:posterior_distribution}
 \end{figure}

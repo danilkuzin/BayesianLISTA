@@ -109,7 +109,7 @@ h_\lambda(\mathbf{b}) = \text{sgn}(\mathbf{b}) \max(|\mathbf{b}| - \lambda, 0),
 where $\lambda$ is a shrinkage parameter.
 In \textsc{ista}, weights of the linear transformation are assumed fixed: $\mathbf{W} = \mathbf{X}^\top / E$, where $E$ is the upper bound of the largest eigenvalue of $\mathbf{X}^\top\mathbf{X}$, and $\mathbf{S} = \mathbf{I}_{D \times D} - \mathbf{W}\mathbf{X}$, where $\mathbf{I}_{D \times D}$ is the identity matrix of size $D$.
 
-In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} learns the values of matrices $\mathbf{W}$, $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, the \textsc{ista} is limited with the fixed amount of iterations $L$, and interpreted as a recurrent neural network: every iteration $l$ of \textsc{ista} corresponds to the layer $l$ of \textsc{lista}. A coefficient vector $\boldsymbol\beta$ for an observation~$\mathbf{y}$ is predicted according to Algorithm~\ref{alg:lista}.
+In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} learns the values of matrices $\mathbf{W}$, $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, the \textsc{ista} is limited with the fixed amount of iterations $L$ and interpreted as a recurrent neural network: every iteration $l$ of \textsc{ista} corresponds to the layer $l$ of \textsc{lista}. A coefficient vector $\boldsymbol\beta$ for an observation~$\mathbf{y}$ is predicted according to Algorithm~\ref{alg:lista}.
 
 \begin{algorithm}[h]
   \caption{\textsc{lista} forward propagation}
@@ -151,7 +151,7 @@ p(\mathbf{S}) = \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd''} ; 0, \eta^{-
 \end{equation}
 where $\eta$ is the precision of the Gaussian distribution.
 
-For every layer $l$ of Bayesian \textsc{lista} we assume that $\widehat{\boldsymbol\beta}_{l}$ has the spike and slab distribution with the spike probability $\boldsymbol\omega$, the slab mean $\mathbf{m}$, and the slab variance $\mathbf{v}$
+For every layer $l$ of Bayesian \textsc{lista}, we assume that $\widehat{\boldsymbol\beta}_{l}$ has the spike and slab distribution with the spike probability $\boldsymbol\omega$, the slab mean $\mathbf{m}$, and the slab variance $\mathbf{v}$
 \begin{equation}
 [\widehat{\boldsymbol\beta}_{l}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d),
 \end{equation}
