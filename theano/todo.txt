@@ -1,3 +1,9 @@
+===NEW===
+
+-we can optimise lambda as in LISTA (via backprop of usual loss)
+
+=========
+
 -plot nmse vs number of layers in LISTA and Bayesian Lista
 
 
