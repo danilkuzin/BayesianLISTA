@@ -199,3 +199,6 @@ theano/experiments/active_learning/mnist_test_3_plots/*
 
 paper/supplementary_uncertainty_propagation_sparse_coding.pdf
 paper/uncertainty_propagation_sparse_coding.pdf
+review_nips_2018/response_to_reviews_nips.pdf
+
+.idea/*
