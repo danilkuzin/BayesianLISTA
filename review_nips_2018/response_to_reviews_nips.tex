@@ -17,7 +17,7 @@ A: The LISTA algorithm introduces the weights in the model. Their point estimate
 
 Q: how does the sparse promoting prior interact with the sparsity promoting non-linearity.
 
-A: In the LISTA model the sequential estimates of beta are obtained at each layer using the previous estimate. At every layer the estimate becomes more sparse due to soft-thresholding non-linearity. We do not specify sparsity priors over the $beta_l$ - we show that the distribution of these estimates can be approximated with the spike-and-slab distribution, i.e. its sparsity naturally arises from the Gaussian prior on NN weights and sparsity promoting soft thresholding nonlinearity.
+A: In the LISTA model the sequential estimates of beta are obtained at each layer using the previous estimate. At every layer the estimate becomes more sparse due to soft-thresholding non-linearity. We do not specify sparsity priors over the $\beta_l$ - we show that the distribution of these estimates can be approximated with the spike-and-slab distribution, i.e. its sparsity naturally arises from the Gaussian prior on NN weights and sparsity promoting soft thresholding nonlinearity.
 \newline
 \newline
 
@@ -27,7 +27,7 @@ A: Yes, they are part of the inference procedure, the model remains the same as 
 \newline
 \newline
 
-Q: The assumption of mutual independence over the elements of $S$ and $beta_{l-1}$
+Q: The assumption of mutual independence over the elements of $S$ and $\beta_{l-1}$
 
 A: Generally speaking, correlation is partially removed due to the soft-thresholding on the previous layer. It requires further research to establish the influence of remaining correlation on the quality of approximation.
 \newline
