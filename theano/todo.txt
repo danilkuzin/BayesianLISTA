@@ -2,6 +2,8 @@
 
 -we can optimise lambda as in LISTA (via backprop of usual loss)
 
+-try using sampling W for prediction rather than mean, since Vetrov showed mean is bad
+
 =========
 
 -plot nmse vs number of layers in LISTA and Bayesian Lista
