@@ -202,3 +202,9 @@ paper/uncertainty_propagation_sparse_coding.pdf
 review_nips_2018/response_to_reviews_nips.pdf
 
 .idea/*
+bayesian_lista_src/.idea/*
+icassp_2019/graphics/*/*-eps-converted-to.pdf
+icassp_2019/paper.bbl
+icassp_2019/paper.blg
+icassp_2019/paper.out
+icassp_2019/paper.pdf
