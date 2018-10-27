@@ -9,10 +9,14 @@
 \usepackage{xcolor}
 \usepackage{times}
 \usepackage{float}
-\usepackage{algorithm, algorithmic}
+\usepackage{algorithm,algorithmic}
+
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
 
 \allowdisplaybreaks
 
@@ -56,7 +60,7 @@ Sparse regression, Bayesian neural networks, uncertainty estimation, compressive
 
 \section{Neural networks for sparse coding}
   \label{sec:bayesian_lista}
-  This section first reviews existing NNs for sparse coding and then describes the novel Bayesian NN.
+  This section first reviews existing NNs for sparse coding and then introduces the novel Bayesian NN.
   
 \subsection{Frequentist neural networks}  
 \label{subsec:nn_sc}
@@ -65,7 +69,7 @@ Sparse regression, Bayesian neural networks, uncertainty estimation, compressive
   \label{eq:regression_problem}
   ||\mathbf{X}\boldsymbol\beta - \mathbf{y}||_2^2 + \alpha ||\boldsymbol\beta||_1
   \end{equation}
-w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is the penalty parameter.
+w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is a penalty parameter.
   
   At every iteration $l$, \textsc{ista} obtains the new estimate $\widehat{\boldsymbol\beta}_l$ of the target vector $\boldsymbol\beta$ as the linear transformation $\mathbf{b} = \mathbf{W}\mathbf{y} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ propagated through the soft-thresholding function %$h_\lambda(\cdot)$
   \begin{equation}
@@ -74,7 +78,7 @@ w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is the penalty parameter.
   where $\lambda$ is a shrinkage parameter.
   In \textsc{ista}, weights $\mathbf{W}$ and $\mathbf{S}$ of the linear transformation are assumed fixed.
   
-  In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} learns the values of matrices $\mathbf{W}$ and $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, the \textsc{ista} is limited with the fixed amount of iterations $L$ and interpreted as a recurrent NN: every iteration $l$ of \textsc{ista} corresponds to the layer $l$ of \textsc{lista}. A vector $\boldsymbol\beta$ for an observation~$\mathbf{y}$ is predicted by Algorithm~\ref{alg:lista}.
+  In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} learns the values of matrices $\mathbf{W}$ and $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, \textsc{ista} is limited with the fixed amount of iterations $L$ and interpreted as a recurrent NN: every iteration $l$ of \textsc{ista} corresponds to the layer $l$ of \textsc{lista}. A vector $\boldsymbol\beta$ for an observation~$\mathbf{y}$ is predicted by Algorithm~\ref{alg:lista}.
   
   \begin{algorithm}[t]
     \caption{\textsc{lista} forward propagation}
@@ -95,7 +99,7 @@ w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is the penalty parameter.
 
   \subsection{Bayes\textsc{lista}}
   \label{subsec:bayesian_lista}
-  This section introduces the proposed Bayesian version of \textsc{lista}. The prior distributions are imposed on the unknown weights
+  This section introduces the proposed Bayesian version of \textsc{lista} (Bayes\textsc{lista}). The prior distributions are imposed on the unknown weights
   \begin{equation}
   \label{eq:ws}
   \begin{split}
@@ -109,7 +113,7 @@ w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is the penalty parameter.
   \begin{equation}
   [\widehat{\boldsymbol\beta}_{l}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d),
   \end{equation}
-  where $\delta_0$ is the delta-function that represents a spike, $[\cdot]_d$ denotes the $d$-th component of a vector. Section \ref{sec:fprop} shows that the output of the next layer $\widehat{\boldsymbol\beta}_{l+1}$ can be approximated with a spike and slab distribution and, therefore, the output of the Bayes\textsc{lista} network $\widehat{\boldsymbol\beta}$ has the spike and slab distribution.
+  where $\delta_0$ is the delta-function that represents a spike, $[\cdot]_d$ denotes the $d$-th component of a vector. Section \ref{sec:fprop} shows that the output of the next layer $\widehat{\boldsymbol\beta}_{l+1}$ can be approximated with the spike and slab distribution and, therefore, the output of the Bayes\textsc{lista} network $\widehat{\boldsymbol\beta}$ has the spike and slab distribution.
   
   To introduce the uncertainty of predictions, we assume that the true $\boldsymbol\beta$ is an output $f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$ of the Bayes\textsc{lista} network corrupted by the additive Gaussian zero-mean noise with the precision~$\gamma$. Then the likelihood of $\mathbf{B}$ is defined as
   \begin{equation}
@@ -138,7 +142,7 @@ w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is the penalty parameter.
   
   \section{Uncertainty propagation through soft-thresholding}
   \label{sec:fprop}
-  This section describes modification of \textsc{lista} forward propagation (Algorithm~\ref{alg:lista}) to include probability distributions of the random variables introduced in section~\ref{sec:bayesian_lista}. 
+  This section describes modification of \textsc{lista} forward propagation (Algorithm~\ref{alg:lista}) to include probability distributions of the random variables introduced in section~\ref{subsec:bayesian_lista}. 
   
   \subsection{Initialisation}
   \label{subsec:forward_init}
@@ -255,7 +259,7 @@ Then for new values of $\mathbf{W}$ and $\mathbf{S}$ derivatives of the logarith
   \end{equation}
   where $\{\omega^{\widehat{\boldsymbol\beta}}_d, m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\}$ are the parameters of the spike and slab distribution for $[\widehat{\boldsymbol\beta}]_d$. Parameters of $q$ are then updated with the derivatives of $Z$ according to (\ref{eq:param_update}).
   
-  Prior factors (\ref{eq:ws}) and (\ref{eq:gamma_eta}) from $p$ are incorporated into $q$ with the EP algorithm~\cite{hernandez2015probabilistic}, i.e. they replace the corresponding approximating factors from $q$, and then $q$ is updated to minimise the Kullback–Leibler divergence.
+  Prior factors (\ref{eq:ws}) and (\ref{eq:gamma_eta}) from $p$ are incorporated into $q$ with the EP algorithm~\cite{hernandez2015probabilistic}, i.e. they replace the corresponding approximating factors from $q$, and then $q$ is updated to minimise the Kullback--Leibler divergence.
   
   \section{Experiments}
   \label{sec:experiments}
@@ -273,7 +277,7 @@ Then for new values of $\mathbf{W}$ and $\mathbf{S}$ derivatives of the logarith
   \hfil
   \subfloat[\textsc{mnist} for $K = 250$]{\includegraphics[width=0.24\textwidth]{graphics/mnist/250_nmse_valid}
   \label{fig:nmse_k_250}}
-  \caption{\textsc{nmse} results. The synthetic data for different number of layers~\protect\subref{fig:nmse_n_layers_synthetic} and for different sizes of observations~\protect\subref{fig:nmse_undersampling_synthetic}. \textsc{mnist} results for increasing number of iterations with the observation size $K = 100$~\protect\subref{fig:nmse_k_100} and $K = 250$~\protect\subref{fig:nmse_k_250}}
+  \caption{\textsc{nmse} results. The synthetic data results for different number of layers~\protect\subref{fig:nmse_n_layers_synthetic} and for different sizes of observations~\protect\subref{fig:nmse_undersampling_synthetic}. The \textsc{mnist} results for increasing number of iterations with the observation size $K = 100$~\protect\subref{fig:nmse_k_100} and $K = 250$~\protect\subref{fig:nmse_k_250}}
   \label{fig:number_of_layers_synthetic}
   \end{figure*}  
   
@@ -281,7 +285,7 @@ Then for new values of $\mathbf{W}$ and $\mathbf{S}$ derivatives of the logarith
   \centering
   \includegraphics[width=0.24\textwidth]{graphics/active_mnist/nmse_validation}
   %\subfloat[F measure]{\includegraphics[width=0.48\columnwidth]{graphics/active_mnist/f_measure_validation}}
-  \caption{\textsc{nmse} for active learning experiment on \textsc{mnist} data. }
+  \caption{\textsc{nmse} for the active learning experiment on \textsc{mnist} data. }
   \label{fig:active_learning_mnist}
   \end{figure}
   
@@ -314,7 +318,7 @@ Then for new values of $\mathbf{W}$ and $\mathbf{S}$ derivatives of the logarith
   
   
   \subsection{Predictive performance on \textsc{mnist} data}
-  In this experiment, the methods are evaluated on \textsc{mnist} dataset \cite{lecun1998gradient}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is standard random Gaussian. Observations are generated as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta \in \mathbb{R}^{784}$ are flattened images. We use $100$ images for training and $100$ for test. The shrinkage parameter $\lambda$ is~$0.1$.
+  In this experiment, the methods are evaluated on the \textsc{mnist} dataset \cite{lecun1998gradient}. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is standard random Gaussian. Observations are generated as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta \in \mathbb{R}^{784}$ are flattened images. We use $100$ images for training and $100$ for test. The shrinkage parameter $\lambda$ is~$0.1$.
   
   Figures \ref{fig:nmse_k_100} and~\ref{fig:nmse_k_250} present \textsc{nmse} with observation sizes $100$ and $250$. The experiment with $K=100$ presents severe conditions for the algorithms: the limited size of the training dataset combined with the small dimensionality of observations. Bayes\textsc{lista} is able to learn under these conditions, significantly outperforming \textsc{lista}. Under better conditions of the second experiment with $K=250$, both NNs converge to the similar results. However, Bayes\textsc{lista} demonstrates a remarkably better convergence rate. \textsc{ista} and \textsc{fista} are unable to perform well in these experiments.
   
@@ -337,7 +341,7 @@ Then for new values of $\mathbf{W}$ and $\mathbf{S}$ derivatives of the logarith
   \subsection{Active learning}
   To demonstrate a potential scenario that can benefit from uncertainty estimates of Bayes\textsc{lista}, we consider the active learning example~\cite{settles.tr09}. The active learning area researches ways to select new training subsets to reduce the total number of required supervision. One of the popular approaches in active learning is uncertainty sampling, when the data with the least certain predictions is chosen for labelling. We use a variance (\ref{eq:spsl_moments}) as a measure of uncertainty.
   
-  \textsc{mnist} dataset with the observation size $K=100$ is employed. We use the training data is of size $50$, the pool data of size $500$,  and the test data of size $100$. The algorithm learns on the training data and it is evaluated on the test data. To actively collect a next data point from the pool, the algorithm is used to predict a point with the highest uncertainty. The selected point is moved from the pool to the training data and the algorithms learns on the updated training data. Overall, $10$ pool additions are performed. After every addition the performance is measured on the test data. We compare the active approach of adding new points from the pool with the random approach that picks a new data point from the pool at random. The procedure is repeated for $20$ times.
+ The \textsc{mnist} dataset with the observation size $K=100$ is utilised. We use the training data of size $50$, the pool data of size $500$,  and the test data of size $100$. The algorithm learns on the training data and it is evaluated on the test data. To actively collect a next data point from the pool, the algorithm is used to predict a point with the highest uncertainty. The selected point is moved from the pool to the training data and the algorithms learns on the updated training data. Overall, $10$ pool additions are performed. After every addition the performance is measured on the test data. We compare the active approach of adding new points from the pool with the random approach that picks a new data point from the pool at random. The procedure is repeated for $20$ times.
   
   Figure \ref{fig:active_learning_mnist} demonstrates performance of the active and non-active methods of updates with Bayes\textsc{lista}. The active approach with uncertainty sampling steadily demonstrates better results. This means the posterior distribution learnt by Bayes\textsc{lista} is an adequate estimate of the true posterior.
   
