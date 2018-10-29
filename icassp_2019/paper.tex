@@ -40,7 +40,7 @@ e-mail: olga.isupova@eng.ox.ac.uk}
 \end{abstract}
 
 \begin{keywords}
-Sparse regression, Bayesian neural networks, uncertainty estimation, compressive sensing
+sparse coding, Bayesian neural networks, uncertainty estimation, compressive sensing
 \end{keywords}
 
 \section{Introduction}
@@ -50,9 +50,9 @@ Sparse regression, Bayesian neural networks, uncertainty estimation, compressive
 
   Recently several techniques~\cite{ranganath2015deep, gal2016dropout} have been proposed to handle specific types of NNs with efficient Bayesian inference. For example, feed-forward networks with the rectified linear unit nonlinearity~\cite{hernandez2015probabilistic}, networks with discrete distributions~\cite{soudry2014expectation}, recurrent networks~\cite{mcdermott2017bayesian}.
 
-  In this paper, we consider the area of sparse coding. The sparse coding problem can be viewed as a linear regression problem with the additional assumption that the majority of the basis representation coefficients should be zeros. This sparsity assumption may be represented as $l1$-penalty~\cite{tibshirani1996regression}, or, in Bayesian interpretation, as a prior that has a sharp peak at zero~\cite{tipping2001sparse}. One of the modern approaches for sparse coding utilises NNs with the soft-thresholding nonlinearity~\cite{gregor2010learning, sprechmann2015learning}. Sparse coding is widely used in different applications, such as compressive sensing~\cite{candes2008introduction}, image and video processing~\cite{mairal2014sparse, wang2015deep}, neuroscience~\cite{baillet1997bayesian, jas2017learning}.
+  In this paper, we consider the area of sparse coding. The sparse coding problem can be viewed as a linear regression problem with the additional assumption that the majority of the basis representation coefficients should be zeros. This sparsity assumption may be represented as $l1$ penalty~\cite{tibshirani1996regression}, or, in Bayesian interpretation, as a prior that has a sharp peak at zero~\cite{tipping2001sparse}. One of the modern approaches for sparse coding utilises NNs with the soft-thresholding nonlinearity~\cite{gregor2010learning, sprechmann2015learning}. Sparse coding is widely used in different applications, such as compressive sensing~\cite{candes2008introduction}, image and video processing~\cite{mairal2014sparse, wang2015deep}, neuroscience~\cite{baillet1997bayesian, jas2017learning}.
 
-  A novel method to propagate uncertainty through the soft-thresholding nonlinearity is proposed in this paper. At every layer the current distribution of the target vector is represented as a spike and slab distribution~\cite{mitchell1988bayesian}, which represents the probabilities of each variable being zero, or Gaussian-distributed. Using the proposed method of uncertainty propagation, the gradients of the logarithms of normalisation constants are derived, which can be used to update a weight distribution. A novel Bayesian NN for sparse coding is designed utilising both the proposed method of uncertainty propagation and Bayesian inference algorithm.
+  A novel method to propagate uncertainty through the soft-thresholding nonlinearity is proposed in this paper. At every layer the current distribution of the target vector is approximated with a spike and slab distribution~\cite{mitchell1988bayesian}, which represents the probabilities of each variable being zero, or Gaussian-distributed. Using the proposed method of uncertainty propagation, the gradients of the logarithms of normalisation constants are derived, which can be used to update a weight distribution. A novel Bayesian NN for sparse coding is designed utilising both the proposed method of uncertainty propagation and Bayesian inference algorithm.
 
   The main contributions of this paper are: (\textit{i}) for the first time a method for uncertainty propagation through the soft-thresholding nonlinearity is proposed for a Bayesian NN; (\textit{ii}) an efficient posterior inference algorithm for weights and outputs of NNs with the soft-thresholding nonlinearity is developed; (\textit{iii}) a novel Bayesian NN for sparse coding is designed.
 
@@ -67,9 +67,9 @@ Sparse regression, Bayesian neural networks, uncertainty estimation, compressive
   The NN approach to sparse coding is based on earlier Iterative Shrinkage and Thresholding Algorithm (\textsc{ista}) \cite{daubechies2004iterative}. It addresses the sparse coding problem as the linear regression problem with the $l1$ penalty that promotes sparsity. For the linear regression model with observations $\mathbf{y} \in \mathbb{R}^K$, the design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$, and the sparse unknown vector of weights $\boldsymbol\beta \in \mathbb{R}^D$, \textsc{ista} minimises
   \begin{equation}
   \label{eq:regression_problem}
-  ||\mathbf{X}\boldsymbol\beta - \mathbf{y}||_2^2 + \alpha ||\boldsymbol\beta||_1
+  ||\mathbf{X}\boldsymbol\beta - \mathbf{y}||_2^2 + \alpha ||\boldsymbol\beta||_1 \, \text{w.r.t.} \,\boldsymbol\beta,
   \end{equation}
-w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is a penalty parameter.
+  where $\alpha$ is a regularisation parameter.
   
   At every iteration $l$, \textsc{ista} obtains the new estimate $\widehat{\boldsymbol\beta}_l$ of the target vector $\boldsymbol\beta$ as the linear transformation $\mathbf{b} = \mathbf{W}\mathbf{y} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ propagated through the soft-thresholding function %$h_\lambda(\cdot)$
   \begin{equation}
