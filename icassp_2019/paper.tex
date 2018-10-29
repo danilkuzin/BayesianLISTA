@@ -36,7 +36,7 @@ e-mail: olga.isupova@eng.ox.ac.uk}
 \maketitle
 
 \begin{abstract}
-  Deep learning is actively used in the area of sparse coding. In current methods uncertainty of predictions is rarely estimated, thus providing the results that lack the quantitative justification. Bayesian learning provides the way to estimate the uncertainty of predictions in neural networks (NNs) by imposing the prior distributions on weights, propagating the resulting uncertainty through the layers and computing the posterior distributions of predictions. We propose a novel method of propagating the uncertainty through the sparsity-promoiting layers of NNs for the first time. We design a Bayesian Learned Iterative Shrinkage-Thresholding network (Bayes\textsc{lista}). An efficient posterior inference algorithm based on probabilistic backpropagation is developed. Experiments on sparse coding show that the proposed framework provides both accurate predictions and sensible estimates of uncertainty in these predictions.
+  Deep learning is actively used in the area of sparse coding. In current deep sparse coding methods uncertainty of predictions is rarely estimated, thus providing the results that lack the quantitative justification. Bayesian learning provides the way to estimate the uncertainty of predictions in neural networks (NNs) by imposing the prior distributions on weights, propagating the resulting uncertainty through the layers and computing the posterior distributions of predictions. We propose a novel method of propagating the uncertainty through the sparsity-promoiting layers of NNs for the first time. We design a Bayesian Learned Iterative Shrinkage-Thresholding network (Bayes\textsc{lista}). An efficient posterior inference algorithm based on probabilistic backpropagation is developed. Experiments on sparse coding show that the proposed framework provides both accurate predictions and sensible estimates of uncertainty in these predictions.
 \end{abstract}
 
 \begin{keywords}
@@ -86,7 +86,7 @@ w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is a penalty parameter.
     \begin{algorithmic}[1]
       \REQUIRE observations $\mathbf{y}$, weights $\mathbf{W}, \mathbf{S}$, number of layers $L$
       \STATE Dense layer $\mathbf{b} \gets \mathbf{W}\mathbf{y}$ \label{eq:first_layer}
-      \STATE soft-thresholding nonlinearity~$\widehat{\boldsymbol\beta}_0 \gets h_\lambda(\mathbf{b})$ \label{eq:thr_first}
+      \STATE Soft-thresholding nonlinearity~$\widehat{\boldsymbol\beta}_0 \gets h_\lambda(\mathbf{b})$ \label{eq:thr_first}
       \FOR{$l=1$ \TO $L$}
         \STATE Dense layer $\mathbf{c}_l \gets \mathbf{b} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ \label{eq:l_dense_layer}
         \STATE Soft-thresholding nonlinearity $\widehat{\boldsymbol\beta}_{l} \gets h_\lambda(\mathbf{c}_l)$ \label{eq:l_thr}
@@ -294,7 +294,7 @@ Then for new values of $\mathbf{W}$ and $\mathbf{S}$ derivatives of the logarith
   \subsection{Predictive performance on synthetic data}
   First, performance is analysed on synthetic data. We generate $N_\text{train}=1000$ and $N_{\text{test}} = 100$ sparse vectors $\boldsymbol\beta^{(n)}$ of size $D = 100$  from the spike and slab distribution with the truncated slab: each component $\beta^{(n)}_{d}$ is zero with the probability~$0.8$ or is sampled from the standard Gaussian distribution without interval $(-0.1, 0.1)$ with the probability~$0.2$. The design matrix $\mathbf{X}$ is random Gaussian.  The observations $\mathbf{y}^{(n)}$ are generated as in~(\ref{eq:regression_problem}) with the zero-mean Gaussian noise with the standard deviation $0.5$. The shrinkage parameter is set to~$\lambda = 0.1$. The algorithms are trained on the training data of size $N_\text{train}$ and evaluated on the test data of size $N_{\text{test}}$.
   
-  In \figurename~\ref{fig:nmse_n_layers_synthetic} \textsc{nmse} for different number of layers (or iterations) $L$ is presented. The observation size is set to $K=50$. Bayes\textsc{lista} outperforms competitors.
+  In \figurename~\ref{fig:nmse_n_layers_synthetic} \textsc{nmse} for up to 20 layers (or iterations) $L$ is presented. The observation size is set to $K=50$. Bayes\textsc{lista} outperforms competitors.
 %  \begin{figure}[t]
 %  \centering
 %  \subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/nmse_train}}
