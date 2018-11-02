@@ -42,34 +42,22 @@
 
 \title{Uncertainty propagation in neural networks for sparse coding}
 
-%\author{
-%  Danil Kuzin$^{\dagger}$, Olga Isupova$^{\star}$, Lyudmila Mihaylova$^{\dagger}$\\
-%  $^{\dagger}$Department of Automatic Control \qquad\qquad\qquad $^{\star}$ Department of Engineering Science\\
-%  and System Engineering \qquad\qquad\qquad\qquad\quad University of Oxford, UK\qquad\qquad\\
-%  \quad\qquad University of Sheffield, UK \qquad\qquad\qquad\qquad\quad \texttt{olga.isupova@eng.ox.ac.uk}\\
-%  \texttt{dkuzin1@sheffield.ac.uk} \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\\
-%  \texttt{l.s.mihaylova@sheffield.ac.uk} \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\\
-%}
 \author{
 Danil Kuzin$^{\dagger}$, Olga Isupova$^{\star}$, Lyudmila Mihaylova$^{\dagger}$\\
 $^{\dagger}$Department of Automatic Control
 and System Engineering,
-University of Sheffield, UK \\
+University of Sheffield, UK \\ 
 $^{\star}$Department of Engineering Science,
-University of Oxford, UK
+University of Oxford, UK \\
+\texttt{\{dkuzin1,l.s.mihaylova\}@sheffield.ac.uk,olga.isupova@eng.ox.ac.uk}
 }
 
 \begin{document}
-
 \maketitle
-%\begin{abstract}
-%Bayesian learning allows to estimate uncertainty of predictions in neural networks by imposing the prior distributions on weights, propagating the resulting uncertainty through the layers and computing the posterior distributions of predictions. We propose a novel method of propagating the uncertainty through the soft thresholding nonlinearity. The method expands the area of Bayesian neural networks and enables the soft thresholding nonlinearity to be included in Bayesian deep neural networks for the first time. We design a Bayesian Learned Iterative Shrinkage-Thresholding network (Bayesian \textsc{lista}). We develop an efficient posterior inference algorithm based on probabilistic backpropagation. A series of experiments on sparse coding shows that the proposed framework provides both accurate predictions and sensible estimates of uncertainty in these predictions.
-%\end{abstract}
-
 \section{Introduction}
   The idea of Bayesian learning in neural networks (NNs)~\cite{neal2012bayesian} has recently gained an attention with the development of distributed approximate inference techniques~\cite{li2015stochastic, hoffman2013stochastic} and general boost in popularity of deep learning. Recently several techniques~\cite{ranganath2015deep, gal2016dropout} have been proposed to handle specific types of NNs with efficient Bayesian inference. For example, feed-forward networks with the rectified linear unit nonlinearity~\cite{hernandez2015probabilistic}, networks with discrete distributions~\cite{soudry2014expectation}, recurrent networks~\cite{mcdermott2017bayesian}.
 
-  In this paper, we consider the area of sparse coding. The sparse coding problem can be viewed as a linear regression problem with the additional assumption that the majority of the basis representation coefficients should be zeros. This sparsity assumption may be represented as $l1$-penalty~\cite{tibshirani1996regression}, or, in Bayesian interpretation, as a prior that has a sharp peak at zero~\cite{tipping2001sparse}. One of the modern approaches for sparse coding utilises NNs with the soft-thresholding nonlinearity~\cite{gregor2010learning, sprechmann2015learning}. Sparse coding is widely used in different applications, such as compressive sensing~\cite{candes2008introduction}, image and video processing~\cite{mairal2014sparse, wang2015deep}, neuroscience~\cite{baillet1997bayesian, jas2017learning}.
+  In this paper, we consider the area of sparse coding. The sparse coding problem can be viewed as a linear regression problem with the additional assumption that the majority of the basis representation coefficients should be zeros. This sparsity assumption may be represented as $l1$ penalty~\cite{tibshirani1996regression}, or, in Bayesian interpretation, as a prior that has a sharp peak at zero~\cite{tipping2001sparse}. One of the modern approaches for sparse coding utilises NNs with the soft-thresholding nonlinearity~\cite{gregor2010learning, sprechmann2015learning}. Sparse coding is widely used in different applications, such as compressive sensing~\cite{candes2008introduction}, image and video processing~\cite{mairal2014sparse, wang2015deep}, neuroscience~\cite{baillet1997bayesian, jas2017learning}.
 
   A novel method to propagate uncertainty through the soft-thresholding nonlinearity is proposed in this paper. At every layer the current distribution of the target vector is represented as a spike and slab distribution~\cite{mitchell1988bayesian}, which represents the probabilities of each variable being zero, or Gaussian-distributed. Using the proposed method of uncertainty propagation, the gradients of the logarithms of normalisation constants are derived, which can be used to update a weight distribution. A novel Bayesian NN for sparse coding is designed utilising both the proposed method of uncertainty propagation and Bayesian inference algorithm.
 
@@ -86,11 +74,11 @@ University of Oxford, UK
   The NN approach to sparse coding is based on earlier Iterative Shrinkage and Thresholding Algorithm (\textsc{ista}) \cite{daubechies2004iterative}. It addresses the sparse coding problem as the linear regression problem with the $l1$ penalty that promotes sparsity. For the linear regression model with observations $\mathbf{y} \in \mathbb{R}^K$, the design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$, and the sparse unknown vector of weights $\boldsymbol\beta \in \mathbb{R}^D$, \textsc{ista} minimises
   \begin{equation}
   \label{eq:regression_problem}
-  ||\mathbf{X}\boldsymbol\beta - \mathbf{y}||_2^2 + \alpha ||\boldsymbol\beta||_1
+  ||\mathbf{X}\boldsymbol\beta - \mathbf{y}||_2^2 + \alpha ||\boldsymbol\beta||_1 \, \text{w.r.t.} \, \boldsymbol\beta,
   \end{equation}
-w.r.t.  $\boldsymbol\beta$,  where $\alpha$ is a penalty parameter.
+where $\alpha$ is a regularisation parameter.
  
- \begin{wrapfigure}[13]{l}{0.5\textwidth}  
+ \begin{wrapfigure}[13]{r}{0.5\textwidth}  
  \vspace{-10pt}
 \begin{minipage}{0.5\textwidth}
   \begin{algorithm}[H]
@@ -116,7 +104,7 @@ At every iteration $l$, \textsc{ista} obtains the new estimate $\widehat{\boldsy
   where $\lambda$ is a shrinkage parameter.
   In \textsc{ista}, weights $\mathbf{W}$ and $\mathbf{S}$ of the linear transformation are assumed fixed.
    
-In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} learns the values of matrices $\mathbf{W}$ and $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, \textsc{ista} is limited with the fixed amount of iterations $L$ and interpreted as a recurrent NN: every iteration $l$ of \textsc{ista} corresponds to the layer $l$ of \textsc{lista}. A vector $\boldsymbol\beta$ for an observation~$\mathbf{y}$ is predicted by Algorithm~\ref{alg:lista}.
+In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} learns the values of matrices $\mathbf{W}$ and $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, \textsc{ista} is limited with the fixed amount of iterations $L$ and interpreted as a recurrent NN: every iteration $l$ of \textsc{ista} corresponds to the layer $l$ of \textsc{lista}. A vector $\widehat{\boldsymbol\beta}$ for an observation~$\mathbf{y}$ is predicted by Algorithm~\ref{alg:lista}.
 
  % In \textsc{lista}, matrices $\mathbf{W}$ and $\mathbf{S}$ are the parameters that are initialised as in the \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$ and $\mathbf{b}$ are auxiliary vectors that describe forward propagation.
 
