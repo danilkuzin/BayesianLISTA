@@ -11,7 +11,7 @@
 \usepackage{float}
 
 \usepackage[square,numbers]{natbib}
-\usepackage[final]{nips_2018}
+\usepackage[preprint]{nips_2018}
 
 \usepackage{bbm}
 \usepackage{algorithm, algorithmic}
@@ -152,22 +152,22 @@ In the appendix we describe modification of \textsc{lista} forward propagation (
 
    \begin{figure}[!t]
   \centering
-  \subfloat[Synthetic for different $L$]{\includegraphics[width=0.25\textwidth]{graphics/synthetic_number_of_layers/nmse_validation}
+  \subfloat[Synthetic for different $L$]{\includegraphics[width=0.27\textwidth]{graphics/synthetic_number_of_layers/nmse_validation}
   \label{fig:nmse_n_layers_synthetic}}
   \hfil
-  \subfloat[Synthetic for different $K$]{\includegraphics[width=0.25\textwidth]{graphics/synthetic_undersampling/nmse_validation}
+  \subfloat[Synthetic for different $K$]{\includegraphics[width=0.27\textwidth]{graphics/synthetic_undersampling/nmse_validation}
   \label{fig:nmse_undersampling_synthetic}}
   \hfil
-  \subfloat[Active learning example]{\includegraphics[width=0.25\textwidth]{graphics/active_mnist/nmse_validation}
+  \subfloat[Active learning example]{\includegraphics[width=0.27\textwidth]{graphics/active_mnist/nmse_validation}
   \label{fig:active_learning_mnist}}
   \caption{\textsc{nmse} results. The synthetic data results for different number of layers~\protect\subref{fig:nmse_n_layers_synthetic} and for different sizes of observations~\protect\subref{fig:nmse_undersampling_synthetic}. The active learning example results on the \textsc{mnist} data~\protect\subref{fig:active_learning_mnist}.}
   \label{fig:number_of_layers_synthetic}
   \end{figure}  
   
-  Proposed Bayes\textsc{lista} is evaluated on sparse coding problems and compared with \textsc{lista}~\cite{gregor2010learning}, \textsc{ista} \cite{daubechies2004iterative} and Fast \textsc{ista} (\textsc{fista}) \cite{beck2009fast}. The number of iterations in \textsc{ista} and \textsc{fista}  and the number of layers in NNs is $L$. For quantitative comparison the normalised mean square error (\textsc{nmse}) is used. %We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for \textsc{lista} to learn.
+  Proposed Bayes\textsc{lista} is evaluated on sparse coding problems and compared with \textsc{lista}~\cite{gregor2010learning}, \textsc{ista} \cite{daubechies2004iterative} and Fast \textsc{ista} (\textsc{fista}) \cite{beck2009fast}. The number of iterations in \textsc{ista} and \textsc{fista} is same as the number of layers in NNs, denoted as $L$. For quantitative comparison the normalised mean square error (\textsc{nmse}) is used. %We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for \textsc{lista} to learn.
   
   \subsection{Predictive performance on synthetic data}
-  First, performance is analysed on synthetic data. We generate $N_\text{train}=1000$ and $N_{\text{test}} = 100$ sparse vectors $\boldsymbol\beta^{(n)}$ of size $D = 100$  from the spike and slab distribution with the truncated slab: each component $\beta^{(n)}_{d}$ is zero with the probability~$0.8$ or is sampled from the standard Gaussian distribution without interval $(-0.1, 0.1)$ with the probability~$0.2$. The design matrix $\mathbf{X}$ is random Gaussian.  The observations $\mathbf{y}^{(n)}$ are generated as in~(\ref{eq:regression_problem}) with the zero-mean Gaussian noise with the standard deviation $0.5$. The shrinkage parameter is set to~$\lambda = 0.1$. The algorithms are trained on the training data of size $N_\text{train}$ and evaluated on the test data of size $N_{\text{test}}$.
+  First, performance is analysed on synthetic data. We generate $N_\text{train}=1000$ and $N_{\text{test}} = 100$ sparse vectors $\boldsymbol\beta^{(n)}$ of size $D = 100$  from the spike and slab distribution with the truncated slab: each component $\beta^{(n)}_{d}$ is zero with the probability~$0.8$ or is sampled from the standard Gaussian distribution without interval $(-0.1, 0.1)$ with the probability~$0.2$. The design matrix $\mathbf{X}$ is standard random Gaussian.  The observations $\mathbf{y}^{(n)}$ are generated as $\mathbf{X} \boldsymbol\beta^{(n)}$ with the additive zero-mean Gaussian noise with the standard deviation $0.5$. The shrinkage parameter is set to~$\lambda = 0.1$. The algorithms are trained on the training data of size $N_\text{train}$ and evaluated on the test data of size $N_{\text{test}}$.
   
   In \figurename~\ref{fig:nmse_n_layers_synthetic} \textsc{nmse} for different number of layers (or iterations) $L$ is presented. The observation size is set to $K=50$. Bayes\textsc{lista} outperforms competitors.
 %  \begin{figure}[t]
@@ -194,7 +194,7 @@ In the appendix we describe modification of \textsc{lista} forward propagation (
   \subsection{Active learning}
  To demonstrate a potential scenario that can benefit from uncertainty estimates of Bayes\textsc{lista}, we consider the active learning example~\cite{settles.tr09}. The active learning area researches ways to select new training subsets to reduce the total number of required supervision. One of the popular approaches in active learning is uncertainty sampling, when the data with the least certain predictions is chosen for labelling. We use a variance of the spike and slab distributed prediction as a measure of uncertainty.
   
- The \textsc{mnist} dataset~\cite{lecun1998gradient} is utilised. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is standard random Gaussian. Observations are generated as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta \in \mathbb{R}^{784}$ are flattened images. The shrinkage parameter $\lambda$ is~$0.1$, the observation size $K$ is $100$.
+ The \textsc{mnist} dataset~\cite{lecun1998gradient} is utilised. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is standard random Gaussian. Observations are generated as $\mathbf{y}^{(n)} = \mathbf{X}\boldsymbol\beta^{(n)}$, where $\boldsymbol\beta^{(n)} \in \mathbb{R}^{784}$ are flattened images. The shrinkage parameter $\lambda$ is~$0.1$, the observation size $K$ is $100$.
 
  We use the training data of size $50$, the pool data of size $500$,  and the test data of size $100$. The algorithm learns on the training data and it is evaluated on the test data. To actively collect a next data point from the pool, the algorithm is used to predict a point with the highest uncertainty. The selected point is moved from the pool to the training data and the algorithms learns on the updated training data. Overall, $10$ pool additions are performed. After every addition the performance is measured on the test data. We compare the active approach of adding new points from the pool with the random approach that picks a new data point from the pool at random. The procedure is repeated for $20$ times.
   
@@ -285,7 +285,7 @@ According to the Central Limit Theorem $[ \mathbf{e}_l ]_d$ can be approximated 
 %  \end{equation}
   
   
-  Then $\widehat{\boldsymbol\beta}_{l}$ at step \ref{eq:l_thr} of \textsc{lista} (Algorithm~\ref{alg:lista}) is the result of soft-thresholding of a Gaussian variable, which is approximated with the spike and slab distribution,  similar to step \ref{eq:thr_first} (section~\ref{subsec:forward_init}).
+  Then $\widehat{\boldsymbol\beta}_{l}$ at step \ref{eq:l_thr} of \textsc{lista} (Algorithm~\ref{alg:lista}) is the result of soft-thresholding of a Gaussian variable, which is approximated with the spike and slab distribution,  similar to step \ref{eq:thr_first}.
   Thus, all the steps of Bayes\textsc{lista} are covered and distributions for outputs of these steps are derived.
   
   \section*{Appendix B: Backpropagation}
@@ -314,7 +314,7 @@ q(\mathbf{W}, \mathbf{S}, \gamma, \eta) &= \prod_{d=1}^D\prod_{k=1}^K \mathcal{N
   \end{equation}
 Then for new values of $\mathbf{W}$ and $\mathbf{S}$ derivatives of the logarithm of $Z$ are required when the factor of $p$ is incorporated in $q$.
   
-  With the likelihood factors~(\ref{eq:likelihood}) of $p$ the ADF approach is employed and they are iteratively incorporated into $q$. The normalisation constant of $q$ with the likelihood term for the data point $n$ incorporated is (let $z_d$ denote (to simplify notation the superscript $(n)$ is omitted)
+  With the likelihood factors~(\ref{eq:likelihood}) of $p$ the ADF approach is employed and they are iteratively incorporated into $q$. The normalisation constant of $q$ with the likelihood term for the data point $n$ incorporated is (to simplify notation the superscript $(n)$ is omitted)
   \begin{equation}
   Z  = \int \prod_{d=1}^{D} \mathcal{N}(\beta_d ; [f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)]_d, \gamma^{-1}) q(\mathbf{W}, \mathbf{S}, \gamma, \eta) \mathrm{d}\mathbf{W} \mathrm{d}\mathbf{S} \mathrm{d}\gamma \mathrm{d}\eta
   \end{equation}
@@ -329,10 +329,10 @@ Z \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}
   
    \begin{figure}[!t]
   \centering
-  \subfloat[\textsc{mnist} for $K = 100$]{\includegraphics[width=0.25\textwidth]{graphics/mnist/100_nmse_valid}
+  \subfloat[\textsc{mnist} for $K = 100$]{\includegraphics[width=0.27\textwidth]{graphics/mnist/100_nmse_valid}
   \label{fig:nmse_k_100}}
   \hfil
-  \subfloat[\textsc{mnist} for $K = 250$]{\includegraphics[width=0.25\textwidth]{graphics/mnist/250_nmse_valid}
+  \subfloat[\textsc{mnist} for $K = 250$]{\includegraphics[width=0.27\textwidth]{graphics/mnist/250_nmse_valid}
   \label{fig:nmse_k_250}}
   \caption{\textsc{nmse} results on the \textsc{mnist} data for increasing number of iterations with the observation size $K = 100$~\protect\subref{fig:nmse_k_100} and $K = 250$~\protect\subref{fig:nmse_k_250}}
   \label{fig:number_of_layers_synthetic}

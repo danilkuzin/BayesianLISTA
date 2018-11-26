@@ -218,8 +218,17 @@ nips_workshop_2018/BayesianLISTA.out
 nips_workshop_2018/BayesianLISTA.pdf
 icassp_2019/BayesianNNForSparceCoding.pdf
 nips_workshop_2018/BayesianLISTA_nips2018workshop.pdf
+
 *.blg
 *.out
 nips_workshop_2018/camera_ready/BayesianLISTA.pdf
 nips_workshop_2018/camera_ready/BayesianLISTA.bbl
 *.bbl
+
+SparseUtils/.idea/*
+SparseUtils/gauss.pdf
+SparseUtils/spsl.pdf
+SparseUtils/strong_sparse.pdf
+SparseUtils/weak_sparse.pdf
+SparseUtils/s_thr.svg
+SparseUtils/s_thr.png
