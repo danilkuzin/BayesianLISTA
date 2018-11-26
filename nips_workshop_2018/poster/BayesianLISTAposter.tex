@@ -1,12 +1,16 @@
 \documentclass[25pt, a0paper, portrait, margin=0mm, innermargin=15mm, blockverticalspace=15mm, colspace=15mm, subcolspace=8mm]{tikzposter}
 \usepackage{mathtools}
-\usepackage{algorithm}
+\usepackage[boxed]{algorithm}
 \usepackage{algorithmic}
 \usepackage{wrapfig}
 \usepackage{pgfplots}
 \usepackage{subcaption}
 \usepackage{etoolbox}
 \usepackage{booktabs}
+
+\AtBeginEnvironment{algorithm}{%
+  \setlength{\columnwidth}{\linewidth}%
+}
 
 \title{Uncertainty propagation in neural networks for sparse coding}   \institute{University of Sheffield, UK, University of Oxford, UK }
 \author{Danil Kuzin, Olga Isupova, Lyudmila Mihaylova}   \titlegraphic{Logo}
@@ -17,28 +21,49 @@
   \begin{columns}
     \column{0.5}
     \block{1-LISTA}{
-      \innerblock{Sparse coding}{
-        Reconstruct $\boldsymbol\beta$ from observations $\mathbf{y}$ collected as $\mathbf{y} = \mathbf{X} \boldsymbol\beta + \boldsymbol\varepsilon$, such that elements $\boldsymbol\beta$ contain zeros. 
-      }
-      \innerblock{LISTA}{
-        \begin{itemize}
-          \item Represent iterative soft-thresholding algorithm as a recurrent neural network with shared weights
-          \item Learn weights with backpropagation through time
-          \item Overfitting
-          \item No uncertainty estimation
-        \end{itemize} 
+      \begin{minipage}[t]{0.55\linewidth}
+        \vspace{0.1in}
+        \coloredbox{
+          Estimate \(\boldsymbol\beta \) from observations \(\mathbf{y}\) collected as \(\mathbf{y} = \mathbf{X} \boldsymbol\beta + \boldsymbol\varepsilon\), s.t.\ elements \(\boldsymbol\beta \) contain zeros. 
+        }
+      \end{minipage}
+      \begin{minipage}[t]{0.4\linewidth}
+        \begin{tikzfigure}
+          \includegraphics[width=400pt]{graphics/sparse_problem.pdf}
+        \end{tikzfigure}
+      \end{minipage}
 
-        \begin{algorithmic}[1]
-          \REQUIRE observation $\mathbf{y}$, current weights $\mathbf{W}, \mathbf{S}$, number of layers $L$
-          \STATE \textit{Initialisation.} Dense layer $\mathbf{b} \gets \mathbf{W}\mathbf{y}$
-          \STATE \textit{Initialisation.} Soft-thresholding nonlinearity $\widehat{\boldsymbol\beta}_0 \gets h_\lambda(\mathbf{b})$
-          \FOR{$l=1$ \TO $L$}
-          \STATE Dense layer $\mathbf{c}_l \gets \mathbf{b} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$
-          \STATE Soft-thresholding nonlinearity $\widehat{\boldsymbol\beta}_{l} \gets h_\lambda(\mathbf{c}_l)$
-          \ENDFOR
-          \RETURN $\widehat{\boldsymbol\beta} \gets \widehat{\boldsymbol\beta}_{L}$
-        \end{algorithmic}     
-      }
+      \begin{minipage}[t]{0.55\linewidth}
+        \emph{LISTA}
+        \begin{itemize}
+          \item Represent iterative soft-thresholding algorithm as RNN with shared weights
+          \item Learn weights with BPTT
+        \end{itemize} 
+      %\end{minipage}
+
+      %\begin{minipage}[t]{0.55\linewidth}
+        
+        \begin{algorithm}[H]
+          \begin{algorithmic}
+            \STATE \textit{Init.} Dense $\mathbf{b} \gets \mathbf{W}\mathbf{y}$
+            \STATE \textit{Init.} Soft-thresholding $\widehat{\boldsymbol\beta}_0 \gets h_\lambda(\mathbf{b})$
+            \FOR{$l=1$ \TO $L$} 
+            \STATE Dense $\mathbf{c}_l \gets \mathbf{b} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$
+            \STATE Soft-thresholding $\widehat{\boldsymbol\beta}_{l} \gets h_\lambda(\mathbf{c}_l)$
+            \ENDFOR
+            \RETURN $\widehat{\boldsymbol\beta} \gets \widehat{\boldsymbol\beta}_{L}$
+          \end{algorithmic}   
+        \end{algorithm}
+          \begin{itemize}
+            \item[] {\color{red}Overfitting}
+            \item[] {\color{red}No uncertainty estimation}
+          \end{itemize} 
+      \end{minipage} 
+      \begin{minipage}[t]{0.4\linewidth} 
+        \begin{tikzfigure}
+          \includegraphics[width=400pt]{graphics/LISTA_main.pdf}
+        \end{tikzfigure}
+      \end{minipage}
     }
     \block{3-Uncertainty propagation}{
       \innerblock{Idea}{
@@ -62,9 +87,18 @@
     \block{2-BayesLISTA}{ 
       \innerblock{Bayesian LISTA}{
       \begin{itemize}
-        \item Add priors for NN weights
-        \item Perform full Bayesian inference
-        \item Estimate uncertainty of predictions
+        \item[] Add priors for NN weights
+        \begin{equation}
+          p(\mathbf{W}) = \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{ij} ; 0, \eta^{-1}), \quad
+          p(\mathbf{S}) = \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd''} ; 0, \eta^{-1}),
+        \end{equation}
+        \item[] Propagate distribution for $\widehat{\boldsymbol\beta}$ through layers
+        \item[] Compute prediction as noisy NN output
+        \begin{equation}
+          p(\mathbf{\boldsymbol\beta}| \mathbf{y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda)
+          = \prod_{d=1}^D\mathcal{N}\left(\beta_d; [f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)]_d, \gamma^{-1}\right)
+        \end{equation}
+        \item[] Update weights with PBP
       \end{itemize}
       }
     }
