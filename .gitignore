@@ -218,3 +218,8 @@ nips_workshop_2018/BayesianLISTA.out
 nips_workshop_2018/BayesianLISTA.pdf
 icassp_2019/BayesianNNForSparceCoding.pdf
 nips_workshop_2018/BayesianLISTA_nips2018workshop.pdf
+*.blg
+*.out
+nips_workshop_2018/camera_ready/BayesianLISTA.pdf
+nips_workshop_2018/camera_ready/BayesianLISTA.bbl
+*.bbl
