@@ -12,6 +12,21 @@
   \setlength{\columnwidth}{\linewidth}%
 }
 
+\renewenvironment{tikzfigure}[1][]{
+  \def \rememberparameter{#1}
+  \vspace{10pt}
+  \refstepcounter{figurecounter}
+  \begin{center}
+  }{
+    \ifx\rememberparameter\@empty
+    \else %nothing
+    \\[10pt]
+    %{\small Fig.~\thefigurecounter: \rememberparameter}
+    {\small \rememberparameter}
+    \fi
+  \end{center}
+}
+
 \title{Uncertainty propagation in neural networks for sparse coding}   \institute{University of Sheffield, UK, University of Oxford, UK }
 \author{Danil Kuzin, Olga Isupova, Lyudmila Mihaylova}   \titlegraphic{Logo}
 \usetheme{Autumn}
@@ -66,7 +81,7 @@
       \end{minipage}
     }
     \block{3-Uncertainty propagation}{
-      \innerblock{Idea}{
+      %\innerblock{Idea}{
         At every step the output of soft-thresholding can be closely approximated with spike and slab distribution
       \begin{enumerate}
         \item \(\mathbf{b} = \mathbf{W}\mathbf{y}\) is Gaussian-distributed
@@ -75,58 +90,88 @@
         \item \(\mathbf{c}_l = \mathbf{b} + \mathbf{e}_l\) is Gaussian-distributed
         \item \(\widehat{\boldsymbol\beta}_{l} = h_\lambda(\mathbf{c}_l)\) is approximated with the spike and slab distribution
       \end{enumerate}
-      }
-      \innerblock{Advantages}{
+      \begin{tikzfigure}
+        \includegraphics[width=400pt]{graphics/spsl_propagation.pdf}
+      \end{tikzfigure}
+      %}
+      %\innerblock{Advantages}{
         \begin{itemize}
           \item All latent variables are modelled with parametrised distributions
           \item We can apply approximate Bayesian inference methods
         \end{itemize}
-      }
+      %}
+    }
+    \block{6-References}{
+      \begin{itemize}
+        \item J. M. Hern{\'a}ndez-Lobato, R. Adams. Probabilistic backpropagation for scalable learning of Bayesian neural networks. ICML 2015.
+        \item K. Gregor, Y. LeCun. Learning fast approximations of sparse coding. ICML 2010.
+      \end{itemize}
     }
     \column{0.5}
     \block{2-BayesLISTA}{ 
       \begin{itemize}
-        \item[] Add priors for NN weights
+        \item Add priors for NN weights
         \begin{equation}
           p(\mathbf{W}) = \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{ij} ; 0, \eta^{-1}), \quad
           p(\mathbf{S}) = \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd''} ; 0, \eta^{-1}),
         \end{equation}
-        \item[] Propagate distribution for $\widehat{\boldsymbol\beta}$ through layers
-        \item[] Compute prediction as noisy NN output
+        \item Propagate distribution for $\widehat{\boldsymbol\beta}$ through layers
+        \item Compute prediction as noisy NN output
         \begin{equation}
           p(\mathbf{\boldsymbol\beta}| \mathbf{y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda)
           = \prod_{d=1}^D\mathcal{N}\left(\beta_d; [f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)]_d, \gamma^{-1}\right)
         \end{equation}
-        \item[] Update weights with PBP
+        \item Update weights with PBP
       \end{itemize}
       }
-    \block{4-BackProp-PBP}{Blocktext}
+    \block{4-BackProp-PBP}{
+      Approximate posterior
+    \begin{align}
+    \label{eq:approximating_dsitribution}
+    \begin{split}
+    q(\mathbf{W}, \mathbf{S}, \gamma, \eta) &= \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{dk} ; m^w_{dk}, v^w_{dk}) \prod_{d'=1}^D\prod_{d''=1}^D \mathcal{N}(s_{d'd''} ; m^s_{d'd''}, v^s_{d'd''}) \\
+    &\times \text{Gam}(\gamma; a^\gamma, b^\gamma) \text{Gam}(\eta; a^\eta, b^\eta)
+    \end{split}
+    \end{align}
+    
+    probabilistic backpropagation algorithm: derivatives of the logarithm of a normalisation constant
+
+    \begin{equation}
+    q(a) = Z^{-1}f(a)\mathcal{N}(a; m, v)
+    \end{equation}
+    \begin{equation}
+    Z \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}\left(\beta_d ; 0, \beta^\gamma / \alpha^\gamma, 2\alpha^\gamma\right) + \vphantom{m^{\widehat{\boldsymbol\beta}}_d} \left(1 - \omega^{\widehat{\boldsymbol\beta}}_d\right)\mathcal{N}\left(\beta_d ; m^{\widehat{\boldsymbol\beta}}_d,  \beta^\gamma / (\alpha^\gamma - 1) + v^{\widehat{\boldsymbol\beta}}_d\right)\right],
+    \end{equation}
+    where $\{\omega^{\widehat{\boldsymbol\beta}}_d, m^{\widehat{\boldsymbol\beta}}_d, v^{\widehat{\boldsymbol\beta}}_d\}$ are the parameters of the spike and slab distribution for $[\widehat{\boldsymbol\beta}]_d$. 
+    
+    }
     \block{5-Results}{
-      \innerblock{Synthetic Experiments}{
+      %\innerblock{Synthetic Experiments}{
+        \emph{Synthetic}
         \begin{tikzfigure}[Different depth performance]
           \subcaptionbox*{\emph{NMSE}}{%
-                     \includegraphics[width=200pt]{graphics/synthetic_number_of_layers/nmse_validation}
+                     \includegraphics[width=300pt]{graphics/synthetic_number_of_layers/nmse_validation}
           }
           \quad
           \subcaptionbox*{\emph{F measure}}{%
-                     \includegraphics[width=200pt]{graphics/synthetic_number_of_layers/f_measure_validation}
+                     \includegraphics[width=300pt]{graphics/synthetic_number_of_layers/f_measure_validation}
           }
           %\captionsetup{labelformat=empty}
         \end{tikzfigure}
 
         \begin{tikzfigure}[Different observation size performance]
           \subcaptionbox*{\emph{NMSE}}{%
-                     \includegraphics[width=200pt]{graphics/synthetic_undersampling/nmse_validation}
+                     \includegraphics[width=300pt]{graphics/synthetic_undersampling/nmse_validation}
           }
           \quad
           \subcaptionbox*{\emph{F measure}}{%
-                     \includegraphics[width=200pt]{graphics/synthetic_undersampling/f_measure_validation}
+                     \includegraphics[width=300pt]{graphics/synthetic_undersampling/f_measure_validation}
           }
           %\captionsetup{labelformat=empty}
         \end{tikzfigure}
-      }
-      
-      \innerblock{MNIST Experiments}{
+      %}
+      \emph{MNIST}
+      %\innerblock{MNIST Experiments}{
         \begin{tikzfigure}[Posterior parameters for an image of digit 7]
           \subcaptionbox*{posterior mean}{
             \includegraphics[width=200pt]{graphics/posterior_mean}
@@ -139,33 +184,33 @@
 
         \begin{tikzfigure}[Samples from the posterior for an image of digit 7]
           \subcaptionbox*{posterior sample 0}{
-            \includegraphics[width=150pt]{graphics/posterior_sample_0}
+            \includegraphics[width=200pt]{graphics/posterior_sample_0}
           }
           \quad
           \subcaptionbox*{posterior sample 1}{
-            \includegraphics[width=150pt]{graphics/posterior_sample_1}
+            \includegraphics[width=200pt]{graphics/posterior_sample_1}
           }
           \quad
           \subcaptionbox*{posterior sample 2}{
-            \includegraphics[width=150pt]{graphics/posterior_sample_2}
+            \includegraphics[width=200pt]{graphics/posterior_sample_2}
           }
         \end{tikzfigure}
-      }
+      %}
       
-      \innerblock{Active Learning}{
+      %\innerblock{Active Learning}{
+      \emph{Active Learning}
         Use the estimated uncertainty to choose next training data with largest variance
         \begin{tikzfigure}[Sequential pool additions]
         \subcaptionbox*{NMSE}{
-            \includegraphics[width=200pt]{graphics/active_mnist/nmse_validation}
+            \includegraphics[width=300pt]{graphics/active_mnist/nmse_validation}
         }
         \subcaptionbox*{F measure}{
-            \includegraphics[width=200pt]{graphics/active_mnist/f_measure_validation}
+            \includegraphics[width=300pt]{graphics/active_mnist/f_measure_validation}
         }
         \end{tikzfigure}
-      }
+      %}
+
+
     }
-    
-    \block{6-Summary}{Blocktext}
-    \note{Notetext}
   \end{columns}
 \end{document}
