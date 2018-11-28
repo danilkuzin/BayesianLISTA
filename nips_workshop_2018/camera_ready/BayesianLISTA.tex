@@ -11,6 +11,7 @@
 \usepackage{float}
 
 \usepackage[square,numbers]{natbib}
+%\usepackage[final]{nips_2018}
 \usepackage[final]{bdl_2018}
 
 \usepackage{bbm}
@@ -59,19 +60,18 @@ University of Oxford, UK \\
 
   In this paper, we consider the area of sparse coding. The sparse coding problem can be viewed as a linear regression problem with the additional assumption that the majority of the basis representation coefficients should be zeros. This sparsity assumption may be represented as $l1$ penalty~\cite{tibshirani1996regression}, or, in Bayesian interpretation, as a prior that has a sharp peak at zero~\cite{tipping2001sparse}. One of the modern approaches for sparse coding utilises NNs with the soft-thresholding nonlinearity~\cite{gregor2010learning, sprechmann2015learning}. Sparse coding is widely used in different applications, such as compressive sensing~\cite{candes2008introduction}, image and video processing~\cite{mairal2014sparse, wang2015deep}, neuroscience~\cite{baillet1997bayesian, jas2017learning}.
 
-  A novel method to propagate uncertainty through the soft-thresholding nonlinearity is proposed in this paper. At every layer the current distribution of the target vector is represented as a spike and slab distribution~\cite{mitchell1988bayesian}, which represents the probabilities of each variable being zero, or Gaussian-distributed. Using the proposed method of uncertainty propagation, the gradients of the logarithms of normalisation constants are derived, which can be used to update a weight distribution. A novel Bayesian NN for sparse coding is designed utilising both the proposed method of uncertainty propagation and Bayesian inference algorithm.
+  A novel method to propagate uncertainty through the soft-thresholding nonlinearity is proposed in this paper. At every layer the current distribution of the target vector is represented as a spike and slab distribution~\cite{mitchell1988bayesian}, which represents the probabilities of each variable being zero, or Gaussian-distributed. Using the proposed method of uncertainty propagation, the gradients of the logarithms of normalisation constants are derived, that can be used to update a weight distribution. A novel Bayesian NN for sparse coding is designed utilising both the proposed method of uncertainty propagation and Bayesian inference algorithm.
 
   The main contributions of this paper are: (\textit{i}) for the first time a method for uncertainty propagation through the soft-thresholding nonlinearity is proposed for a Bayesian NN; (\textit{ii}) an efficient posterior inference algorithm for weights and outputs of NNs with the soft-thresholding nonlinearity is developed; (\textit{iii}) a novel Bayesian NN for sparse coding is designed.
 
-% The rest of the paper is organised as follows. A novel Bayesian neural network is introduced in Section~\ref{sec:bayesian_lista}. The proposed forward uncertainty propagation and probabilistic backpropagation methods are given in Sections~\ref{sec:fprop} and~\ref{sec:backpropagation}. Section~\ref{sec:experiments} provides the experimental results and Section~\ref{sec:conclusions} concludes the paper.
-
+ The rest of the paper is organised as follows. A NN approach for sparse coding is described in Section~\ref{subsec:nn_sc}. The Bayesian formulation is introduced in Section~\ref{subsec:bayesian_lista}. Section~\ref{sec:experiments} provides the experimental results. The proposed forward uncertainty propagation and probabilistic backpropagation methods are given in Appendices~\ref{sec:fprop} and~\ref{sec:backpropagation}. 
 \section{Neural networks for sparse coding}
   \label{sec:bayesian_lista}
   The section first reviews existing NNs for sparse coding and then introduces the novel Bayesian NN.
   
 \subsection{Frequentist neural networks}  
 \label{subsec:nn_sc}
-  The NN approach to sparse coding is based on earlier Iterative Shrinkage and Thresholding Algorithm (\textsc{ista}) \cite{daubechies2004iterative}. It addresses the sparse coding problem as the linear regression problem with the $l1$ penalty that promotes sparsity. For the linear regression model with observations $\mathbf{y} \in \mathbb{R}^K$, the design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$, and the sparse unknown vector of weights $\boldsymbol\beta \in \mathbb{R}^D$, \textsc{ista} minimises
+  The NN approach to sparse coding is based on earlier Iterative Shrinkage and Thresholding Algorithm (ISTA) \cite{daubechies2004iterative}. It addresses the sparse coding problem as the linear regression problem with the $l1$ penalty that promotes sparsity. For the linear regression model with observations $\mathbf{y} \in \mathbb{R}^K$, the design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$, and the sparse unknown vector of weights $\boldsymbol\beta \in \mathbb{R}^D$, ISTA minimises
   \begin{equation}
   \label{eq:regression_problem}
   ||\mathbf{X}\boldsymbol\beta - \mathbf{y}||_2^2 + \alpha ||\boldsymbol\beta||_1 \, \text{w.r.t.} \, \boldsymbol\beta,
@@ -82,7 +82,7 @@ where $\alpha$ is a regularisation parameter.
  \vspace{-10pt}
 \begin{minipage}{0.5\textwidth}
   \begin{algorithm}[H]
-    \caption{\textsc{lista} forward propagation}
+    \caption{LISTA forward propagation}
 \label{alg:lista}   
     \begin{algorithmic}[1]
       \REQUIRE observations $\mathbf{y}$, weights $\mathbf{W}, \mathbf{S}$, number of layers $L$
@@ -97,20 +97,20 @@ where $\alpha$ is a regularisation parameter.
   \end{algorithm}
 \end{minipage}
 \end{wrapfigure}  
-At every iteration $l$, \textsc{ista} obtains the new estimate $\widehat{\boldsymbol\beta}_l$ of the target vector $\boldsymbol\beta$ as the linear transformation $\mathbf{b} = \mathbf{W}\mathbf{y} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ propagated through the soft-thresholding function %$h_\lambda(\cdot)$
+At every iteration $l$, ISTA obtains the new estimate $\widehat{\boldsymbol\beta}_l$ of the target vector $\boldsymbol\beta$ as the linear transformation $\mathbf{b} = \mathbf{W}\mathbf{y} + \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ propagated through the soft-thresholding function %$h_\lambda(\cdot)$
   \begin{equation}
   h_\lambda(\mathbf{b}) = \text{sgn}(\mathbf{b}) \max(|\mathbf{b}| - \lambda, 0),
   \end{equation}
   where $\lambda$ is a shrinkage parameter.
-  In \textsc{ista}, weights $\mathbf{W}$ and $\mathbf{S}$ of the linear transformation are assumed fixed.
+  In ISTA, weights $\mathbf{W}$ and $\mathbf{S}$ of the linear transformation are assumed fixed.
    
-In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{gregor2010learning} learns the values of matrices $\mathbf{W}$ and $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, \textsc{ista} is limited with the fixed amount of iterations $L$ and interpreted as a recurrent NN: every iteration $l$ of \textsc{ista} corresponds to the layer $l$ of \textsc{lista}. A vector $\widehat{\boldsymbol\beta}$ for an observation~$\mathbf{y}$ is predicted by Algorithm~\ref{alg:lista}.
+In contrast to ISTA, Learned ISTA (LISTA) \cite{gregor2010learning} learns the values of matrices $\mathbf{W}$ and $\mathbf{S}$ based on a set of pairs $\{\mathbf{Y}, \mathbf{B}\}=\{\mathbf{y}^{(n)}, \boldsymbol\beta^{(n)}\}_{n=1}^N$, where $N$ is the number of these pairs. To achieve this, ISTA is limited with the fixed amount of iterations $L$ and interpreted as a recurrent NN: every iteration $l$ of ISTA corresponds to the layer $l$ of LISTA. A vector $\widehat{\boldsymbol\beta}$ for an observation~$\mathbf{y}$ is predicted by Algorithm~\ref{alg:lista}.
 
- % In \textsc{lista}, matrices $\mathbf{W}$ and $\mathbf{S}$ are the parameters that are initialised as in the \textsc{ista} and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$ and $\mathbf{b}$ are auxiliary vectors that describe forward propagation.
+ % In LISTA, matrices $\mathbf{W}$ and $\mathbf{S}$ are the parameters that are initialised as in the ISTA and then updated with the backpropagation algorithm. Vectors $\mathbf{c}_l$ and $\mathbf{b}$ are auxiliary vectors that describe forward propagation.
 
-  \subsection{Bayes\textsc{lista}}
+  \subsection{BayesLISTA}
   \label{subsec:bayesian_lista}
-  This section introduces the proposed Bayesian version of \textsc{lista} (Bayes\textsc{lista}). The prior distributions are imposed on the unknown weights
+  This section introduces the proposed Bayesian version of LISTA (BayesLISTA). The prior distributions are imposed on the unknown weights
   \begin{equation}
   \label{eq:ws}
   p(\mathbf{W}) = \prod_{d=1}^D\prod_{k=1}^K \mathcal{N}(w_{ij} ; 0, \eta^{-1}), \quad
@@ -118,13 +118,13 @@ In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{grego
   \end{equation}
   where $\eta$ is the precision of the Gaussian distribution.
   
-  For every layer $l$ of Bayes\textsc{lista}, $\widehat{\boldsymbol\beta}_{l}$ is assumed to have the spike and slab distribution with the spike probability $\boldsymbol\omega$, the slab mean $\mathbf{m}$, and the slab variance $\mathbf{v}$
+  For every layer $l$ of BayesLISTA, $\widehat{\boldsymbol\beta}_{l}$ is assumed to have the spike and slab distribution with the spike probability $\boldsymbol\omega$, the slab mean $\mathbf{m}$, and the slab variance $\mathbf{v}$
   \begin{equation}
   [\widehat{\boldsymbol\beta}_{l}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d),
   \end{equation}
-  where $\delta_0$ is the delta-function that represents a spike, $[\cdot]_d$ denotes the $d$-th component of a vector. In appendix we show that the output of the next layer $\widehat{\boldsymbol\beta}_{l+1}$ can be approximated with the spike and slab distribution and, therefore, the output of the Bayes\textsc{lista} network $\widehat{\boldsymbol\beta}$ has the spike and slab distribution.
+  where $\delta_0$ is the delta-function that represents a spike, $[\cdot]_d$ denotes the $d$-th component of a vector. In appendix we show that the output of the next layer $\widehat{\boldsymbol\beta}_{l+1}$ can be approximated with the spike and slab distribution and, therefore, the output of the BayesLISTA network $\widehat{\boldsymbol\beta}$ has the spike and slab distribution.
   
-  To introduce the uncertainty of predictions, we assume that the true $\boldsymbol\beta$ is an output $f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$ of the Bayes\textsc{lista} network corrupted by the additive Gaussian zero-mean noise with the precision~$\gamma$. Then the likelihood of $\mathbf{B}$ is defined as
+  To introduce the uncertainty of predictions, we assume that the true $\boldsymbol\beta$ is an output $f(\mathbf{y} ; \mathbf{S}, \mathbf{W}, \lambda)$ of the BayesLISTA network corrupted by the additive Gaussian zero-mean noise with the precision~$\gamma$. Then the likelihood of $\mathbf{B}$ is defined as
   \begin{equation}
   \label{eq:likelihood}
   p(\mathbf{B}| \mathbf{Y}, \mathbf{W}, \mathbf{S}, \gamma, \lambda)
@@ -145,7 +145,7 @@ In contrast to \textsc{ista}, Learned \textsc{ista} (\textsc{lista}) \cite{grego
   \end{equation}
   The shrinkage parameter $\lambda$ is a hyperparameter of the model.
   
-In the appendix we describe modification of \textsc{lista} forward propagation (Algorithm~\ref{alg:lista}) to include probability distributions of the random variables introduced in this section and also an efficient Bayesian inference algorithm.
+In the appendix we describe modification of LISTA forward propagation (Algorithm~\ref{alg:lista}) to include probability distributions of the random variables introduced in this section and also an efficient Bayesian inference algorithm.
   
   \section{Experiments}
   \label{sec:experiments}
@@ -160,27 +160,27 @@ In the appendix we describe modification of \textsc{lista} forward propagation (
   \hfil
   \subfloat[Active learning example]{\includegraphics[width=0.25\textwidth]{graphics/active_mnist/nmse_validation}
   \label{fig:active_learning_mnist}}
-  \caption{\textsc{nmse} results. The synthetic data results for different number of layers~\protect\subref{fig:nmse_n_layers_synthetic} and for different sizes of observations~\protect\subref{fig:nmse_undersampling_synthetic}. The active learning example results on the \textsc{mnist} data~\protect\subref{fig:active_learning_mnist}.}
+  \caption{NMSE results. The synthetic data results for different number of layers~\protect\subref{fig:nmse_n_layers_synthetic} and for different sizes of observations~\protect\subref{fig:nmse_undersampling_synthetic}. The active learning example results on the MNIST data~\protect\subref{fig:active_learning_mnist}.}
   \label{fig:number_of_layers_synthetic}
   \end{figure}  
   
-  Proposed Bayes\textsc{lista} is evaluated on sparse coding problems and compared with \textsc{lista}~\cite{gregor2010learning}, \textsc{ista} \cite{daubechies2004iterative} and Fast \textsc{ista} (\textsc{fista}) \cite{beck2009fast}. The number of iterations in \textsc{ista} and \textsc{fista}  and the number of layers in NNs is $L$. For quantitative comparison the normalised mean square error (\textsc{nmse}) is used. %We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for \textsc{lista} to learn.
+  Proposed BayesLISTA is evaluated on sparse coding problems and compared with LISTA~\cite{gregor2010learning}, ISTA \cite{daubechies2004iterative} and Fast ISTA (FISTA) \cite{beck2009fast}. The number of iterations in ISTA and FISTA  and the number of layers in NNs is $L$. For quantitative comparison the normalised mean square error (NMSE) is used. %We demonstrate the performance on small datasets to highlight that the proposed algorithm can infer accurate predictions when the dataset size is not sufficient for LISTA to learn.
   
   \subsection{Predictive performance on synthetic data}
   First, performance is analysed on synthetic data. We generate $N_\text{train}=1000$ and $N_{\text{test}} = 100$ sparse vectors $\boldsymbol\beta^{(n)}$ of size $D = 100$  from the spike and slab distribution with the truncated slab: each component $\beta^{(n)}_{d}$ is zero with the probability~$0.8$ or is sampled from the standard Gaussian distribution without interval $(-0.1, 0.1)$ with the probability~$0.2$. The design matrix $\mathbf{X}$ is random Gaussian.  The observations $\mathbf{y}^{(n)}$ are generated as in~(\ref{eq:regression_problem}) with the zero-mean Gaussian noise with the standard deviation $0.5$. The shrinkage parameter is set to~$\lambda = 0.1$. The algorithms are trained on the training data of size $N_\text{train}$ and evaluated on the test data of size $N_{\text{test}}$.
   
-  In \figurename~\ref{fig:nmse_n_layers_synthetic} \textsc{nmse} for different number of layers (or iterations) $L$ is presented. The observation size is set to $K=50$. Bayes\textsc{lista} outperforms competitors.
+  In \figurename~\ref{fig:nmse_n_layers_synthetic} NMSE for different number of layers (or iterations) $L$ is presented. The observation size is set to $K=50$. BayesLISTA outperforms competitors.
 %  \begin{figure}[t]
 %  \centering
-%  \subfloat[\textsc{nmse} on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/nmse_train}}
+%  \subfloat[NMSE on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/nmse_train}}
 %  ~
-%  \subfloat[\textsc{nmse} for different $L$]{\includegraphics[width=0.48\columnwidth]{graphics/synthetic_number_of_layers/nmse_validation}
+%  \subfloat[NMSE for different $L$]{\includegraphics[width=0.48\columnwidth]{graphics/synthetic_number_of_layers/nmse_validation}
 %  \label{fig:nmse_n_layers_synthetic}}
 %  \subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_number_of_layers/f_measure_train}}
 %  ~
 %  \subfloat[F measure for different $L$]{\includegraphics[width=0.48\columnwidth]{graphics/synthetic_number_of_layers/f_measure_validation}
 %  \label{fig:f_meas_n_layers_synthetic}}\\[-13pt]
-%  \subfloat[\textsc{nmse} for different $K$]{\includegraphics[width=0.48\columnwidth]{graphics/synthetic_undersampling/nmse_validation}
+%  \subfloat[NMSE for different $K$]{\includegraphics[width=0.48\columnwidth]{graphics/synthetic_undersampling/nmse_validation}
 %  \label{fig:nmse_undersampling_synthetic}}
 %  \subfloat[F measure on train]{\includegraphics[width=0.5\columnwidth]{graphics/synthetic_undersampling/f_measure_train}}
 %  ~
@@ -189,18 +189,18 @@ In the appendix we describe modification of \textsc{lista} forward propagation (
 %  \caption{Predictive accuracy on the synthetic data: for different numbers of layers (for neural networks) or iterations (for baselines), and for different sizes of observations}
 %  \label{fig:number_of_layers_synthetic}
 %  \end{figure}
-   \figurename~\ref{fig:nmse_undersampling_synthetic} gives \textsc{nmse} for different observation sizes $K$. The number of layers (iterations) is set as $L=4$. In the previous experiment, Bayesian and classic \textsc{lista} show similar results with this number of layers. \figurename~\ref{fig:nmse_undersampling_synthetic} confirms this competitive behaviour between two \textsc{lista}s. \textsc{ista} and \textsc{fista} underperform the NNs. %Overall, the experiments on the synthetic data demonstrate that Bayesian \textsc{lista} provides competitive results in terms of predictive accuracy.
+   \figurename~\ref{fig:nmse_undersampling_synthetic} gives NMSE for different observation sizes $K$. The number of layers (iterations) is set as $L=4$. In the previous experiment, Bayesian and classic LISTA show similar results with this number of layers. \figurename~\ref{fig:nmse_undersampling_synthetic} confirms this competitive behaviour between two LISTAs. ISTA and FISTA underperform the NNs. %Overall, the experiments on the synthetic data demonstrate that Bayesian LISTA provides competitive results in terms of predictive accuracy.
   
   \subsection{Active learning}
- To demonstrate a potential scenario that can benefit from uncertainty estimates of Bayes\textsc{lista}, we consider the active learning example~\cite{settles.tr09}. The active learning area researches ways to select new training subsets to reduce the total number of required supervision. One of the popular approaches in active learning is uncertainty sampling, when the data with the least certain predictions is chosen for labelling. We use a variance of the spike and slab distributed prediction as a measure of uncertainty.
+ To demonstrate a potential scenario that can benefit from uncertainty estimates of BayesLISTA, we consider the active learning example~\cite{settles.tr09}. The active learning area researches ways to select new training subsets to reduce the total number of required supervision. One of the popular approaches in active learning is uncertainty sampling, when the data with the least certain predictions is chosen for labelling. We use a variance of the spike and slab distributed prediction as a measure of uncertainty.
   
- The \textsc{mnist} dataset~\cite{lecun1998gradient} is utilised. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is standard random Gaussian. Observations are generated as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta \in \mathbb{R}^{784}$ are flattened images. The shrinkage parameter $\lambda$ is~$0.1$, the observation size $K$ is $100$.
+ The MNIST dataset~\cite{lecun1998gradient} is utilised. The dataset contains images of handwritten digits of size $28 \times 28 = 784$. The design matrix $\mathbf{X}$ is standard random Gaussian. Observations are generated as $\mathbf{y} = \mathbf{X}\boldsymbol\beta$, where $\boldsymbol\beta \in \mathbb{R}^{784}$ are flattened images. The shrinkage parameter $\lambda$ is~$0.1$, the observation size $K$ is $100$.
 
  We use the training data of size $50$, the pool data of size $500$,  and the test data of size $100$. The algorithm learns on the training data and it is evaluated on the test data. To actively collect a next data point from the pool, the algorithm is used to predict a point with the highest uncertainty. The selected point is moved from the pool to the training data and the algorithms learns on the updated training data. Overall, $10$ pool additions are performed. After every addition the performance is measured on the test data. We compare the active approach of adding new points from the pool with the random approach that picks a new data point from the pool at random. The procedure is repeated for $20$ times.
   
-  Figure \ref{fig:active_learning_mnist} demonstrates performance of the active and non-active methods of updates with Bayes\textsc{lista}. The active approach with uncertainty sampling steadily demonstrates better results. This means the posterior distribution learnt by Bayes\textsc{lista} is an adequate estimate of the true posterior.
+  Figure \ref{fig:active_learning_mnist} demonstrates performance of the active and non-active methods of updates with BayesLISTA. The active approach with uncertainty sampling steadily demonstrates better results. This means the posterior distribution learnt by BayesLISTA is an adequate estimate of the true posterior.
   
- Appendix provides additional results on predictive performance on the \textsc{mnist} data.
+ Appendix provides additional results on predictive performance on the MNIST data.
  
 
 {\small
@@ -209,20 +209,20 @@ In the appendix we describe modification of \textsc{lista} forward propagation (
 }
 
 \appendix
-  \section*{Appendix A: Uncertainty propagation through soft-thresholding}
+  \section{Appendix: Uncertainty propagation through soft-thresholding}
   \label{sec:fprop}
-  This section describes modification of \textsc{lista} forward propagation (Algorithm~\ref{alg:lista}) to include probability distributions of the random variables introduced in section~\ref{subsec:bayesian_lista}. 
+  This section describes modification of LISTA forward propagation (Algorithm~\ref{alg:lista}) to include probability distributions of the random variables introduced in section~\ref{subsec:bayesian_lista}. 
   
   \subsection*{Initialisation}
   \label{subsec:forward_init}
-  At step \ref{eq:first_layer} of \textsc{lista} (Algorithm~\ref{alg:lista}) the matrix $\mathbf{W}$ consists of Gaussian-distributed components $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $\mathbf{y}$ is a deterministic vector. Then the output $\mathbf{b}$ is a vector of Gaussian-distributed components $b_d \sim \mathcal{N}(m^b_d, v^b_d)$, where $m^b_d = \sum_{k=1}^Ky_k m^w_{dk}$, and $v^b_d = \sum_{k=1}^Ky_k^2v^w_{dk}$.
+  At step \ref{eq:first_layer} of LISTA (Algorithm~\ref{alg:lista}) the matrix $\mathbf{W}$ consists of Gaussian-distributed components $w_{dk} \sim \mathcal{N}(m^w_{dk}, v^w_{dk})$, and $\mathbf{y}$ is a deterministic vector. Then the output $\mathbf{b}$ is a vector of Gaussian-distributed components $b_d \sim \mathcal{N}(m^b_d, v^b_d)$, where $m^b_d = \sum_{k=1}^Ky_k m^w_{dk}$, and $v^b_d = \sum_{k=1}^Ky_k^2v^w_{dk}$.
 %  \begin{equation}
 %  \label{eq:matrix_vector_product}
 %  m^b_d = \sum_{k=1}^Ky_k m^w_{dk}, \qquad
 %  v^b_d = \sum_{k=1}^Ky_k^2v^w_{dk}.
 %  \end{equation}
   
-  At step~\ref{eq:thr_first} of \textsc{lista} (Algorithm~\ref{alg:lista}) the Gaussian vector $\mathbf{b}$ is taken as an input of the soft-thresholding function. When a Gaussian random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft-thresholding function $x^* = h_{\lambda}(x)$, the probability mass of the resulting random variable $x^*$ is split into two parts. The values of $x$ from the interval $[-\lambda, \lambda]$ are converted to~$0$ by the soft-thresholding operator. Therefore, the probability mass of the original distribution that lies in $[-\lambda, \lambda]$ is squeezed into the probability of $x^*$ being zero. The values of $x$ from outside of the $[-\lambda, \lambda]$ interval are shifted towards~$0$. The distribution of $x^* \neq 0$ then represents the tails of the original Gaussian distribution. The distribution of $x^*$ can be then parametrised by the probability of being zero, $\omega^*$, the mean $m^*$ and the variance $v^*$ of the truncated Gaussian distribution.
+  At step~\ref{eq:thr_first} of LISTA (Algorithm~\ref{alg:lista}) the Gaussian vector $\mathbf{b}$ is taken as an input of the soft-thresholding function. When a Gaussian random variable $x \sim \mathcal{N}(x; m, v)$ is propagated through the soft-thresholding function $x^* = h_{\lambda}(x)$, the probability mass of the resulting random variable $x^*$ is split into two parts. The values of $x$ from the interval $[-\lambda, \lambda]$ are converted to~$0$ by the soft-thresholding operator. Therefore, the probability mass of the original distribution that lies in $[-\lambda, \lambda]$ is squeezed into the probability of $x^*$ being zero. The values of $x$ from outside of the $[-\lambda, \lambda]$ interval are shifted towards~$0$. The distribution of $x^* \neq 0$ then represents the tails of the original Gaussian distribution. The distribution of $x^*$ can be then parametrised by the probability of being zero, $\omega^*$, the mean $m^*$ and the variance $v^*$ of the truncated Gaussian distribution.
 %  \begin{lemma}[Propagation of a Gaussian variable through soft-thresholding]
 %  \label{thm:soft_thresholding}
 %  The distribution of $x^*$ can be parametrised by the probability of being zero, $\omega^*$, the mean $m^*$ and the variance $v^*$ of the truncated Gaussian distribution.
@@ -231,7 +231,7 @@ In the appendix we describe modification of \textsc{lista} forward propagation (
  Therefore, we approximate the distribution of $\widehat{\boldsymbol\beta}_0$ at step~\ref{eq:thr_first} with a spike and slab distribution with parameters: the spike probability $\omega^*$, the slab mean $m^*$ and variance $v^*$.
   
   \subsection*{Main layers}
-  At step \ref{eq:l_dense_layer} of \textsc{lista} (Algorithm~\ref{alg:lista}) the vector $\mathbf{b}$ and matrix $\mathbf{S}$ consist of Gaussian components: $b_d \sim \mathcal{N}(m^b_d, v^b_d)$, $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\widehat{\boldsymbol\beta}_{l-1}$ is a vector of the spike and slab random variables: $[\widehat{\beta}_{l-1}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. 
+  At step \ref{eq:l_dense_layer} of LISTA (Algorithm~\ref{alg:lista}) the vector $\mathbf{b}$ and matrix $\mathbf{S}$ consist of Gaussian components: $b_d \sim \mathcal{N}(m^b_d, v^b_d)$, $s_{d'd''} \sim \mathcal{N}(m^s_{d'd''}, v^s_{d'd''})$, and $\widehat{\boldsymbol\beta}_{l-1}$ is a vector of the spike and slab random variables: $[\widehat{\beta}_{l-1}]_d \sim \omega_d \delta_0 + (1 - \omega_d)\mathcal{N}(m_d, v_d)$. 
   
  It can be shown that the expected value and variance of a spike and slab distributed variable $\xi$ with the probability of spike $\omega$, the slab mean $m$ and slab variance $v$ are:  
    \begin{equation}
@@ -275,7 +275,7 @@ According to the Central Limit Theorem $[ \mathbf{e}_l ]_d$ can be approximated 
 %  
 %  The proofs of Lemmas~\ref{thm:moments_spsl} and~\ref{thm:matrix_vector} are given in the supplementary materials.
 %  
-%  Let $\mathbf{e}_l$ denote the product $\mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ at step \ref{eq:l_dense_layer} of \textsc{lista}. We assume that $\mathbf{S}$ and $\widehat{\boldsymbol\beta}_{l-1}$ are mutually independent. Then according to the Central Limit Theorem $[ \mathbf{e}_l ]_d$ can be approximated as a Gaussian-distributed variable when $D$ is sufficiently large. The parameters of the of the approximating Gaussian distribution are set to the marginal mean and variance given in Lemma~\ref{thm:matrix_vector}. The supplementary materials provide a discussion of the quality of this approximation.
+%  Let $\mathbf{e}_l$ denote the product $\mathbf{S}\widehat{\boldsymbol\beta}_{l-1}$ at step \ref{eq:l_dense_layer} of LISTA. We assume that $\mathbf{S}$ and $\widehat{\boldsymbol\beta}_{l-1}$ are mutually independent. Then according to the Central Limit Theorem $[ \mathbf{e}_l ]_d$ can be approximated as a Gaussian-distributed variable when $D$ is sufficiently large. The parameters of the of the approximating Gaussian distribution are set to the marginal mean and variance given in Lemma~\ref{thm:matrix_vector}. The supplementary materials provide a discussion of the quality of this approximation.
   
   The output $\mathbf{c}_l$ at step \ref{eq:l_dense_layer} is then represented as a sum of two Gaussian-distributed vectors: $\mathbf{b}$ and~$\mathbf{e}_l$, i.e. it is a Gaussian-distributed vector with components $c_{d} \sim \mathcal{N}(m^c_{d}, v^c_{d})$, where $m^c_{d} = m^b_{d} + m^e_{d}$ and $v^c_{d} = v^b_{d} + v^e_{d}$.
 %  \begin{equation}
@@ -285,10 +285,10 @@ According to the Central Limit Theorem $[ \mathbf{e}_l ]_d$ can be approximated 
 %  \end{equation}
   
   
-  Then $\widehat{\boldsymbol\beta}_{l}$ at step \ref{eq:l_thr} of \textsc{lista} (Algorithm~\ref{alg:lista}) is the result of soft-thresholding of a Gaussian variable, which is approximated with the spike and slab distribution,  similar to step \ref{eq:thr_first} (section~\ref{subsec:forward_init}).
-  Thus, all the steps of Bayes\textsc{lista} are covered and distributions for outputs of these steps are derived.
+  Then $\widehat{\boldsymbol\beta}_{l}$ at step \ref{eq:l_thr} of LISTA (Algorithm~\ref{alg:lista}) is the result of soft-thresholding of a Gaussian variable, which is approximated with the spike and slab distribution,  similar to step \ref{eq:thr_first} (section~\ref{subsec:forward_init}).
+  Thus, all the steps of BayesLISTA are covered and distributions for outputs of these steps are derived.
   
-  \section*{Appendix B: Backpropagation}
+  \section{Appendix: Backpropagation}
   \label{sec:backpropagation}
   
   The exact intractable posterior (\ref{eq:posterior}) is approximated with a factorised distribution
@@ -329,18 +329,18 @@ Z \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}
   
    \begin{figure}[!t]
   \centering
-  \subfloat[\textsc{mnist} for $K = 100$]{\includegraphics[width=0.25\textwidth]{graphics/mnist/100_nmse_valid}
+  \subfloat[MNIST for $K = 100$]{\includegraphics[width=0.25\textwidth]{graphics/mnist/100_nmse_valid}
   \label{fig:nmse_k_100}}
   \hfil
-  \subfloat[\textsc{mnist} for $K = 250$]{\includegraphics[width=0.25\textwidth]{graphics/mnist/250_nmse_valid}
+  \subfloat[MNIST for $K = 250$]{\includegraphics[width=0.25\textwidth]{graphics/mnist/250_nmse_valid}
   \label{fig:nmse_k_250}}
-  \caption{\textsc{nmse} results on the \textsc{mnist} data for increasing number of iterations with the observation size $K = 100$~\protect\subref{fig:nmse_k_100} and $K = 250$~\protect\subref{fig:nmse_k_250}}
+  \caption{NMSE results on the MNIST data for increasing number of iterations with the observation size $K = 100$~\protect\subref{fig:nmse_k_100} and $K = 250$~\protect\subref{fig:nmse_k_250}}
   \label{fig:number_of_layers_synthetic}
   \end{figure}    
 
-\section*{Appendix C: Predictive performance on \textsc{mnist} data}
-In this experiment, the methods are evaluated on the \textsc{mnist} dataset in terms of predictive performance. We use $100$ images for training and $100$ for test.
+\section{Appendix: Predictive performance on MNIST data}
+In this experiment, the methods are evaluated on the MNIST dataset in terms of predictive performance. We use $100$ images for training and $100$ for test.
   
-  Figures \ref{fig:nmse_k_100} and~\ref{fig:nmse_k_250} present \textsc{nmse} with observation sizes $100$ and $250$. The experiment with $K=100$ presents severe conditions for the algorithms: the limited size of the training dataset combined with the small dimensionality of observations. Bayes\textsc{lista} is able to learn under these conditions, significantly outperforming \textsc{lista}. Under better conditions of the second experiment with $K=250$, both NNs converge to the similar results. However, Bayes\textsc{lista} demonstrates a remarkably better convergence rate. \textsc{ista} and \textsc{fista} are unable to perform well in these experiments.
+  Figures \ref{fig:nmse_k_100} and~\ref{fig:nmse_k_250} present NMSE with observation sizes $100$ and $250$. The experiment with $K=100$ presents severe conditions for the algorithms: the limited size of the training dataset combined with the small dimensionality of observations. BayesLISTA is able to learn under these conditions, significantly outperforming LISTA. Under better conditions of the second experiment with $K=250$, both NNs converge to the similar results. However, BayesLISTA demonstrates a remarkably better convergence rate. ISTA and FISTA are unable to perform well in these experiments.
 
 \end{document}
