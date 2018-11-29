@@ -27,10 +27,33 @@
   \end{center}
 }
 
-\title{Uncertainty propagation in neural networks for sparse coding}   \institute{University of Sheffield, UK, University of Oxford, UK }
-\author{Danil Kuzin, Olga Isupova, Lyudmila Mihaylova}   \titlegraphic{Logo}
+\title{Uncertainty propagation in neural networks for sparse coding}   
+\institute{University of Sheffield, UK, University of Oxford, UK }
+\author{Danil Kuzin, Olga Isupova, Lyudmila Mihaylova}   
+\titlegraphic{\includegraphics[width=0.25\textwidth]{graphics/University_of_Sheffield_coat_of_arms}
+\vspace{-1in}\includegraphics[width=0.247\textwidth]{graphics/oxford_coat_of_arms}}
 \usetheme{Autumn}
 \usecolorstyle{Britain}
+
+\makeatletter
+\renewcommand\TP@maketitle{%
+    \begin{minipage}{0.2\linewidth}
+       \centering
+       \@titlegraphic
+    \end{minipage}
+    \hfill
+   \begin{minipage}{0.8\linewidth}
+        \centering
+        \color{titlefgcolor}
+        {\bfseries \Huge \sc \@title \par}
+        \vspace*{1em}
+        {\huge \@author \par}
+        \vspace*{1em}
+        {\LARGE \@institute}
+    \end{minipage}%
+}
+\makeatother
+
 \begin{document}
   \maketitle
   \begin{columns}
