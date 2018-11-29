@@ -67,8 +67,7 @@ University of Oxford, UK \\
  The rest of the paper is organised as follows. A NN approach for sparse coding is described in Section~\ref{subsec:nn_sc}. The Bayesian formulation is introduced in Section~\ref{subsec:bayesian_lista}. Section~\ref{sec:experiments} provides the experimental results. The proposed forward uncertainty propagation and probabilistic backpropagation methods are given in Appendices~\ref{sec:fprop} and~\ref{sec:backpropagation}. 
 \section{Neural networks for sparse coding}
   \label{sec:bayesian_lista}
-  The section first reviews existing NNs for sparse coding and then introduces the novel Bayesian NN.
-  
+  This section presents background knowledge about networks for sparse coding and then describes the novel Bayesian neural network. 
 \subsection{Frequentist neural networks}  
 \label{subsec:nn_sc}
   The NN approach to sparse coding is based on earlier Iterative Shrinkage and Thresholding Algorithm (ISTA) \cite{daubechies2004iterative}. It addresses the sparse coding problem as the linear regression problem with the $l1$ penalty that promotes sparsity. For the linear regression model with observations $\mathbf{y} \in \mathbb{R}^K$, the design matrix $\mathbf{X} \in \mathbb{R}^{K \times D}$, and the sparse unknown vector of weights $\boldsymbol\beta \in \mathbb{R}^D$, ISTA minimises
@@ -79,7 +78,7 @@ University of Oxford, UK \\
 where $\alpha$ is a regularisation parameter.
  
  \begin{wrapfigure}[13]{r}{0.5\textwidth}  
- \vspace{-10pt}
+ \vspace{-25pt}
 \begin{minipage}{0.5\textwidth}
   \begin{algorithm}[H]
     \caption{LISTA forward propagation}
@@ -200,7 +199,7 @@ In the appendix we describe modification of LISTA forward propagation (Algorithm
   
   Figure \ref{fig:active_learning_mnist} demonstrates performance of the active and non-active methods of updates with BayesLISTA. The active approach with uncertainty sampling steadily demonstrates better results. This means the posterior distribution learnt by BayesLISTA is an adequate estimate of the true posterior.
   
- Appendix provides additional results on predictive performance on the MNIST data.
+ Appendix~\ref{app:mnist} provides additional results on predictive performance on the MNIST data.
  
 
 {\small
@@ -339,6 +338,7 @@ Z \approx \prod_{d=1}^D \left[\omega^{\widehat{\boldsymbol\beta}}_d  \mathcal{T}
   \end{figure}    
 
 \section{Appendix: Predictive performance on MNIST data}
+\label{app:mnist}
 In this experiment, the methods are evaluated on the MNIST dataset in terms of predictive performance. We use $100$ images for training and $100$ for test.
   
   Figures \ref{fig:nmse_k_100} and~\ref{fig:nmse_k_250} present NMSE with observation sizes $100$ and $250$. The experiment with $K=100$ presents severe conditions for the algorithms: the limited size of the training dataset combined with the small dimensionality of observations. BayesLISTA is able to learn under these conditions, significantly outperforming LISTA. Under better conditions of the second experiment with $K=250$, both NNs converge to the similar results. However, BayesLISTA demonstrates a remarkably better convergence rate. ISTA and FISTA are unable to perform well in these experiments.
