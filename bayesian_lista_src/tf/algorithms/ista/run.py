@@ -1,6 +1,6 @@
 from tqdm import trange
 
-from tf.algorithms.lista.handler import ListaHandler
+from tf.algorithms.ista.handler import IstaHandler
 from tf.data.synthetic.data_generator import DataGenerator
 import tensorflow as tf
 import numpy as np
@@ -19,7 +19,7 @@ if __name__=="__main__":
     tf.enable_eager_execution()
 
     data_generator = DataGenerator(D=D, K=K, sparsity=sparsity, beta_scale=beta_scale, noise_scale=noise_scale)
-    handler = ListaHandler(D=D, K=K, L=L, X=data_generator.X.astype(np.float32), learning_rate=learning_rate, initial_lambda=initial_lambda)
+    handler = IstaHandler(D=D, K=K, L=L, X=data_generator.X.astype(np.float32), initial_lambda=initial_lambda)
 
     num_epochs = 10
     N = 1000
@@ -28,10 +28,9 @@ if __name__=="__main__":
     loss_hist, valid_loss_hist = [], []
     t = trange(100, desc='ML')
     for i in t:
-        handler.train(num_epochs=100, beta_train=beta.astype(np.float32), y_train=y.astype(np.float32))
         prediction = handler.predict(y.astype(np.float32))
-        loss = ListaHandler.loss(handler.model(y.astype(np.float32)), beta)
-        valid_loss = ListaHandler.loss(handler.model(y_valid.astype(np.float32)), beta_valid)
+        loss = IstaHandler.loss(handler.model(y.astype(np.float32)), beta)
+        valid_loss = IstaHandler.loss(handler.model(y_valid.astype(np.float32)), beta_valid)
         t.set_description(f'ML (loss={loss.numpy()}, valid_loss={valid_loss.numpy()})')
         loss_hist.append(loss.numpy())
         valid_loss_hist.append(valid_loss.numpy())
