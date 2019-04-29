@@ -71,18 +71,25 @@ class PBP_lista:
         counter = 0
         for i in permutation:
             #w, m, v = self.network.output_probabilistic(Y[i, :])
-            old_params = self.network.get_params()
+            #old_params = self.network.get_params()
             with tf.GradientTape() as t:
                 logZ, logZ1, logZ2 = self.network.logZ_Z1_Z2(Beta[i, :], Y[i, :])
             updates = self.network.generate_updates(logZ, logZ1, logZ2, t)
-            for param, update in updates:
-                # toso this will not probably update the params
-                param = param + update
+            # new_params = {}
+            # for param, update in updates:
+            #     # toso this will not probably update the params
+            #     new_params[param] =
+            # new_params['W_M'] = updates[0, 0] + updates[0, 1]
+            # new_params['W_V'] = updates[1, 0] + updates[1, 1]
+            # new_params['S_M'] = updates[2, 0] + updates[2, 1]
+            # new_params['S_V'] = updates[3, 0] + updates[3, 1]
+            #param = param + update
             #Z = self.adf_update(Beta[i, :], Y[i, :])
-            new_params = self.network.get_params()
+            #new_params = self.network.get_params()
 
-            self.network.remove_invalid_updates(new_params, old_params)
-            self.network.set_params(new_params)
+            self.network.apply_updates(updates)
+            #todo check if updates were updated in previous procedure
+            #self.network.set_params(updates)
 
             counter += 1
 

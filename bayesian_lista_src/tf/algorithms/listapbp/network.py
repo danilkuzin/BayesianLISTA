@@ -86,15 +86,41 @@ class Network:
 
         grads = t.gradient(logZ, [self.params_W_M, self.params_W_V, self.params_S_M, self.params_S_V])
         grad_WM, grad_WV, grad_SM, grad_SV = grads[0], grads[1], grads[2], grads[3]
-        updates.append((self.params_W_M, self.params_W_M + self.params_W_V * grad_WM))
-        updates.append((self.params_W_V, self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV)))
-        updates.append((self.params_S_M, self.params_S_M + self.params_S_V * grad_SM))
-        updates.append((self.params_S_V, self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)))
+        updated_WM = self.params_W_M + self.params_W_V * grad_WM
+        updated_WV = self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV)
+        updated_SM = self.params_S_M + self.params_S_V * grad_SM
+        updated_SV = self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)
 
         # updates.append((self.a, 1.0 / (tf.exp(logZ2 - 2 * logZ1 + logZ) * (self.a + 1) / self.a - 1.0)))
         # updates.append((self.b, 1.0 / (tf.exp(logZ2 - logZ1) * (self.a + 1) / self.b - tf.exp(logZ1 - logZ) * self.a / self.b)))
 
-        return updates
+        #return updates
+        # return {'W_M': self.params_W_M + self.params_W_V * grad_WM,
+        #         'W_V': self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV),
+        #         'S_M': self.params_S_M + self.params_S_V * grad_SM,
+        #         'S_V': self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)}
+
+        index1 = np.where(W_V_new <= 1e-100)
+        index2 = np.where(np.logical_or(np.isnan(W_M_new),
+                                        np.isnan(W_V_new)))
+
+        index = [np.concatenate((index1[0], index2[0])),
+                 np.concatenate((index1[1], index2[1]))]
+
+        if len(index[0]) > 0:
+            W_M_new[index] = W_M_old[index]
+            W_V_new[index] = W_V_old[index]
+
+        index1 = np.where(S_V_new <= 1e-100)
+        index2 = np.where(np.logical_or(np.isnan(S_M_new),
+                                        np.isnan(S_V_new)))
+
+        index = [np.concatenate((index1[0], index2[0])),
+                 np.concatenate((index1[1], index2[1]))]
+
+        if len(index[0]) > 0:
+            S_M_new[index] = S_M_old[index]
+            S_V_new[index] = S_V_old[index]
 
     def generate_updates_full_learning(self, logZ, logZ1, logZ2):
 
@@ -128,10 +154,10 @@ class Network:
         self.params_S_M.assign(params['S_M'])
         self.params_S_V.assign(params['S_V'])
 
-        self.a.assign(params['a'])
-        self.b.assign(params['b'])
+        # self.a.assign(params['a'])
+        # self.b.assign(params['b'])
 
-    def remove_invalid_updates(self, new_params, old_params):
+    def apply_updates(self, new_params, old_params):
 
         W_M_new = new_params['W_M']
         W_V_new = new_params['W_V']
