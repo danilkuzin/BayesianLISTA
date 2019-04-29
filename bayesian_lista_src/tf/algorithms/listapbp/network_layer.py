@@ -8,11 +8,6 @@ def n_cdf(x):
 def n_pdf(x, mu, sigma):
     return 1 / tf.sqrt(2 * np.pi * sigma) * tf.exp(-0.5 * (x - mu) ** 2 / sigma)
 
-# def student_pdf(x, mu, beta, nu):
-#     return tf.gamma(0.5 * (nu + 1)) / (tf.gamma(0.5 * nu) * tf.sqrt(np.pi * nu * beta)) * tf.power(
-#         (1 + 1 / nu * (x - mu) ** 2 / beta), -0.5 * (nu + 1))
-
-#todo check switch to log
 def log_student_pdf(x, mu, beta, nu):
     return tf.lgamma(0.5 * (nu + 1)) - (tf.lgamma(0.5 * nu) + 0.5 * tf.log(np.pi * nu * beta)) - 0.5 * (nu + 1) * tf.log(
         (1 + 1 / nu * (x - mu) ** 2 / beta))
@@ -20,8 +15,6 @@ def log_student_pdf(x, mu, beta, nu):
 def student_pdf(x, mu, beta, nu):
     return tf.exp(log_student_pdf(x, mu, beta, nu))
 
-# def theano_soft_threshold(v, thr_lambda):
-#     return tf.sign(v) * tf.maximum(abs(v) - thr_lambda, tf.zeros_like(v))
 
 class Network_layer:
 

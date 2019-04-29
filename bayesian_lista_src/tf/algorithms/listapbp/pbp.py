@@ -74,7 +74,7 @@ class PBP_lista:
             #old_params = self.network.get_params()
             with tf.GradientTape() as t:
                 logZ, logZ1, logZ2 = self.network.logZ_Z1_Z2(Beta[i, :], Y[i, :])
-            updates = self.network.generate_updates(logZ, logZ1, logZ2, t)
+            self.network.generate_updates(logZ, logZ1, logZ2, t)
             # new_params = {}
             # for param, update in updates:
             #     # toso this will not probably update the params
@@ -87,7 +87,7 @@ class PBP_lista:
             #Z = self.adf_update(Beta[i, :], Y[i, :])
             #new_params = self.network.get_params()
 
-            self.network.apply_updates(updates)
+            #self.network.apply_updates(updates)
             #todo check if updates were updated in previous procedure
             #self.network.set_params(updates)
 

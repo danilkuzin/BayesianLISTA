@@ -28,7 +28,7 @@ if __name__=="__main__":
     loss_hist, valid_loss_hist = [], []
     t = trange(10, desc='ML')
     for i in t:
-        handler.train(num_epochs=2, beta_train=beta.astype(np.float32), y_train=y.astype(np.float32))
+        handler.train(num_epochs=num_epochs, beta_train=beta.astype(np.float32), y_train=y.astype(np.float32))
         prediction = handler.predict(y.astype(np.float32))
         loss = SingleBayesianListaHandler.loss(handler.predict(y.astype(np.float32)), beta)
         valid_loss = SingleBayesianListaHandler.loss(handler.predict(y_valid.astype(np.float32)), beta_valid)

@@ -82,8 +82,6 @@ class Network:
 
     def generate_updates(self, logZ, logZ1, logZ2, t):
 
-        updates = []
-
         grads = t.gradient(logZ, [self.params_W_M, self.params_W_V, self.params_S_M, self.params_S_V])
         grad_WM, grad_WV, grad_SM, grad_SV = grads[0], grads[1], grads[2], grads[3]
         updated_WM = self.params_W_M + self.params_W_V * grad_WM
@@ -91,36 +89,34 @@ class Network:
         updated_SM = self.params_S_M + self.params_S_V * grad_SM
         updated_SV = self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)
 
-        # updates.append((self.a, 1.0 / (tf.exp(logZ2 - 2 * logZ1 + logZ) * (self.a + 1) / self.a - 1.0)))
-        # updates.append((self.b, 1.0 / (tf.exp(logZ2 - logZ1) * (self.a + 1) / self.b - tf.exp(logZ1 - logZ) * self.a / self.b)))
-
-        #return updates
-        # return {'W_M': self.params_W_M + self.params_W_V * grad_WM,
-        #         'W_V': self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV),
-        #         'S_M': self.params_S_M + self.params_S_V * grad_SM,
-        #         'S_V': self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)}
-
-        index1 = np.where(W_V_new <= 1e-100)
-        index2 = np.where(np.logical_or(np.isnan(W_M_new),
-                                        np.isnan(W_V_new)))
+        index1 = np.where(updated_WV <= 1e-100)
+        index2 = np.where(np.logical_or(np.isnan(updated_WM),
+                                        np.isnan(updated_WV)))
 
         index = [np.concatenate((index1[0], index2[0])),
                  np.concatenate((index1[1], index2[1]))]
 
         if len(index[0]) > 0:
-            W_M_new[index] = W_M_old[index]
-            W_V_new[index] = W_V_old[index]
+            print(f"index:{index}")
+            updated_WM[index] = self.params_W_M[index]
+            updated_WV[index] = self.params_W_V[index]
 
-        index1 = np.where(S_V_new <= 1e-100)
-        index2 = np.where(np.logical_or(np.isnan(S_M_new),
-                                        np.isnan(S_V_new)))
+        index1 = np.where(updated_SV <= 1e-100)
+        index2 = np.where(np.logical_or(np.isnan(updated_SM),
+                                        np.isnan(updated_SV)))
 
         index = [np.concatenate((index1[0], index2[0])),
                  np.concatenate((index1[1], index2[1]))]
 
         if len(index[0]) > 0:
-            S_M_new[index] = S_M_old[index]
-            S_V_new[index] = S_V_old[index]
+            print(f"index:{index}")
+            updated_SM[index] = self.params_S_M[index]
+            updated_SV[index] = self.params_S_V[index]
+
+        self.params_W_M.assign(updated_WM)
+        self.params_W_V.assign(updated_WV)
+        self.params_S_M.assign(updated_SM)
+        self.params_S_V.assign(updated_SV)
 
     def generate_updates_full_learning(self, logZ, logZ1, logZ2):
 
