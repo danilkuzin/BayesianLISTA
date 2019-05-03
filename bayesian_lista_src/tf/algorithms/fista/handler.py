@@ -1,25 +1,22 @@
-from ..handler import Handler
+from tf.algorithms.handler import Handler
 import numpy as np
 
-from ..fista.fista import Fista
+from tf.algorithms.fista.fista import Fista
 
 
 class FistaHandler(Handler):
     def __init__(self, D, K, L, X, initial_lambda):
         super().__init__(D, K, L, X, initial_lambda)
 
-        self.fista = Fista(L, D, K, X, initial_lambda)
+        self.model = Fista(L, D, K, X, initial_lambda)
 
     def test(self, beta_test, y_test):
         beta_estimator = self.predict(y_test)
         return self.nmse(beta_test, beta_estimator), self.f_measure(beta_test, beta_estimator)
 
     def predict(self, y_test):
-        beta_estimator = self.fista.predict(y_test)
+        beta_estimator = self.model(y_test)
         return beta_estimator
-
-    def nmse(self, beta_true, beta_estimator):
-        return np.mean(np.sqrt(np.sum((beta_estimator - beta_true)**2, axis=1)) / np.sqrt(np.sum(beta_true**2, axis=1)))
 
     def f_measure(self, beta_true, beta_estimator):
         true_zero_loc = beta_true == 0

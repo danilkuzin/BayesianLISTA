@@ -1,9 +1,7 @@
 import tensorflow as tf
 
-
-from tf.algorithms.lista.lista import Lista
-
 from tf.algorithms.handler import Handler
+from tf.algorithms.lista.lista import Lista
 
 
 class ListaHandler(Handler):
@@ -20,6 +18,7 @@ class ListaHandler(Handler):
         self.model.W.assign_sub(self.learning_rate * dW)
         self.model.S.assign_sub(self.learning_rate * dS)
         self.model.thr_lambda.assign_sub(self.learning_rate * dLambda)
+        return current_loss.numpy(), Handler.f_measure(beta_train, self.model(y_train))
 
     def train(self, num_epochs, beta_train, y_train):
         Ws, Ss, thr_lambdas = [], [], []
@@ -30,3 +29,8 @@ class ListaHandler(Handler):
     def predict(self, y_test):
         beta_estimator = self.model(y_test)
         return beta_estimator
+
+    def test(self, beta_test, y_test):
+        beta_estimator = self.predict(y_test)
+        return self.nmse(beta_test, beta_estimator), self.f_measure(beta_test, beta_estimator)
+

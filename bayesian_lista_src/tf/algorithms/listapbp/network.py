@@ -84,34 +84,30 @@ class Network:
 
         grads = t.gradient(logZ, [self.params_W_M, self.params_W_V, self.params_S_M, self.params_S_V])
         grad_WM, grad_WV, grad_SM, grad_SV = grads[0], grads[1], grads[2], grads[3]
-        updated_WM = self.params_W_M + self.params_W_V * grad_WM
-        updated_WV = self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV)
-        updated_SM = self.params_S_M + self.params_S_V * grad_SM
-        updated_SV = self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)
+        updated_WM = (self.params_W_M + self.params_W_V * grad_WM).numpy()
+        updated_WV = (self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV)).numpy()
+        updated_SM = (self.params_S_M + self.params_S_V * grad_SM).numpy()
+        updated_SV = (self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)).numpy()
 
-        index1 = np.where(updated_WV <= 1e-100)
-        index2 = np.where(np.logical_or(np.isnan(updated_WM),
-                                        np.isnan(updated_WV)))
-
-        index = [np.concatenate((index1[0], index2[0])),
-                 np.concatenate((index1[1], index2[1]))]
+        index = tf.where(tf.logical_or(tf.logical_or(
+            tf.math.is_nan(updated_WM),
+            tf.math.is_nan(updated_WV)),
+            updated_WV <= 1e-100))
 
         if len(index[0]) > 0:
             print(f"index:{index}")
-            updated_WM[index] = self.params_W_M[index]
-            updated_WV[index] = self.params_W_V[index]
+            updated_WM[index] = self.params_W_M.numpy()[index]
+            updated_WV[index] = self.params_W_V.numpy()[index]
 
-        index1 = np.where(updated_SV <= 1e-100)
-        index2 = np.where(np.logical_or(np.isnan(updated_SM),
-                                        np.isnan(updated_SV)))
-
-        index = [np.concatenate((index1[0], index2[0])),
-                 np.concatenate((index1[1], index2[1]))]
+        index = tf.where(tf.logical_or(tf.logical_or(
+            tf.math.is_nan(updated_SM),
+            tf.math.is_nan(updated_SV)),
+            updated_SV <= 1e-100))
 
         if len(index[0]) > 0:
             print(f"index:{index}")
-            updated_SM[index] = self.params_S_M[index]
-            updated_SV[index] = self.params_S_V[index]
+            updated_SM[index] = self.params_S_M.numpy()[index]
+            updated_SV[index] = self.params_S_V.numpy()[index]
 
         self.params_W_M.assign(updated_WM)
         self.params_W_V.assign(updated_WV)

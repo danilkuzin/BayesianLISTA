@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 class Handler(object):
     def __init__(self, D, K, L, X, initial_lambda):
@@ -20,3 +21,26 @@ class Handler(object):
 
     def predict(self, y_test):
         raise NotImplementedError
+
+    @staticmethod
+    def f_measure(beta_true, beta_estimator):
+        true_zero_loc = beta_true == 0
+        true_nonzero_loc = beta_true != 0
+        est_zero_loc = beta_estimator == 0
+        est_nonzero_loc = beta_estimator != 0
+
+        tp = np.sum(true_nonzero_loc * est_nonzero_loc)
+        fp = np.sum(true_zero_loc * est_nonzero_loc)
+        fn = np.sum(true_nonzero_loc * est_zero_loc)
+
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
+
+        if precision + recall > 0:
+            return 2 * (precision * recall / (precision + recall))
+        else:
+            return 0
+
+    @staticmethod
+    def nmse(beta_true, beta_estimator):
+        return np.mean(np.sqrt(np.sum((beta_estimator - beta_true)**2, axis=1)) / np.sqrt(np.sum(beta_true**2, axis=1)))

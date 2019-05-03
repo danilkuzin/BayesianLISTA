@@ -1,6 +1,6 @@
 import numpy as np
 
-from algorithms.PBP_net_lista.test_network_layer import soft_threshold
+from ..shared.soft_thresholding import soft_threshold
 
 
 class Fista(object):
@@ -13,7 +13,7 @@ class Fista(object):
         self.S = np.identity(D) - np.matmul(self.W, X)
         self.thr_lambda = initial_lambda
 
-    def predict(self, y):
+    def __call__(self, y):
         b = np.dot(y, self.W.T)
         beta_estimator_history = [soft_threshold(b, self.thr_lambda)]
         z = [beta_estimator_history[-1]]

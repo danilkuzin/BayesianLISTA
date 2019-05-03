@@ -9,7 +9,7 @@ class DataGenerator:
         self.noise_scale = noise_scale
         self.sparsity = sparsity
 
-        self.X = np.random.randn(K, D)
+        self.X = np.random.randn(K, D).astype(np.float32)
         #X_distr = tfd.Normal(loc=tf.zeros(K, D), scale=tf.ones(K, D))
         #self.X = X_distr.sample([1])
 
@@ -45,4 +45,4 @@ class DataGenerator:
         for n in np.arange(N):
             Y[n] = np.dot(self.X, Beta[n]) + Noise[n]
 
-        return Beta, Y, Noise
+        return Beta.astype(np.float32), Y.astype(np.float32), Noise.astype(np.float32)
