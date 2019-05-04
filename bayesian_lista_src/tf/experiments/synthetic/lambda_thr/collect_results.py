@@ -7,7 +7,7 @@ class LambdaExperimentResultsCollector(object):
     def __init__(self):
         self.lambda_array = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
         self.random_range = 10 # TODO update when experiments finished
-        self.n_iter = 1000
+        self.n_iter = 10
 
     def collect_all(self):
         self.ista_f_meas_train, self.ista_f_meas_validation, self.ista_loss_train, self.ista_loss_validation, \

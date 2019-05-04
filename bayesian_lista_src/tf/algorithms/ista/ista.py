@@ -10,7 +10,7 @@ class Ista(object):
         self.K = K
 
         self.W = X.T / (1.01 * np.linalg.norm(X, 2) ** 2)
-        self.S = np.identity(D) - np.matmul(self.W, X)
+        self.S = np.identity(D, dtype=np.float32) - np.matmul(self.W, X)
         self.thr_lambda = initial_lambda
 
     def __call__(self, y):

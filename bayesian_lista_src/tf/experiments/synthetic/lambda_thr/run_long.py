@@ -6,11 +6,15 @@ import tensorflow as tf
 
 from tf.comparator.compare_sequential import SequentialComparator
 from tf.data.synthetic.data_generator import DataGenerator
-from tf.experiments.synthetic.experiments_parameters import load_long_experiment
+from tf.experiments.synthetic.experiments_parameters import load_long_experiment, load_quick_experiment
 
-rseed, D, K, L, batch_size, validation_size, n_iter = load_long_experiment()
+tf.enable_eager_execution()
+
+rseed, D, K, L, batch_size, validation_size, n_iter = load_quick_experiment()
 np.random.seed(rseed)
-lambda_array = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
+tf.random.set_random_seed(rseed)
+
+lambda_array = [0.001, 0.01, 0.1, 1., 10., 100., 1000.]
 
 freq_train_loss = np.zeros((len(lambda_array), n_iter))
 freq_validation_loss = np.zeros((len(lambda_array), n_iter))
@@ -43,7 +47,6 @@ class SyntheticData():
         self.beta_validation = beta_validation
         self.y_validation = y_validation
 
-tf.enable_eager_execution()
 
 for rseed in range(10):
     np.random.seed(rseed)
