@@ -1,5 +1,13 @@
 import numpy as np
 
+class SyntheticData():
+    def __init__(self, X, beta_train, y_train, beta_validation, y_validation):
+        self.X = X
+        self.beta_train = beta_train
+        self.y_train = y_train
+        self.beta_validation = beta_validation
+        self.y_validation = y_validation
+
 class DataGenerator:
 
     def __init__(self, D, K, sparsity=0.8, beta_scale=1, noise_scale=0.5):

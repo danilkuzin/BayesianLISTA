@@ -5,14 +5,12 @@ from tqdm import tqdm, trange
 import tensorflow as tf
 
 from tf.comparator.compare_sequential import SequentialComparator
-from tf.data.synthetic.data_generator import DataGenerator
+from tf.data.synthetic.data_generator import DataGenerator, SyntheticData
 from tf.experiments.synthetic.experiments_parameters import load_long_experiment, load_quick_experiment
 
 tf.enable_eager_execution()
 
-rseed, D, K, L, batch_size, validation_size, n_iter = load_quick_experiment()
-np.random.seed(rseed)
-tf.random.set_random_seed(rseed)
+rseed, D, K, L, batch_size, validation_size, n_iter = load_long_experiment()
 
 lambda_array = [0.001, 0.01, 0.1, 1., 10., 100., 1000.]
 
@@ -39,17 +37,9 @@ fista_train_f_measure = np.zeros((len(lambda_array), n_iter))
 fista_validation_f_measure = np.zeros((len(lambda_array), n_iter))
 
 
-class SyntheticData():
-    def __init__(self, X, beta_train, y_train, beta_validation, y_validation):
-        self.X = X
-        self.beta_train = beta_train
-        self.y_train = y_train
-        self.beta_validation = beta_validation
-        self.y_validation = y_validation
-
-
 for rseed in range(10):
     np.random.seed(rseed)
+    tf.random.set_random_seed(rseed)
     data_generator = DataGenerator(D, K)
     beta_train, y_train, _ = data_generator.new_sample(batch_size)
     beta_validation, y_validation, _ = data_generator.new_sample(batch_size)

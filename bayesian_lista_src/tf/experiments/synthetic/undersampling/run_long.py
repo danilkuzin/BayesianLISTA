@@ -1,16 +1,14 @@
 import numpy as np
-import six.moves.cPickle as pickle
-
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+import tensorflow as tf
 from tqdm import tqdm, trange
-import os
-from comparator.compare_sequential import SequentialComparator
-from experiments.synthetic.experiments_parameters import load_long_experiment
+
+from tf.comparator.compare_sequential import SequentialComparator
+from tf.data.synthetic.data_generator import DataGenerator, SyntheticData
+from tf.experiments.synthetic.experiments_parameters import load_long_experiment
+
+tf.enable_eager_execution()
 
 rseed, D, _, L, batch_size, validation_size, n_iter = load_long_experiment()
-np.random.seed(rseed)
 K_array = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
 freq_train_loss = np.zeros((len(K_array), n_iter))
@@ -37,10 +35,17 @@ fista_validation_f_measure = np.zeros((len(K_array), n_iter))
 
 for rseed in range(10):
     np.random.seed(rseed)
+    tf.random.set_random_seed(rseed)
+
     for i, K in enumerate(tqdm(K_array)):
-        comparator = SequentialComparator(D, K, L, learning_rate=0.0001, n_train_sample=batch_size,
-                                          n_validation_sample=validation_size, train_freq=True, train_bayes=False,
-                                          train_shared_bayes=True, use_ista=True, use_fista=True, save_history=False)
+        data_generator = DataGenerator(D, K)
+        beta_train, y_train, _ = data_generator.new_sample(batch_size)
+        beta_validation, y_validation, _ = data_generator.new_sample(batch_size)
+        data = SyntheticData(data_generator.X, beta_train, y_train, beta_validation, y_validation)
+
+        comparator = SequentialComparator(D, K, L, learning_rate=0.0001, data=data, train_freq=True,
+                                          train_shared_bayes=True, use_ista=True, use_fista=True, save_history=False,
+                                          initial_lambda=0.1)
         for _ in trange(n_iter):
             comparator.train_iteration()
 
