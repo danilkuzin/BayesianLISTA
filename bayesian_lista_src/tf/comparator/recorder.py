@@ -36,6 +36,7 @@ class Recorder(object):
                 "train_f_meas": self.train_f_meas,
                 "validation_f_meas": self.validation_f_meas,
                 "time": self.time}
+
     def save_numpy(self, filename):
         np.savez('{}_{}'.format(filename, self.name), D=self.handler.D, K=self.handler.K, L=self.handler.L,
                  train_loss=self.train_loss, validation_loss=self.validation_loss,
