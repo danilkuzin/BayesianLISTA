@@ -37,7 +37,7 @@ if __name__=="__main__":
     t = trange(num_epochs)
     for _ in t:
         for i, (beta_batch, y_batch) in enumerate(train_data):
-            handler.train(num_epochs=num_epochs, beta_train=beta.astype(np.float32), y_train=y.astype(np.float32))
+            handler.train(num_epochs=num_epochs, beta_train=beta_batch, y_train=y_batch)
         prediction = handler.predict(y.astype(np.float32))
         loss = SingleBayesianListaHandler.loss(handler.predict(y.astype(np.float32)), beta)
         valid_loss = SingleBayesianListaHandler.loss(handler.predict(y_valid.astype(np.float32)), beta_valid)

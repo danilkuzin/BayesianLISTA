@@ -11,9 +11,8 @@ tf.enable_eager_execution()
 tf.logging.set_verbosity(tf.logging.INFO)
 
 rseed, D, K, L, batch_size, validation_size, n_epochs = load_long_experiment()
-n_epochs = 10
 
-def run_single_experiment(rseed, D, K, L, batch_size, n_iter):
+def run_single_experiment(rseed, D, K, L, batch_size, n_epochs):
     np.random.seed(rseed)
     tf.random.set_random_seed(rseed)
 
