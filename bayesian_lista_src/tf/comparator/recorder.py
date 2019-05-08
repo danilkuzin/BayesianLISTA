@@ -13,7 +13,13 @@ class Recorder(object):
         self.validation_f_meas = []
         self.time = []
 
-    def train_and_record(self, beta_train, y_train, beta_validation, y_validation):
+    def validate(self, beta_validation, y_validation):
+        cur_valid_loss, cur_valid_f_meas = \
+            self.handler.test(beta_test=beta_validation, y_test=y_validation)
+        self.validation_loss.append(cur_valid_loss)
+        self.validation_f_meas.append(cur_valid_f_meas)
+
+    def train(self, beta_train, y_train):
         start_time = time.process_time()
         cur_train_loss, cur_train_f_meas = \
             self.handler.train_iteration(beta_train=beta_train, y_train=y_train)
@@ -24,11 +30,6 @@ class Recorder(object):
             self.time.append(elapsed_time + self.time[-1])
         self.train_loss.append(cur_train_loss)
         self.train_f_meas.append(cur_train_f_meas)
-
-        cur_valid_loss, cur_valid_f_meas = \
-            self.handler.test(beta_test=beta_validation, y_test=y_validation)
-        self.validation_loss.append(cur_valid_loss)
-        self.validation_f_meas.append(cur_valid_f_meas)
 
     def get_metrics(self):
         return {"train_loss": self.train_loss,

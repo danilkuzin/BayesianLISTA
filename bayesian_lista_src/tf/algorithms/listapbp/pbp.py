@@ -35,11 +35,7 @@ class PBP_lista:
             self.network.set_params(params)
 
     def get_deterministic_output(self, Y_test):
-
-        output = np.zeros((Y_test.shape[0], self.D))
-        for i in range(Y_test.shape[0]):
-            output[i] = self.network.output_deterministic(Y_test[i, :])
-            # output[i] = output[i] * self.std_y_train + self.mean_y_train
+        output = self.network.output_deterministic(Y_test)
 
         return output
 
@@ -65,33 +61,21 @@ class PBP_lista:
 
     def train_iter(self, Beta, Y):
 
-        permutation = np.random.choice(range(Beta.shape[0]), Beta.shape[0],
-                                       replace=False)
+        # permutation = np.random.choice(range(Beta.shape[0]), Beta.shape[0],
+        #                                replace=False)
+        #
+        # counter = 0
+        # for i in permutation:
+        #
+        #     with tf.GradientTape() as t:
+        #         logZ, logZ1, logZ2 = self.network.logZ_Z1_Z2(Beta[i, :], Y[i, :])
+        #     self.network.generate_updates(logZ, logZ1, logZ2, t)
+        #
+        #     counter += 1
 
-        counter = 0
-        for i in permutation:
-            #w, m, v = self.network.output_probabilistic(Y[i, :])
-            #old_params = self.network.get_params()
-            with tf.GradientTape() as t:
-                logZ, logZ1, logZ2 = self.network.logZ_Z1_Z2(Beta[i, :], Y[i, :])
-            self.network.generate_updates(logZ, logZ1, logZ2, t)
-            # new_params = {}
-            # for param, update in updates:
-            #     # toso this will not probably update the params
-            #     new_params[param] =
-            # new_params['W_M'] = updates[0, 0] + updates[0, 1]
-            # new_params['W_V'] = updates[1, 0] + updates[1, 1]
-            # new_params['S_M'] = updates[2, 0] + updates[2, 1]
-            # new_params['S_V'] = updates[3, 0] + updates[3, 1]
-            #param = param + update
-            #Z = self.adf_update(Beta[i, :], Y[i, :])
-            #new_params = self.network.get_params()
-
-            #self.network.apply_updates(updates)
-            #todo check if updates were updated in previous procedure
-            #self.network.set_params(updates)
-
-            counter += 1
+        with tf.GradientTape() as t:
+            logZ, logZ1, logZ2 = self.network.logZ_Z1_Z2_minibatch(Beta, Y)
+        self.network.generate_updates_minibatch(logZ, logZ1, logZ2, t)
 
     def sample_ws(self):
 

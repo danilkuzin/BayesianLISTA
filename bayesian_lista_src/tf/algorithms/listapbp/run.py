@@ -16,19 +16,28 @@ if __name__=="__main__":
     learning_rate = 0.1
     initial_lambda = 0.2
 
+    num_epochs = 10
+    N = 100
+    batch_size=1
+
     tf.enable_eager_execution()
 
     data_generator = DataGenerator(D=D, K=K, sparsity=sparsity, beta_scale=beta_scale, noise_scale=noise_scale)
     handler = SingleBayesianListaHandler(D=D, K=K, L=L, X=data_generator.X.astype(np.float32), initial_lambda=initial_lambda)
 
-    num_epochs = 10
-    N = 100
+    beta_train, y_train, _ = data_generator.new_sample(N)
+
+    train_data = tf.data.Dataset.from_tensor_slices((beta_train, y_train)).shuffle(10).batch(batch_size=batch_size)
+
+
     beta, y, Noise = data_generator.new_sample(N)
     beta_valid, y_valid, _ = data_generator.new_sample(N)
     loss_hist, valid_loss_hist = [], []
-    t = trange(10, desc='ML')
-    for i in t:
-        handler.train(num_epochs=num_epochs, beta_train=beta.astype(np.float32), y_train=y.astype(np.float32))
+
+    t = trange(num_epochs)
+    for _ in t:
+        for i, (beta_batch, y_batch) in enumerate(train_data):
+            handler.train(num_epochs=num_epochs, beta_train=beta.astype(np.float32), y_train=y.astype(np.float32))
         prediction = handler.predict(y.astype(np.float32))
         loss = SingleBayesianListaHandler.loss(handler.predict(y.astype(np.float32)), beta)
         valid_loss = SingleBayesianListaHandler.loss(handler.predict(y_valid.astype(np.float32)), beta_valid)

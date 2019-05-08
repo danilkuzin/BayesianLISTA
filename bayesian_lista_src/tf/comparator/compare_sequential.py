@@ -1,5 +1,8 @@
+import tensorflow as tf
+
 import matplotlib.pyplot as plt
 import numpy as np
+import timeit
 
 from .recorder import FrequentistListaRecorder, SharedBayesianRecorder, IstaRecorder, FistaRecorder
 from ..algorithms.fista.handler import FistaHandler
@@ -9,7 +12,7 @@ from ..algorithms.listapbp.handler import SingleBayesianListaHandler
 
 
 class SequentialComparator(object):
-    def __init__(self, D, K, L, data, learning_rate, train_freq, train_shared_bayes, use_ista, use_fista,
+    def __init__(self, D, K, L, learning_rate, X, train_freq, train_shared_bayes, use_ista, use_fista,
                  save_history, initial_lambda):
 
         self.D = D
@@ -17,7 +20,7 @@ class SequentialComparator(object):
         self.L = L
 
         # self.data_generator = DataGenerator(D, K)
-        self.data = data
+        self.X = X
 
         self.train_freq = train_freq
         self.train_shared_bayes = train_shared_bayes
@@ -29,30 +32,33 @@ class SequentialComparator(object):
         self.recorders = {}
 
         if self.train_freq:
-            freq_lista = ListaHandler(D=D, K=K, L=L, X=self.data.X, learning_rate=learning_rate,
+            freq_lista = ListaHandler(D=D, K=K, L=L, X=self.X, learning_rate=learning_rate,
                                                  initial_lambda=initial_lambda)
             self.recorders['lista'] = FrequentistListaRecorder(handler=freq_lista, save_history=save_history,
                                                            name='freq lista')
 
         if self.train_shared_bayes:
-            shared_bayesian_lista = SingleBayesianListaHandler(D=D, K=K, L=L, X=self.data.X,
+            shared_bayesian_lista = SingleBayesianListaHandler(D=D, K=K, L=L, X=self.X,
                                                                initial_lambda=initial_lambda)
             self.recorders['shared_bayes'] = SharedBayesianRecorder(handler=shared_bayesian_lista,
                                                                     save_history=save_history,
                                                                     name='shared bayes lista')
 
         if self.use_ista:
-            ista = IstaHandler(D=D, K=K, L=L, X=self.data.X, initial_lambda=initial_lambda)
+            ista = IstaHandler(D=D, K=K, L=L, X=self.X, initial_lambda=initial_lambda)
             self.recorders['ista'] = IstaRecorder(handler=ista, name='ista')
 
         if self.use_fista:
-            fista = FistaHandler(D=D, K=K, L=L, X=self.data.X, initial_lambda=initial_lambda)
+            fista = FistaHandler(D=D, K=K, L=L, X=self.X, initial_lambda=initial_lambda)
             self.recorders['fista'] = FistaRecorder(handler=fista, name='fista')
 
-    def train_iteration(self):
+    def train_iteration(self, beta, y):
         for recorder_key in self.recorders.keys():
-            self.recorders[recorder_key].train_and_record(beta_train=self.data.beta_train, y_train=self.data.y_train,
-                                      beta_validation=self.data.beta_validation, y_validation=self.data.y_validation)
+            self.recorders[recorder_key].train(beta_train=beta, y_train=y)
+
+    def validate(self, beta, y):
+        for recorder_key in self.recorders.keys():
+            self.recorders[recorder_key].validate(beta_validation=beta, y_validation=y)
 
     def plot_quality_history(self):
 
