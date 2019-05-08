@@ -36,6 +36,6 @@ def load_long_experiment():
 
     rseed = 1
     n_iter = 1000
-    batch_size = 1000
+    batch_size = 5
     validation_size = 100
     return rseed, D, K, L, batch_size, validation_size, n_iter
