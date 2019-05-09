@@ -2,7 +2,7 @@ import numpy as np
 
 import tensorflow as tf
 
-from ..listapbp import tensor_network_layer
+from ..listapbp import network_layer
 from ..shared.soft_thresholding import soft_threshold
 
 
@@ -23,7 +23,7 @@ class Network:
         self.layers = []
 
         for layer in range(L):
-            self.layers.append(tensor_network_layer.Network_layer(thr_lambda_init))
+            self.layers.append(network_layer.Network_layer(thr_lambda_init))
 
         self.params_thr_lambda = []
 
@@ -58,32 +58,6 @@ class Network:
 
         w, m, v = self.output_probabilistic(y)
 
-        v_final = v + self.b / (self.a - 1) * tf.ones(self.D)
-        v_final1 = v + self.b / self.a * tf.ones(self.D)
-        v_final2 = v + self.b / (self.a + 1) * tf.ones(self.D)
-
-        mu_student = tf.zeros(self.D)
-        v_student = self.b / self.a * tf.ones(self.D)
-        v_student1 = self.b / (self.a + 1) * tf.ones(self.D)
-        v_student2 = self.b / (self.a + 2) * tf.ones(self.D)
-
-        nu_student = 2 * self.a * tf.ones(self.D)
-        nu_student1 = 2 * (self.a + 1) * tf.ones(self.D)
-        nu_student2 = 2 * (self.a + 2) * tf.ones(self.D)
-
-        logZ = tf.reduce_sum(tf.log(w * tensor_network_layer.student_pdf(beta, mu_student, v_student, nu_student)
-            + (1 - w) * tensor_network_layer.n_pdf(beta, m, v_final)))
-        logZ1 = tf.reduce_sum(tf.log(w * tensor_network_layer.student_pdf(beta, mu_student, v_student1, nu_student1)
-             + (1 - w) * tensor_network_layer.n_pdf(beta, m, v_final1)))
-        logZ2 = tf.reduce_sum(tf.log(w * tensor_network_layer.student_pdf(beta, mu_student, v_student2, nu_student2)
-             + (1 - w) * tensor_network_layer.n_pdf(beta, m, v_final2)))
-
-        return logZ, logZ1, logZ2
-
-    def logZ_Z1_Z2_minibatch(self, beta, y):
-
-        w, m, v = self.output_probabilistic(y)
-
         v_final = v + self.b / (self.a - 1) * tf.ones((y.shape[0], self.D))
         v_final1 = v + self.b / self.a * tf.ones((y.shape[0], self.D))
         v_final2 = v + self.b / (self.a + 1) * tf.ones((y.shape[0], self.D))
@@ -97,126 +71,73 @@ class Network:
         nu_student1 = 2 * (self.a + 1) * tf.ones((y.shape[0], self.D))
         nu_student2 = 2 * (self.a + 2) * tf.ones((y.shape[0], self.D))
 
-        logZ = tf.reduce_sum(tf.log(w * tensor_network_layer.student_pdf(beta, mu_student, v_student, nu_student)
-            + (1 - w) * tensor_network_layer.n_pdf(beta, m, v_final)))
-        logZ1 = tf.reduce_sum(tf.log(w * tensor_network_layer.student_pdf(beta, mu_student, v_student1, nu_student1)
-             + (1 - w) * tensor_network_layer.n_pdf(beta, m, v_final1)))
-        logZ2 = tf.reduce_sum(tf.log(w * tensor_network_layer.student_pdf(beta, mu_student, v_student2, nu_student2)
-             + (1 - w) * tensor_network_layer.n_pdf(beta, m, v_final2)))
+        logZ = tf.reduce_sum(tf.log(w * network_layer.student_pdf(beta, mu_student, v_student, nu_student)
+            + (1 - w) * network_layer.n_pdf(beta, m, v_final)))
+        logZ1 = tf.reduce_sum(tf.log(w * network_layer.student_pdf(beta, mu_student, v_student1, nu_student1)
+             + (1 - w) * network_layer.n_pdf(beta, m, v_final1)))
+        logZ2 = tf.reduce_sum(tf.log(w * network_layer.student_pdf(beta, mu_student, v_student2, nu_student2)
+             + (1 - w) * network_layer.n_pdf(beta, m, v_final2)))
 
         return logZ, logZ1, logZ2
+
 
     def generate_updates(self, logZ, logZ1, logZ2, t):
 
         grads = t.gradient(logZ, [self.params_W_M, self.params_W_V, self.params_S_M, self.params_S_V])
         grad_WM, grad_WV, grad_SM, grad_SV = grads[0], grads[1], grads[2], grads[3]
-        updated_WM = (self.params_W_M + self.params_W_V * grad_WM).numpy()
-        updated_WV = (self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV)).numpy()
-        updated_SM = (self.params_S_M + self.params_S_V * grad_SM).numpy()
-        updated_SV = (self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)).numpy()
+        # updated_WM = (self.params_W_M + self.params_W_V * grad_WM).numpy()
+        # updated_WV = (self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV)).numpy()
+        # updated_SM = (self.params_S_M + self.params_S_V * grad_SM).numpy()
+        # updated_SV = (self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)).numpy()
 
-        # index = tf.where(tf.logical_or(tf.logical_or(
-        #     tf.math.is_nan(updated_WM),
-        #     tf.math.is_nan(updated_WV)),
-        #     updated_WV <= 1e-100))
+        updated_WM = self.params_W_M + self.params_W_V * grad_WM
+        updated_WV = self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV)
+        updated_SM = self.params_S_M + self.params_S_V * grad_SM
+        updated_SV = self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)
+
+        index_w = tf.logical_or(tf.logical_or(
+            tf.math.is_nan(updated_WM),
+            tf.math.is_nan(updated_WV)),
+            tf.less_equal(updated_WV, 1e-100))
+
+        self.params_W_M.assign(tf.where(index_w, self.params_W_M, updated_WM))
+        self.params_W_V.assign(tf.where(index_w, self.params_W_V, updated_WV))
+
+        index_s = tf.logical_or(tf.logical_or(
+            tf.math.is_nan(updated_SM),
+            tf.math.is_nan(updated_SV)),
+            tf.less_equal(updated_SV, 1e-100))
+
+        self.params_S_M.assign(tf.where(index_s, self.params_S_M, updated_SM))
+        self.params_S_V.assign(tf.where(index_s, self.params_S_V, updated_SV))
+
+
+        # index1 = np.where(updated_WV <= 1e-100)
+        # index2 = np.where(np.logical_or(np.isnan(updated_WM),
+        #                                 np.isnan(updated_WV)))
         #
-        # if len(index) > 0:
-        #     print(f"index:{index}")
+        # index = [np.concatenate((index1[0], index2[0])),
+        #          np.concatenate((index1[1], index2[1]))]
+        #
+        # if len(index[0]) > 0:
         #     updated_WM[index] = self.params_W_M.numpy()[index]
         #     updated_WV[index] = self.params_W_V.numpy()[index]
         #
-        # index = tf.where(tf.logical_or(tf.logical_or(
-        #     tf.math.is_nan(updated_SM),
-        #     tf.math.is_nan(updated_SV)),
-        #     updated_SV <= 1e-100))
+        # index1 = np.where(updated_SV <= 1e-100)
+        # index2 = np.where(np.logical_or(np.isnan(updated_SM),
+        #                                 np.isnan(updated_SV)))
         #
-        # if len(index) > 0:
-        #     print(f"index:{index}")
+        # index = [np.concatenate((index1[0], index2[0])),
+        #          np.concatenate((index1[1], index2[1]))]
+        #
+        # if len(index[0]) > 0:
         #     updated_SM[index] = self.params_S_M.numpy()[index]
         #     updated_SV[index] = self.params_S_V.numpy()[index]
 
-        index1 = np.where(updated_WV <= 1e-100)
-        index2 = np.where(np.logical_or(np.isnan(updated_WM),
-                                        np.isnan(updated_WV)))
-
-        index = [np.concatenate((index1[0], index2[0])),
-                 np.concatenate((index1[1], index2[1]))]
-
-        if len(index[0]) > 0:
-            updated_WM[index] = self.params_W_M.numpy()[index]
-            updated_WV[index] = self.params_W_V.numpy()[index]
-
-        index1 = np.where(updated_SV <= 1e-100)
-        index2 = np.where(np.logical_or(np.isnan(updated_SM),
-                                        np.isnan(updated_SV)))
-
-        index = [np.concatenate((index1[0], index2[0])),
-                 np.concatenate((index1[1], index2[1]))]
-
-        if len(index[0]) > 0:
-            updated_SM[index] = self.params_S_M.numpy()[index]
-            updated_SV[index] = self.params_S_V.numpy()[index]
-
-        self.params_W_M.assign(updated_WM)
-        self.params_W_V.assign(updated_WV)
-        self.params_S_M.assign(updated_SM)
-        self.params_S_V.assign(updated_SV)
-
-    def generate_updates_minibatch(self, logZ, logZ1, logZ2, t):
-
-        grads = t.gradient(logZ, [self.params_W_M, self.params_W_V, self.params_S_M, self.params_S_V])
-        grad_WM, grad_WV, grad_SM, grad_SV = grads[0], grads[1], grads[2], grads[3]
-        updated_WM = (self.params_W_M + self.params_W_V * grad_WM).numpy()
-        updated_WV = (self.params_W_V - self.params_W_V ** 2 * (grad_WM ** 2 - 2 * grad_WV)).numpy()
-        updated_SM = (self.params_S_M + self.params_S_V * grad_SM).numpy()
-        updated_SV = (self.params_S_V - self.params_S_V ** 2 * (grad_SM ** 2 - 2 * grad_SV)).numpy()
-
-        # index = tf.where(tf.logical_or(tf.logical_or(
-        #     tf.math.is_nan(updated_WM),
-        #     tf.math.is_nan(updated_WV)),
-        #     updated_WV <= 1e-100))
-        #
-        # if len(index) > 0:
-        #     print(f"index:{index}")
-        #     updated_WM[index] = self.params_W_M.numpy()[index]
-        #     updated_WV[index] = self.params_W_V.numpy()[index]
-        #
-        # index = tf.where(tf.logical_or(tf.logical_or(
-        #     tf.math.is_nan(updated_SM),
-        #     tf.math.is_nan(updated_SV)),
-        #     updated_SV <= 1e-100))
-        #
-        # if len(index) > 0:
-        #     print(f"index:{index}")
-        #     updated_SM[index] = self.params_S_M.numpy()[index]
-        #     updated_SV[index] = self.params_S_V.numpy()[index]
-
-        index1 = np.where(updated_WV <= 1e-100)
-        index2 = np.where(np.logical_or(np.isnan(updated_WM),
-                                        np.isnan(updated_WV)))
-
-        index = [np.concatenate((index1[0], index2[0])),
-                 np.concatenate((index1[1], index2[1]))]
-
-        if len(index[0]) > 0:
-            updated_WM[index] = self.params_W_M.numpy()[index]
-            updated_WV[index] = self.params_W_V.numpy()[index]
-
-        index1 = np.where(updated_SV <= 1e-100)
-        index2 = np.where(np.logical_or(np.isnan(updated_SM),
-                                        np.isnan(updated_SV)))
-
-        index = [np.concatenate((index1[0], index2[0])),
-                 np.concatenate((index1[1], index2[1]))]
-
-        if len(index[0]) > 0:
-            updated_SM[index] = self.params_S_M.numpy()[index]
-            updated_SV[index] = self.params_S_V.numpy()[index]
-
-        self.params_W_M.assign(updated_WM)
-        self.params_W_V.assign(updated_WV)
-        self.params_S_M.assign(updated_SM)
-        self.params_S_V.assign(updated_SV)
+        # self.params_W_M.assign(updated_WM)
+        # self.params_W_V.assign(updated_WV)
+        # self.params_S_M.assign(updated_SM)
+        # self.params_S_V.assign(updated_SV)
 
     def generate_updates_full_learning(self, logZ, logZ1, logZ2):
 

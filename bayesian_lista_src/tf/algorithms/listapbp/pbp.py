@@ -74,8 +74,8 @@ class PBP_lista:
         #     counter += 1
 
         with tf.GradientTape() as t:
-            logZ, logZ1, logZ2 = self.network.logZ_Z1_Z2_minibatch(Beta, Y)
-        self.network.generate_updates_minibatch(logZ, logZ1, logZ2, t)
+            logZ, logZ1, logZ2 = self.network.logZ_Z1_Z2(Beta, Y)
+        self.network.generate_updates(logZ, logZ1, logZ2, t)
 
     def sample_ws(self):
 

@@ -24,10 +24,20 @@ def load_quick_experiment():
     L = 4
 
     rseed = 1
-    n_iter = 10
-    batch_size = 500
+    n_epochs = 50
     validation_size = 100
-    return rseed, D, K, L, batch_size, validation_size, n_iter
+
+    sparsity = 0.8
+    beta_scale = 1
+    noise_scale = 0.1
+    learning_rate = 0.1
+    initial_lambda = 0.2
+    batch_size = 25
+
+    n_train = 500
+    n_validation = 100
+
+    return rseed, D, K, L, batch_size, validation_size, n_epochs, sparsity, beta_scale, noise_scale, n_train, n_validation, learning_rate, initial_lambda
 
 def load_long_experiment():
     D = 100
@@ -35,7 +45,9 @@ def load_long_experiment():
     L = 4
 
     rseed = 1
-    n_iter = 1000
+    n_epochs = 1000
+    n_train = 1000
+    n_validation = 500
     batch_size = 5
     validation_size = 100
-    return rseed, D, K, L, batch_size, validation_size, n_iter
+    return rseed, D, K, L, batch_size, validation_size, n_epochs, n_train, n_validation

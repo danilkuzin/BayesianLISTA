@@ -22,15 +22,16 @@ class Network_layer:
         self.thr_lambda = thr_lambda
 
     def compute_B(self, y, W_M, W_V):
-        B_m = tf.tensordot(W_M, y, 1)
-        B_v = tf.tensordot(W_V, tf.pow(y, 2), 1)
+        B_m = tf.tensordot(y, W_M, [[1], [1]])
+        B_v = tf.tensordot(tf.pow(y, 2), W_V, [[1], [1]])
         return B_m, B_v
 
     def compute_D(self, z_w_prev, z_m_prev, z_v_prev, S_M, S_V):
         var_z_prev = (1 - z_w_prev) * z_v_prev + (1 - z_w_prev) * z_w_prev * (z_m_prev ** 2)
-        D_m = tf.tensordot(S_M, (1 - z_w_prev) * z_m_prev, 1)
-        D_v = tf.tensordot(tf.pow(S_M, 2), var_z_prev, 1) + tf.tensordot(S_V, ((1 - z_w_prev) ** 2) * (z_m_prev ** 2), 1) + \
-              tf.tensordot(S_V, var_z_prev, 1)
+        D_m = tf.tensordot((1 - z_w_prev) * z_m_prev, S_M, [[1], [1]])
+        D_v = tf.tensordot(var_z_prev, tf.pow(S_M, 2), [[1], [1]]) + \
+              tf.tensordot(((1 - z_w_prev) ** 2) * (z_m_prev ** 2), S_V, [[1], [1]]) + \
+              tf.tensordot(var_z_prev, S_V, [[1], [1]])
         return D_m, D_v
 
     def compute_C(self, B_m, B_v, D_m, D_v):
@@ -66,8 +67,8 @@ class Network_layer:
         return z_new_w, z_new_m, z_new_v
 
     def output_deterministic(self, output_previous, y, W, S):
-        B = tf.tensordot(W, y, 1)
-        D = tf.tensordot(S, output_previous, 1)
+        B = tf.tensordot(y, W, [[1], [1]])
+        D = tf.tensordot(output_previous, S, [[1], [1]])
         C = B + D
         out = soft_threshold(C, self.thr_lambda)
 
