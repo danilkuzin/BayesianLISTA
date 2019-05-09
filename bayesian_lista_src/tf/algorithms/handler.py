@@ -24,14 +24,14 @@ class Handler(object):
 
     @staticmethod
     def f_measure(beta_true, beta_estimator):
-        true_zero_loc = beta_true == 0
-        true_nonzero_loc = beta_true != 0
-        est_zero_loc = beta_estimator == 0
-        est_nonzero_loc = beta_estimator != 0
+        true_zero_loc = tf.equal(beta_true, 0)
+        true_nonzero_loc = tf.not_equal(beta_true, 0)
+        est_zero_loc = tf.equal(beta_estimator, 0)
+        est_nonzero_loc = tf.not_equal(beta_estimator, 0)
 
-        tp = np.sum(true_nonzero_loc * est_nonzero_loc)
-        fp = np.sum(true_zero_loc * est_nonzero_loc)
-        fn = np.sum(true_nonzero_loc * est_zero_loc)
+        tp = tf.count_nonzero(tf.equal(true_nonzero_loc, est_nonzero_loc))
+        fp = tf.count_nonzero(tf.equal(true_zero_loc, est_nonzero_loc))
+        fn = tf.count_nonzero(tf.equal(true_nonzero_loc, est_zero_loc))
 
         precision = tp / (tp + fp)
         recall = tp / (tp + fn)

@@ -3,7 +3,7 @@ import tensorflow as tf
 from tqdm import tqdm, trange
 
 from tf.comparator.compare_sequential import SequentialComparator
-from tf.data.synthetic.data_generator import DataGenerator, SyntheticData
+from tf.data.synthetic.data_generator import DataGenerator
 from tf.experiments.synthetic.experiments_parameters import load_long_experiment, load_quick_experiment
 
 import matplotlib.pyplot as plt
@@ -23,7 +23,7 @@ def run_single_experiment(rseed, D, K, L, batch_size, n_epochs):
     train_data = tf.data.Dataset.from_tensor_slices((beta_train, y_train)).shuffle(10).batch(batch_size=batch_size)
     dataset_valid = tf.data.Dataset.from_tensor_slices((beta_validation, y_validation))
 
-    comparator = SequentialComparator(D, K, L, learning_rate=0.0001, X=data_generator.X, train_freq=True,
+    comparator = SequentialComparator(D, K, L, learning_rate=0.1, X=data_generator.X, train_freq=True,
                                       train_shared_bayes=True, use_ista=True, use_fista=True, save_history=False,
                                       initial_lambda=0.1)
     for _ in trange(n_epochs):
