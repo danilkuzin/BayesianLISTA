@@ -1,0 +1,33 @@
+\begin{tikzpicture}
+
+  % Nodes
+
+  \node[obs] (yi)      {$\mathbf{y}_i$}; %
+  \node[latent, above=1cm of yi] (omegaj) {$\beta_{ki}$}; %
+  \node[latent, above=1cm of yi, xshift=1.5cm] (sigma) {$\sigma$}; %
+  \node[latent, above=1cm of omegaj, xshift=-1.5cm] (gammaj) {$z_{ki}$}; %
+  \node[const, above=1cm of gammaj] (pi0) {$\omega$}; %
+  \node[const, above=1cm of gammaj, xshift=1.5cm] (sigma2omega) {$\sigma^2_\beta$}; %
+  \node[const, above=1cm of sigma, xshift=-0.5cm] (asigma) {$a_{\sigma}$}; %
+  \node[const, above=1cm of sigma, xshift=0.5cm] (bsigma) {$b_{\sigma}$}; %
+
+ %Plates
+  \plate {platej} { %
+    (omegaj) %
+    (gammaj) %
+  } {$k=1,\ldots,P$}; %
+
+    \plate {platei} { %
+    (yi) %
+  } {$i=1,\ldots,N$}; %
+
+   % Edges
+   \edge[->] {omegaj} {yi} {}; %
+   \edge[->] {gammaj} {omegaj} {}; %
+   \edge[->] {pi0} {gammaj} {}; %
+   \edge[->] {sigma2omega} {omegaj} {}; %
+   \edge[->] {sigma} {yi} {}; %
+   \edge[->] {asigma} {sigma} {}; %
+   \edge[->] {bsigma} {sigma} {}; %
+
+\end{tikzpicture}
