@@ -337,9 +337,14 @@ Learn weights $\mathbf{W}, \mathbf{S}$ based on training data
 
 \subsection[Prediction]{Prediction}
   \begin{frame}{Uncertainty propagation: Initialisation}
-    %\innerblock{Idea}{
-      At every step the output of soft-thresholding can be closely approximated with the spike and slab distribution
-    % \begin{enumerate}
+     \begin{block}{Goal}
+    \begin{itemize}
+      \item[] Model intermediate latent variables with parametrised distributions
+      \item[] Apply approximate Bayesian inference methods
+    \end{itemize}
+  \end{block}
+%      The output of soft-thresholding can be approximated with the spike and slab distribution
+    
       \begin{columns}
         \begin{column}{0.33\textwidth}
       1. \(\mathbf{b} = \mathbf{W}\mathbf{y}\) is Gaussian-distributed
@@ -350,25 +355,23 @@ Learn weights $\mathbf{W}, \mathbf{S}$ based on training data
     \end{columns}
     \begin{columns}
       \begin{column}{0.33\textwidth}
-      2.\(\widehat{\boldsymbol\beta}_{0} = h_\lambda(\mathbf{b})\) is approximated with the spike and slab distribution
+      2. \(\widehat{\boldsymbol\beta}_{0} = h_\lambda(\mathbf{b})\) is approximated with the spike and slab distribution
     \end{column}
     \begin{column}{0.67\textwidth}
         \includegraphics[width=0.6\columnwidth]{graphics/spsl_propagation.pdf}
       \end{column}
     \end{columns}
+\end{frame}
+
+\begin{frame}{Uncertainty propagation: Iterations}
     \begin{columns}
       \begin{column}{0.33\textwidth}
-      3.\(\mathbf{e}_l = \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}\) is approximated with the Gaussian distribution
+      3. \(\mathbf{e}_l = \mathbf{S}\widehat{\boldsymbol\beta}_{l-1}\) is approximated with the Gaussian distribution
     \end{column}
     \begin{column}{0.67\textwidth}
         \includegraphics[width=0.6\columnwidth]{graphics/gauss_spsl.pdf}
       \end{column}
     \end{columns}
-\end{frame}
-
-\begin{frame}{Uncertainty propagation: Iterations}
-    %\innerblock{Idea}{
-    % \begin{enumerate}
     \begin{columns}
       \begin{column}{0.33\textwidth}
       4. \(\mathbf{c}_l = \mathbf{b} + \mathbf{e}_l\) is Gaussian-distributed
@@ -385,12 +388,22 @@ Learn weights $\mathbf{W}, \mathbf{S}$ based on training data
         \includegraphics[width=0.6\columnwidth]{graphics/spsl_propagation.pdf}
       \end{column}
     \end{columns}
-  \begin{block}{Advantages}
-    \begin{itemize}
-      \item[] {\color{blue}All latent variables are modelled with parametrised distributions}
-      \item[] {\color{blue}We can apply approximate Bayesian inference methods}
-    \end{itemize}
-  \end{block}
+\end{frame}
+
+\begin{frame}{Approximation quality}
+    \begin{columns}
+      \begin{column}{0.5\textwidth}
+       \centering
+       \includegraphics[width=\columnwidth]{graphics/d_testing}\\
+       Approximation of the \newline product of Gaussians
+      \end{column}
+            \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\columnwidth]{graphics/z_new_testing}\\
+      Approximation of the propagation through soft thresholding
+      \end{column}
+      \end{columns}
+
 \end{frame}
 
 \subsection[Inference]{Inference}
