@@ -25,26 +25,8 @@ beta_valid, y_valid, _ = data_generator.new_sample(n_validation)
 train_data = tf.data.Dataset.from_tensor_slices((beta_train, y_train)).shuffle(10).batch(batch_size=batch_size)
 
 loss_hist, valid_loss_hist, f_meas_hist, valid_f_meas_hist, times = [], [], [], [], []
-t = trange(n_epochs, desc='ML')
-for i in t:
-    start_time = time.process_time()
-    for i, (beta_batch, y_batch) in enumerate(train_data):
-        handler.train_iteration(beta_train=beta_batch, y_train=y_batch)
-    elapsed_time = time.process_time() - start_time
 
-    train_pred = handler.model(y_train.astype(np.float32))
-    valid_pred = handler.model(y_valid.astype(np.float32))
-    loss = ListaHandler.loss(train_pred, beta_train)
-    f_meas = ListaHandler.f_measure(beta_train, train_pred)
-    valid_loss = ListaHandler.loss(valid_pred, beta_valid)
-    valid_f_meas = ListaHandler.f_measure(beta_valid, valid_pred)
-    t.set_description(
-        f'ML (loss={loss.numpy():.3f}, valid_loss={valid_loss.numpy():.3f} f-meas:{f_meas:.3f} valid_f-meas:{valid_f_meas:.3f})')
-    loss_hist.append(loss.numpy())
-    valid_loss_hist.append(valid_loss.numpy())
-    f_meas_hist.append(f_meas)
-    valid_f_meas_hist.append(valid_f_meas)
-    times.append(elapsed_time)
+handler.train(n_epochs, train_data)
 
 plt.plot(loss_hist)
 plt.plot(valid_loss_hist)

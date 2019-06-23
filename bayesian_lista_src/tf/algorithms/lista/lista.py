@@ -17,6 +17,7 @@ class Lista:
         self.S = tf.Variable(initial_value=S_init, name='S')
 
         self.thr_lambda = tf.Variable(initial_value=self.initial_lambda, name='thr_lambda')
+        self.trainable_variables = [self.W, self.S, self.thr_lambda]
 
     def __call__(self, y):
         b = tf.matmul(y, tf.transpose(self.W))
